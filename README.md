@@ -25,4 +25,4 @@ React 19 · TypeScript · Vite 8 · Tailwind v4 · Firebase Firestore · pnpm wo
 
 ## Status
 
-Early scaffolding. See `DCI-Learning-Academy-Handoff-to-Claude-Code.md` for build brief and Week 1 scope.
+Early scaffolding — Week 1 of the fast-track build (portal + Cybersecurity module proof of concept).

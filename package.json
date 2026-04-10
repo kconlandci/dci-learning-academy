@@ -1,0 +1,27 @@
+{
+  "name": "dci-learning-academy",
+  "version": "0.0.0",
+  "private": true,
+  "description": "DCI Learning Academy — unified portal and lab modules for DCI students",
+  "packageManager": "pnpm@10.33.0",
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=10.0.0"
+  },
+  "scripts": {
+    "dev": "pnpm --filter @dci/portal dev",
+    "build": "pnpm -r --filter \"./apps/*\" build",
+    "lint": "pnpm -r lint",
+    "typecheck": "pnpm -r typecheck",
+    "rebrand": "tsx scripts/rebrand.ts"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.2",
+    "typescript": "~5.9.3"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  }
+}
