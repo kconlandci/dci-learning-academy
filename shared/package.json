@@ -1,0 +1,21 @@
+{
+  "name": "@dci/shared",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./ui": "./src/ui/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -b --noEmit"
+  },
+  "dependencies": {
+    "firebase": "^12.11.0",
+    "react": "^19.2.4"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.14",
+    "typescript": "~5.9.3"
+  }
+}
