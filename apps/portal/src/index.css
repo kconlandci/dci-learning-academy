@@ -1,0 +1,22 @@
+@import "tailwindcss";
+
+/*
+ * DCI Learning Academy — Placeholder Theme Tokens
+ * Real DCI brand palette (logo + colors) drops in once brand assets are provided.
+ * Using neutral slate + a warm accent as a temporary identity.
+ */
+@theme {
+  --color-dci-surface: #0f172a;
+  --color-dci-card: #1e293b;
+  --color-dci-accent: #f59e0b;
+  --color-dci-accent-glow: #fbbf24;
+  --color-dci-text: #e2e8f0;
+  --color-dci-muted: #64748b;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
