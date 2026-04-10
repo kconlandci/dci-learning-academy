@@ -1,0 +1,46 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build output
+dist/
+build/
+*.tsbuildinfo
+
+# Env / secrets
+.env
+.env.local
+.env.*.local
+*.firebase-config.local.*
+
+# Logs
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+logs/
+*.log
+
+# Editor / OS
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Vite
+.vite/
+
+# Turbo / cache
+.turbo/
+.cache/
+
+# Coverage
+coverage/
+*.lcov
+
+# Temporary
+tmp/
+temp/
