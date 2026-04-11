@@ -65,16 +65,47 @@ const TEXT_EXTENSIONS = new Set([
 // Safety guards
 // -------------------------------------------------------------------
 
-/** Refuse to run if the DCI repo has uncommitted changes. */
-function assertCleanWorkingTree(): void {
+/**
+ * Refuse to run if the DCI repo has uncommitted changes — except in paths
+ * that are expected to be dirty while iterating on a rebrand:
+ *   - apps/<slug>/         (about to be regenerated)
+ *   - scripts/rebrand.*    (the script you're actively debugging)
+ *   - pnpm-lock.yaml       (shifts around as rebrand devDeps land)
+ *
+ * The gate's purpose is protecting OTHER work from getting clobbered by a
+ * rebrand, not blocking iterative re-runs against the slug you're actively
+ * rebranding. Without this carve-out, a failed rebrand would make the next
+ * rebrand impossible without a manual `git clean`.
+ */
+function assertCleanWorkingTree(slug: string): void {
   try {
     const status = execSync("git status --porcelain", {
       cwd: REPO_ROOT,
       encoding: "utf8",
     });
-    if (status.trim().length > 0) {
-      console.error("[rebrand] FATAL: working tree is dirty. Commit or stash first.\n");
-      console.error(status);
+    const slugPrefix = `apps/${slug}/`;
+    const alwaysAllowedExact = new Set(["pnpm-lock.yaml"]);
+    const alwaysAllowedPrefixes = ["scripts/rebrand."];
+    const dirty = status
+      .split("\n")
+      .filter((line) => line.trim().length > 0)
+      .filter((line) => {
+        // Porcelain format: "XY path" (2 chars + space + path). Extract path.
+        const pathPart = line.slice(3);
+        // Rename entries: "R  old -> new" — check the NEW path
+        const renameIdx = pathPart.indexOf(" -> ");
+        const checkPath = renameIdx >= 0 ? pathPart.slice(renameIdx + 4) : pathPart;
+        if (checkPath.startsWith(slugPrefix)) return false;
+        if (alwaysAllowedExact.has(checkPath)) return false;
+        if (alwaysAllowedPrefixes.some((p) => checkPath.startsWith(p))) return false;
+        return true;
+      });
+    if (dirty.length > 0) {
+      console.error(
+        `[rebrand] FATAL: working tree has uncommitted changes outside apps/${slug}/:\n`,
+      );
+      console.error(dirty.join("\n"));
+      console.error("\nCommit or stash before rerunning.");
       process.exit(1);
     }
   } catch (err) {
@@ -289,8 +320,8 @@ async function main(): Promise<void> {
   console.log(`[rebrand] module: ${slug}`);
   console.log(`[rebrand] source repo: ${module.sourceRepoName}`);
 
-  // 1. Clean working tree gate
-  assertCleanWorkingTree();
+  // 1. Clean working tree gate (ignores changes under apps/<slug>/)
+  assertCleanWorkingTree(slug);
 
   // 2. Resolve paths
   const sourcePath = path.resolve(FORGE_LABS_ROOT, module.sourceRepoName);

@@ -46,13 +46,27 @@ export const MODULES: Record<string, ModuleRebrand> = {
     sourceRepoName: "ThreatForge",
     destSlug: "cybersecurity",
     textReplacements: [
-      // Brand name — display form. Order matters: longer/more-specific first.
+      // Identifier form FIRST — must run before the display-form replacement
+      // below, because "ThreatForgeProgress" would otherwise become
+      // "DCI Cybersecurity LabsProgress" (space inside identifier = syntax error).
+      // The lookahead matches only when followed by a word character, so
+      // standalone `ThreatForge` still hits the next rule.
+      { pattern: /ThreatForge(?=[A-Za-z0-9_])/g, replacement: "DciCybersecurity" },
+      // Brand name — display form.
       { pattern: /ThreatForge/g, replacement: "DCI Cybersecurity Labs" },
       { pattern: /threatforge/g, replacement: "dci-cybersecurity" },
       { pattern: /THREATFORGE/g, replacement: "DCI_CYBERSECURITY" },
       // "Forge Labs" → "DCI Learning Academy" (catches store copy, headings)
       { pattern: /Forge Labs Pro/g, replacement: "DCI Learning Academy" },
       { pattern: /Forge Labs/g, replacement: "DCI Learning Academy" },
+      // Redirect Capacitor imports to a local web-only shim. Importers live
+      // in src/hooks/ and src/screens/ (depth 2), so ../capacitor-shim
+      // resolves for both. If a future module imports Capacitor from a
+      // different depth, add a per-file replacement instead of widening this.
+      {
+        pattern: /from ["']@capacitor\/(app|preferences|dialog|browser)["']/g,
+        replacement: 'from "../capacitor-shim"',
+      },
     ],
     deletions: [
       // Mobile shell + build artifacts
@@ -73,9 +87,10 @@ export const MODULES: Record<string, ModuleRebrand> = {
       // App icon + mobile-only assets
       "icon.png",
       "public/icon-512.png",
-      // Consumer monetization source (nothing imports these after stubs reroute)
+      // Consumer monetization source (nothing imports these after stubs reroute).
+      // usePurchase.ts is NOT deleted — SettingsScreen imports it, so it's
+      // stubbed below with a no-op that keeps the interface.
       "src/config/revenuecat.ts",
-      "src/hooks/usePurchase.ts",
       "src/screens/UpgradeScreen.tsx",
       // Founders Pack UI (if present as standalone)
       "**/FoundersPack*",
@@ -115,6 +130,98 @@ export async function setPremiumStatus(_isPremium: boolean): Promise<void> {
 }
 `,
 
+      "src/hooks/usePurchase.ts": `// Stubbed by scripts/rebrand.ts — no monetization in the DCI classroom build.
+// Kept so SettingsScreen imports still resolve; the restore button is dead code.
+
+export type PurchaseError = "cancelled" | "already_owned" | "network" | "unknown";
+
+interface PurchaseResult {
+  success: boolean;
+  error?: PurchaseError;
+}
+
+interface UsePurchase {
+  purchase: (productId: string, isSubscription?: boolean) => Promise<PurchaseResult>;
+  restore: () => Promise<PurchaseResult>;
+  isPurchasing: boolean;
+  isRestoring: boolean;
+}
+
+export function usePurchase(): UsePurchase {
+  return {
+    purchase: async () => ({ success: false, error: "unknown" }),
+    restore: async () => ({ success: false, error: "unknown" }),
+    isPurchasing: false,
+    isRestoring: false,
+  };
+}
+`,
+
+      // Verbatim re-implementation of the original ErrorBoundary with `override`
+      // modifiers added. DCI's tsconfig.base has `noImplicitOverride: true`, which
+      // the ThreatForge tsconfig did not, so the inherited methods fail to compile
+      // without this annotation. Stubbing is cheaper than a surgical regex.
+      "src/components/ErrorBoundary.tsx": `import { Component, type ReactNode, type ErrorInfo } from "react";
+
+interface Props {
+  children: ReactNode;
+  fallback?: ReactNode;
+  onError?: (error: Error, errorInfo: ErrorInfo) => void;
+}
+
+interface State {
+  hasError: boolean;
+  error: Error | null;
+}
+
+export default class ErrorBoundary extends Component<Props, State> {
+  constructor(props: Props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error: Error): State {
+    return { hasError: true, error };
+  }
+
+  override componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error("[DCI Cybersecurity Labs] Lab error:", error, errorInfo);
+    this.props.onError?.(error, errorInfo);
+  }
+
+  override render() {
+    if (this.state.hasError) {
+      if (this.props.fallback) return this.props.fallback;
+
+      return (
+        <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6">
+          <div className="text-center max-w-sm">
+            <div className="w-16 h-16 rounded-2xl bg-red-500/15 flex items-center justify-center mx-auto mb-4">
+              <span className="text-3xl">\u26A0\uFE0F</span>
+            </div>
+            <h2 className="text-lg font-bold text-white mb-2">
+              This lab encountered an issue
+            </h2>
+            <p className="text-sm text-slate-400 mb-6">
+              Something went wrong loading this lab. This has been logged and
+              we'll look into it.
+            </p>
+            <a
+              href="/"
+              className="inline-block px-6 py-3 rounded-xl bg-orange-500 text-white font-semibold text-sm min-h-[48px] leading-[48px]"
+            >
+              Back to Home
+            </a>
+          </div>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+`,
+
       "src/hooks/useAppReview.ts": `// Stubbed by scripts/rebrand.ts — no native review prompt in the classroom web build.
 
 export function useAppReview() {
@@ -134,6 +241,27 @@ export function useAndroidBackButton(): void {
       "src/hooks/useAnalytics.ts": `// Stubbed by scripts/rebrand.ts — analytics removed for DCI classroom build.
 // Keeps the same exports so consumers don't need edits.
 
+interface LabsPerDayBucket {
+  date: string;
+  count: number;
+}
+
+interface TopLab {
+  labId: string;
+  count: number;
+}
+
+interface AnalyticsSummary {
+  totalSessions: number;
+  avgSessionSeconds: number;
+  labsStarted: number;
+  labsCompleted: number;
+  completionRate: number;
+  avgScore: number;
+  labsPerDay: LabsPerDayBucket[];
+  topLabs: TopLab[];
+}
+
 export function trackAppOpened(): void {}
 export function trackSessionEnd(): void {}
 export function trackAppResumed(): void {}
@@ -145,6 +273,31 @@ export function trackLabCompleted(
 ): void {}
 export function trackHintUsed(_labId: string, _scenarioIndex: number): void {}
 export function trackPathStarted(_pathId: string): void {}
+
+export function getAnalyticsSummary(): AnalyticsSummary {
+  // Build 14 empty day buckets ending today so the chart still renders.
+  const days: LabsPerDayBucket[] = [];
+  const now = new Date();
+  for (let i = 13; i >= 0; i--) {
+    const d = new Date(now);
+    d.setDate(now.getDate() - i);
+    days.push({ date: d.toISOString().slice(0, 10), count: 0 });
+  }
+  return {
+    totalSessions: 0,
+    avgSessionSeconds: 0,
+    labsStarted: 0,
+    labsCompleted: 0,
+    completionRate: 0,
+    avgScore: 0,
+    labsPerDay: days,
+    topLabs: [],
+  };
+}
+
+export function clearAnalytics(): void {
+  // no-op
+}
 
 export function useAnalytics() {
   return {
@@ -270,6 +423,99 @@ export default function App() {
     </ErrorBoundary>
   );
 }
+`,
+
+      // Web-only shim for the handful of @capacitor/* modules ThreatForge
+      // imports. Imports get rewritten by textReplacements to point here.
+      "src/capacitor-shim.ts": `// Stubbed by scripts/rebrand.ts — web fallbacks for the @capacitor/* modules
+// used by the rebranded source (App, Preferences, Dialog, Browser).
+//
+// The handful of files that used these plugins (useProgress, SettingsScreen,
+// AnalyticsScreen) have their import paths rewritten to this shim so their
+// call sites keep working without edits. Semantics:
+//
+//   - Preferences → localStorage (same key-value shape)
+//   - Dialog.confirm → window.confirm (returns { value })
+//   - Browser.open → window.open
+//   - App.addListener("pause", cb) → visibilitychange + beforeunload, which
+//     cover the same "user backgrounded the tab" signal in a browser.
+
+interface ListenerHandle {
+  remove: () => void;
+}
+
+type AppEvent = "pause" | "resume" | "backButton";
+
+type AppListener = (...args: unknown[]) => void;
+
+function addAppListener(event: AppEvent, callback: AppListener): Promise<ListenerHandle> {
+  if (event === "pause") {
+    const visHandler = () => {
+      if (document.visibilityState === "hidden") callback();
+    };
+    const unloadHandler = () => callback();
+    document.addEventListener("visibilitychange", visHandler);
+    window.addEventListener("beforeunload", unloadHandler);
+    return Promise.resolve({
+      remove: () => {
+        document.removeEventListener("visibilitychange", visHandler);
+        window.removeEventListener("beforeunload", unloadHandler);
+      },
+    });
+  }
+  if (event === "resume") {
+    const visHandler = () => {
+      if (document.visibilityState === "visible") callback();
+    };
+    document.addEventListener("visibilitychange", visHandler);
+    return Promise.resolve({
+      remove: () => document.removeEventListener("visibilitychange", visHandler),
+    });
+  }
+  // Unknown events — no-op handle
+  return Promise.resolve({ remove: () => {} });
+}
+
+export const App = {
+  addListener: addAppListener,
+  exitApp: () => {},
+};
+
+export const Preferences = {
+  async get({ key }: { key: string }): Promise<{ value: string | null }> {
+    return { value: typeof localStorage !== "undefined" ? localStorage.getItem(key) : null };
+  },
+  async set({ key, value }: { key: string; value: string }): Promise<void> {
+    if (typeof localStorage !== "undefined") localStorage.setItem(key, value);
+  },
+  async remove({ key }: { key: string }): Promise<void> {
+    if (typeof localStorage !== "undefined") localStorage.removeItem(key);
+  },
+};
+
+interface ConfirmOptions {
+  title?: string;
+  message: string;
+  okButtonTitle?: string;
+  cancelButtonTitle?: string;
+}
+
+export const Dialog = {
+  async confirm({ message }: ConfirmOptions): Promise<{ value: boolean }> {
+    const value = typeof window !== "undefined" ? window.confirm(message) : false;
+    return { value };
+  },
+  async alert({ message }: { title?: string; message: string }): Promise<void> {
+    if (typeof window !== "undefined") window.alert(message);
+  },
+};
+
+export const Browser = {
+  async open({ url }: { url: string }): Promise<void> {
+    if (typeof window !== "undefined") window.open(url, "_blank", "noopener,noreferrer");
+  },
+  async close(): Promise<void> {},
+};
 `,
 
       "src/main.tsx": `import { StrictMode } from "react";
