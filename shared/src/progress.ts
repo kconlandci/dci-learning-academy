@@ -3,8 +3,13 @@
  *
  * Schema:
  *   config/access                         { code }
- *   students/{studentId}                  { displayName, createdAt }
+ *   students/{studentId}                  { displayName, normalizedDisplayName, createdAt }
  *   students/{studentId}/progress/{labId} { module, labId, completedAt }
+ *
+ * `displayName` is the raw string the student typed (e.g. "Kevin C."),
+ * shown verbatim in the UI. `normalizedDisplayName` is the canonical form
+ * used to derive studentId and exists on the doc to support cheap identity
+ * checks and backfills.
  *
  * No cohorts, no term semantics — DCI uses rolling admissions and flat
  * progress tracking. The instructor view reads students/ as a single flat
@@ -21,9 +26,11 @@ import {
   type Timestamp,
 } from "firebase/firestore";
 import { getDb } from "./firebase";
+import { normalizeDisplayName } from "./studentId";
 
 export interface StudentDoc {
   displayName: string;
+  normalizedDisplayName: string;
   createdAt: Timestamp;
 }
 
@@ -43,22 +50,29 @@ export interface StudentProgress {
 /**
  * Result of ensureStudentDoc.
  *
- * - `created`: no doc existed, a new one was created with displayName.
- * - `existing`: a doc already existed with the same displayName; no write.
- * - `collision`: a doc already existed with a DIFFERENT displayName at this
- *   studentId hash. Caller should prompt the student to pick a different
- *   name (add a last initial, etc.).
+ * - `created`: no doc existed, a new one was created.
+ * - `existing`: a doc already existed at this studentId; returned verbatim.
+ *
+ * There is no `collision` case: if the hash matches an existing doc, the
+ * student IS that doc's owner by definition. The hash is derived from the
+ * normalized display name, so "Kevin C." and "Kevin C" (same person on two
+ * devices) land on the same hash and are treated as the same identity.
+ *
+ * This does mean two real humans who pick identical normalized names will
+ * silently share a record. That's unavoidable without adding a second
+ * identity factor (real auth, device fingerprint, etc.) and is mitigated at
+ * the classroom level — instructors ask students to pick distinct names.
  */
 export type EnsureStudentResult =
   | { kind: "created"; displayName: string }
-  | { kind: "existing"; displayName: string }
-  | { kind: "collision"; existingDisplayName: string };
+  | { kind: "existing"; displayName: string };
 
 /**
  * Create or reconcile a students/{studentId} doc.
  *
- * Called once per session after the student enters their display name.
- * Returns a discriminated result so the caller can route collision UX.
+ * Called once per session after the student enters their display name. If
+ * an existing doc predates the normalizedDisplayName field, this function
+ * backfills it as a side effect.
  */
 export async function ensureStudentDoc(
   studentId: string,
@@ -67,20 +81,26 @@ export async function ensureStudentDoc(
   const db = getDb();
   const ref = doc(db, "students", studentId);
   const snap = await getDoc(ref);
+  const normalized = normalizeDisplayName(displayName);
 
   if (!snap.exists()) {
     await setDoc(ref, {
       displayName,
+      normalizedDisplayName: normalized,
       createdAt: serverTimestamp(),
     });
     return { kind: "created", displayName };
   }
 
-  const existing = snap.data() as StudentDoc;
-  if (existing.displayName === displayName) {
-    return { kind: "existing", displayName: existing.displayName };
+  const existing = snap.data() as Partial<StudentDoc>;
+  // Backfill normalizedDisplayName for pre-fix docs written before this
+  // field existed. Safe to overwrite: by construction, `normalized` matches
+  // whatever the original doc would have computed — they hashed to the
+  // same studentId, so they normalize to the same string.
+  if (!existing.normalizedDisplayName) {
+    await setDoc(ref, { normalizedDisplayName: normalized }, { merge: true });
   }
-  return { kind: "collision", existingDisplayName: existing.displayName };
+  return { kind: "existing", displayName: existing.displayName ?? displayName };
 }
 
 /**
