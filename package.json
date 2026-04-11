@@ -11,6 +11,7 @@
   "scripts": {
     "dev": "pnpm --filter @dci/portal dev",
     "build": "pnpm -r --filter \"./apps/*\" build",
+    "smoke": "pnpm build && node scripts/smoke-serve.mjs",
     "lint": "pnpm -r lint",
     "typecheck": "pnpm -r typecheck",
     "rebrand": "tsx scripts/rebrand.ts",

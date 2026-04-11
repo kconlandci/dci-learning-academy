@@ -6,6 +6,7 @@ node_modules/
 dist/
 build/
 *.tsbuildinfo
+.test-deploy/
 
 # Env / secrets
 .env
@@ -29,6 +30,9 @@ logs/
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Claude Code (local agent scaffolding — don't ship to team)
+.claude/
 
 # Vite
 .vite/
