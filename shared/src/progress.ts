@@ -106,8 +106,14 @@ export async function ensureStudentDoc(
 /**
  * Record a single lab completion.
  *
- * Idempotent: re-completing a lab overwrites the timestamp with the latest.
- * Document ID is `${module}:${labId}` so it's stable and human-readable.
+ * Idempotent on re-completion: the write is merged, so `completedAt` gets
+ * refreshed to the latest server timestamp while any other fields on the
+ * doc are preserved. This matters for forward-compatibility — if we later
+ * add fields like `firstCompletedAt`, `attempts`, or `bestScore`, a retake
+ * won't nuke them.
+ *
+ * Document ID is `${module}:${labId}` so it's stable, human-readable, and
+ * lets the instructor dashboard key off a predictable shape.
  */
 export async function recordLabCompletion(
   studentId: string,
@@ -116,11 +122,15 @@ export async function recordLabCompletion(
 ): Promise<void> {
   const db = getDb();
   const ref = doc(db, "students", studentId, "progress", `${module}:${labId}`);
-  await setDoc(ref, {
-    module,
-    labId,
-    completedAt: serverTimestamp(),
-  });
+  await setDoc(
+    ref,
+    {
+      module,
+      labId,
+      completedAt: serverTimestamp(),
+    },
+    { merge: true },
+  );
 }
 
 /** Fetch all lab completions for a single student. */

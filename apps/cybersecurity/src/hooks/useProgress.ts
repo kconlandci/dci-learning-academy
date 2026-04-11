@@ -6,6 +6,7 @@
 // ============================================================
 
 import { useState, useCallback, useEffect, useRef } from "react";
+import { recordLabCompletion as recordToFirestore } from "@dci/shared";
 import { App as CapApp } from "../capacitor-shim";
 import { Preferences } from "../capacitor-shim";
 import { getLocalDateString } from "../utils/localDate";
@@ -315,6 +316,42 @@ export function useProgress(userId?: string | null) {
 
         saveProgress(next);
         mirrorToPreferences(next);
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        // DCI PHASE B — Mirror completion to Firestore for instructor view.
+        //
+        // The local write above is the source of truth for the student's own
+        // UX (streaks, XP, per-lab records). This extra write fans the same
+        // event out to DCI's Firestore so `getAllStudentsProgress()` in
+        // @dci/shared can power the instructor dashboard.
+        //
+        // Fire-and-forget: we don't await it and we don't block the local
+        // state update on its success. Firestore being down or rules being
+        // misconfigured must never prevent a student from seeing their own
+        // completion land.
+        //
+        // studentId is read directly from localStorage (key set by the
+        // portal's Gate on sign-in) rather than recomputed from the session,
+        // to keep this module decoupled from identity derivation.
+        //
+        // Fires every retake by design — the dashboard's "Last activity"
+        // column uses completedAt as the freshness signal.
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        const dciStudentId =
+          typeof localStorage !== "undefined"
+            ? localStorage.getItem("dci:student-id")
+            : null;
+        if (dciStudentId) {
+          recordToFirestore(dciStudentId, "cybersecurity", labId).catch(
+            (err) => {
+              console.warn(
+                "[DCI] Failed to record lab completion to Firestore:",
+                err,
+              );
+            },
+          );
+        }
+
         return next;
       });
     },

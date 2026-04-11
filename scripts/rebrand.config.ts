@@ -67,6 +67,14 @@ export const MODULES: Record<string, ModuleRebrand> = {
         pattern: /from ["']@capacitor\/(app|preferences|dialog|browser)["']/g,
         replacement: 'from "../capacitor-shim"',
       },
+      // Phase B: .gitignore must not swallow .env.example (upstream ignore
+      // rule `.env.*` catches it otherwise). Append an un-ignore exception.
+      // Idempotent because the replacement result no longer matches the
+      // original pattern — a second rebrand pass is a no-op.
+      {
+        pattern: /^\.env\.\*\r?\n(?!!\.env\.example)/m,
+        replacement: ".env.*\n!.env.example\n",
+      },
     ],
     deletions: [
       // Mobile shell + build artifacts
@@ -520,17 +528,96 @@ export const Browser = {
 
       "src/main.tsx": `import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import { loadSession } from "@dci/shared";
+import "./firebase-init";
 import "./index.css";
 import App from "./App";
 
-const root = document.getElementById("root");
-if (!root) throw new Error("Root element not found");
+// Derive the portal root from Vite's BASE_URL. In dev this is "/"; in prod
+// under GitHub Pages the cybersecurity app is served at
+// "/dci-learning-academy/cybersecurity/", so stripping the trailing module
+// segment lands us at the portal root "/dci-learning-academy/".
+const PORTAL_ROOT =
+  import.meta.env.BASE_URL.replace(/\\/cybersecurity\\/?$/, "/") || "/";
 
-createRoot(root).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-);
+if (!loadSession()) {
+  // Student hit the cybersecurity app without going through the portal gate.
+  // Bounce them to the portal so they sign in, then come back here.
+  window.location.replace(PORTAL_ROOT);
+} else {
+  const root = document.getElementById("root");
+  if (!root) throw new Error("Root element not found");
+
+  createRoot(root).render(
+    <StrictMode>
+      <App />
+    </StrictMode>,
+  );
+}
+`,
+
+      "src/firebase-init.ts": `/**
+ * Cybersecurity-side Firebase bootstrap.
+ *
+ * Reads the Firebase Web config from Vite env vars (VITE_FIREBASE_*) at
+ * build time and calls initFirebase() from @dci/shared once. Imported by
+ * main.tsx before React mounts, so any shared/* module that calls getDb()
+ * after that point is safe.
+ */
+
+import { initFirebase } from "@dci/shared";
+
+const env = import.meta.env;
+
+function required(key: keyof ImportMetaEnv): string {
+  const value = env[key];
+  if (typeof value !== "string" || value.length === 0) {
+    throw new Error(
+      \`Missing required env var \${key}. Copy apps/cybersecurity/.env.example to apps/cybersecurity/.env and fill in the Firebase console values.\`,
+    );
+  }
+  return value;
+}
+
+initFirebase({
+  apiKey: required("VITE_FIREBASE_API_KEY"),
+  authDomain: required("VITE_FIREBASE_AUTH_DOMAIN"),
+  projectId: required("VITE_FIREBASE_PROJECT_ID"),
+  storageBucket: required("VITE_FIREBASE_STORAGE_BUCKET"),
+  messagingSenderId: required("VITE_FIREBASE_MESSAGING_SENDER_ID"),
+  appId: required("VITE_FIREBASE_APP_ID"),
+});
+`,
+
+      "src/vite-env.d.ts": `/// <reference types="vite/client" />
+
+interface ImportMetaEnv {
+  readonly VITE_FIREBASE_API_KEY: string;
+  readonly VITE_FIREBASE_AUTH_DOMAIN: string;
+  readonly VITE_FIREBASE_PROJECT_ID: string;
+  readonly VITE_FIREBASE_STORAGE_BUCKET: string;
+  readonly VITE_FIREBASE_MESSAGING_SENDER_ID: string;
+  readonly VITE_FIREBASE_APP_ID: string;
+}
+
+interface ImportMeta {
+  readonly env: ImportMetaEnv;
+}
+`,
+
+      ".env.example": `# Firebase Web SDK config — copy to .env and fill in from the Firebase console.
+# These values are safe to ship in the client bundle; Firestore access is
+# enforced by security rules, not by hiding this config. They live in env
+# vars for tidiness and to make rotation cleaner.
+#
+# Project: dci-learning-academy
+# Where to find: Firebase console \u2192 Project settings \u2192 Your apps \u2192 SDK setup
+VITE_FIREBASE_API_KEY=
+VITE_FIREBASE_AUTH_DOMAIN=
+VITE_FIREBASE_PROJECT_ID=
+VITE_FIREBASE_STORAGE_BUCKET=
+VITE_FIREBASE_MESSAGING_SENDER_ID=
+VITE_FIREBASE_APP_ID=
 `,
 
       "package.json": `{
@@ -545,6 +632,7 @@ createRoot(root).render(
     "typecheck": "tsc -b --noEmit"
   },
   "dependencies": {
+    "@dci/shared": "workspace:*",
     "firebase": "^12.11.0",
     "lucide-react": "^0.577.0",
     "react": "^19.2.4",

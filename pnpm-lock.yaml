@@ -23,6 +23,9 @@ importers:
 
   apps/cybersecurity:
     dependencies:
+      '@dci/shared':
+        specifier: workspace:*
+        version: link:../../shared
       firebase:
         specifier: ^12.11.0
         version: 12.12.0
