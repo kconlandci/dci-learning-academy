@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "rebrandScriptVersion": "1.0.0",
+  "module": {
+    "slug": "cybersecurity",
+    "sourceRepoName": "ThreatForge"
+  },
+  "source": {
+    "path": "C:\\Users\\conla\\OneDrive\\Desktop\\Forge Labs\\ThreatForge",
+    "gitCommit": "4e20eb9c9a934cc46878dc51b29382c21288d4ad",
+    "gitBranch": "main"
+  },
+  "rebrandedAt": "2026-04-11T11:16:40.020Z"
+}
