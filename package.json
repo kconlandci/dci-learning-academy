@@ -16,6 +16,8 @@
     "rebrand": "tsx scripts/rebrand.ts"
   },
   "devDependencies": {
+    "@types/node": "^24.12.0",
+    "fast-glob": "^3.3.2",
     "tsx": "^4.19.2",
     "typescript": "~5.9.3"
   },
