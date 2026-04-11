@@ -18,6 +18,7 @@ import { getDb } from "./firebase";
 const LS_ACCESS_CODE = "dci:access-code";
 const LS_DISPLAY_NAME = "dci:display-name";
 const LS_STUDENT_ID = "dci:student-id";
+const LS_INSTRUCTOR = "dci:instructor";
 
 export interface Session {
   accessCode: string;
@@ -26,6 +27,10 @@ export interface Session {
 }
 
 interface AccessConfig {
+  code: string;
+}
+
+interface InstructorConfig {
   code: string;
 }
 
@@ -71,4 +76,45 @@ export function clearSession(): void {
   localStorage.removeItem(LS_ACCESS_CODE);
   localStorage.removeItem(LS_DISPLAY_NAME);
   localStorage.removeItem(LS_STUDENT_ID);
+}
+
+// -------------------------------------------------------------------
+// Instructor session
+// -------------------------------------------------------------------
+//
+// Instructor auth is parallel to student auth but simpler: single code,
+// boolean session flag, no student record. The code lives at
+// `config/instructor { code }` so rotation is a one-field edit in the
+// Firebase console, same as the student access code.
+
+/**
+ * Check whether a candidate instructor code matches the one in Firestore.
+ *
+ * Case-insensitive and whitespace-insensitive, like validateAccessCode.
+ */
+export async function validateInstructorCode(candidate: string): Promise<boolean> {
+  const db = getDb();
+  const snap = await getDoc(doc(db, "config", "instructor"));
+  if (!snap.exists()) {
+    throw new Error(
+      "Instructor config missing. Seed config/instructor in Firestore.",
+    );
+  }
+  const config = snap.data() as InstructorConfig;
+  return normalizeCode(candidate) === normalizeCode(config.code);
+}
+
+/** Mark the current browser as an instructor session. */
+export function saveInstructorSession(): void {
+  localStorage.setItem(LS_INSTRUCTOR, "true");
+}
+
+/** Returns true if this browser has an active instructor session. */
+export function loadInstructorSession(): boolean {
+  return localStorage.getItem(LS_INSTRUCTOR) === "true";
+}
+
+/** Clear the instructor session flag. */
+export function clearInstructorSession(): void {
+  localStorage.removeItem(LS_INSTRUCTOR);
 }

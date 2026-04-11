@@ -1,17 +1,58 @@
-import { MODULES } from "@dci/shared";
+import { useCallback, useState } from "react";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import {
+  clearInstructorSession,
+  clearSession,
+  loadInstructorSession,
+  loadSession,
+  type Session,
+} from "@dci/shared";
+import { Gate } from "./components/Gate";
+import { Landing } from "./components/Landing";
+import { InstructorGate } from "./components/InstructorGate";
+import { InstructorDashboard } from "./components/InstructorDashboard";
+import { NotFound } from "./components/NotFound";
+
+// BrowserRouter needs the Vite base URL without its trailing slash.
+// In dev this resolves to "" (root); in production to "/dci-learning-academy".
+const BASENAME = import.meta.env.BASE_URL.replace(/\/$/, "") || "/";
 
 export default function App() {
   return (
-    <main className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center p-8">
-      <div className="max-w-xl text-center space-y-4">
-        <h1 className="text-4xl font-bold tracking-tight">DCI Learning Academy</h1>
-        <p className="text-slate-400">
-          Portal scaffold. Access gate, module tiles, and instructor view wired in later steps.
-        </p>
-        <p className="text-xs text-slate-600">
-          {MODULES.length} modules registered
-        </p>
-      </div>
-    </main>
+    <BrowserRouter basename={BASENAME}>
+      <Routes>
+        <Route path="/" element={<StudentHome />} />
+        <Route path="/instructor" element={<InstructorHome />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </BrowserRouter>
   );
+}
+
+function StudentHome() {
+  const [session, setSession] = useState<Session | null>(() => loadSession());
+
+  const handleSignOut = useCallback(() => {
+    clearSession();
+    setSession(null);
+  }, []);
+
+  if (!session) {
+    return <Gate onAuthed={setSession} />;
+  }
+  return <Landing session={session} onSignOut={handleSignOut} />;
+}
+
+function InstructorHome() {
+  const [authed, setAuthed] = useState<boolean>(() => loadInstructorSession());
+
+  const handleSignOut = useCallback(() => {
+    clearInstructorSession();
+    setAuthed(false);
+  }, []);
+
+  if (!authed) {
+    return <InstructorGate onAuthed={() => setAuthed(true)} />;
+  }
+  return <InstructorDashboard onSignOut={handleSignOut} />;
 }

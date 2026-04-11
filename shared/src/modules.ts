@@ -15,6 +15,10 @@ export interface DciModule {
   tagline: string;
   /** Forge Labs source repo name (used by the rebrand script) */
   sourceRepo: string;
+  /** Total lab count — instructor dashboard denominator. */
+  labCount: number;
+  /** True once the module has been rebranded and wired into the portal. */
+  available: boolean;
 }
 
 export const MODULES: readonly DciModule[] = [
@@ -23,36 +27,48 @@ export const MODULES: readonly DciModule[] = [
     name: "DCI Cybersecurity Labs",
     tagline: "Hands-on cybersecurity fundamentals and threat analysis",
     sourceRepo: "ThreatForge",
+    labCount: 100,
+    available: true,
   },
   {
     slug: "programming",
     name: "DCI Programming Labs",
     tagline: "Software development foundations with real coding exercises",
     sourceRepo: "CodeForge",
+    labCount: 100,
+    available: false,
   },
   {
     slug: "data-analytics",
     name: "DCI Data Analytics Labs",
     tagline: "Data exploration, analysis, and visualization practice",
     sourceRepo: "DataForge",
+    labCount: 100,
+    available: false,
   },
   {
     slug: "cloud-computing",
     name: "DCI Cloud Computing Labs",
     tagline: "Cloud platform fundamentals and infrastructure basics",
     sourceRepo: "CloudForge",
+    labCount: 100,
+    available: false,
   },
   {
     slug: "networking",
     name: "DCI Networking Labs",
     tagline: "Network concepts, protocols, and troubleshooting skills",
     sourceRepo: "NetForge",
+    labCount: 100,
+    available: false,
   },
   {
     slug: "it-support",
     name: "DCI IT Support Labs",
     tagline: "Help desk skills and IT support fundamentals",
     sourceRepo: "TechForge",
+    labCount: 100,
+    available: false,
   },
 ] as const;
 

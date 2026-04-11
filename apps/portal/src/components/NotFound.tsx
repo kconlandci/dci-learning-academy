@@ -1,0 +1,21 @@
+import { Link } from "react-router-dom";
+
+export function NotFound() {
+  return (
+    <main className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center p-8">
+      <div className="max-w-md text-center space-y-4">
+        <p className="text-xs uppercase tracking-widest text-amber-400">404</p>
+        <h1 className="text-3xl font-bold tracking-tight">Page not found</h1>
+        <p className="text-sm text-slate-400">
+          That link doesn&rsquo;t go anywhere we recognize.
+        </p>
+        <Link
+          to="/"
+          className="inline-block mt-4 text-sm text-amber-400 hover:text-amber-300 underline underline-offset-4"
+        >
+          Back to the portal
+        </Link>
+      </div>
+    </main>
+  );
+}

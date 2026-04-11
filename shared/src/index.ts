@@ -7,6 +7,10 @@ export {
   saveSession,
   loadSession,
   clearSession,
+  validateInstructorCode,
+  saveInstructorSession,
+  loadInstructorSession,
+  clearInstructorSession,
   type Session,
 } from "./auth";
 

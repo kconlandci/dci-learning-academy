@@ -1,0 +1,34 @@
+rules_version = '2';
+
+// DCI Learning Academy — Firestore security rules.
+//
+// MVP security model: no Firebase Auth. Student identity is derived from a
+// SHA-256 hash of (accessCode + ':' + normalizedDisplayName). Without the
+// access code an attacker cannot construct a valid students/{studentId}
+// path, so open read/write on that subtree is acceptable for the MVP.
+//
+// Revisit when/if we add real auth (Firebase Anonymous Auth at minimum).
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Config lives at config/access and config/instructor.
+    // Clients can only `get` these two specific docs (used by the gates);
+    // they cannot `list` the collection or write to it.
+    match /config/{docId} {
+      allow get: if docId in ['access', 'instructor'];
+      allow list, write: if false;
+    }
+
+    // Student docs and their progress subcollection.
+    // Open read/write, gated in practice by the secrecy of the access code
+    // (which is required to derive the studentId path).
+    match /students/{studentId} {
+      allow read, write: if true;
+
+      match /progress/{progressId} {
+        allow read, write: if true;
+      }
+    }
+  }
+}
