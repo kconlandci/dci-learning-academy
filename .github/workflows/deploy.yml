@@ -55,23 +55,23 @@ jobs:
 
       - name: Assemble Pages artifact
         run: |
-          mkdir -p _site/dci-learning-academy
+          mkdir -p _site
 
-          # Portal → site root
-          cp -r apps/portal/dist/* _site/dci-learning-academy/
+          # Portal → artifact root (GitHub Pages adds /dci-learning-academy/
+          # prefix automatically for project sites)
+          cp -r apps/portal/dist/* _site/
 
-          # Each non-portal app → /dci-learning-academy/<name>/
+          # Each non-portal app → /<name>/
           for app_dir in apps/*/; do
             app_name=$(basename "$app_dir")
             [ "$app_name" = "portal" ] && continue
             [ -d "$app_dir/dist" ] || continue
-            mkdir -p "_site/dci-learning-academy/$app_name"
-            cp -r "$app_dir/dist/"* "_site/dci-learning-academy/$app_name/"
+            mkdir -p "_site/$app_name"
+            cp -r "$app_dir/dist/"* "_site/$app_name/"
           done
 
           # SPA deep-link support: GitHub Pages serves 404.html when a path
-          # has no matching file. By placing a copy of the portal's index.html
-          # at the Pages root, React Router still boots and resolves the
+          # has no matching file. React Router boots and resolves the
           # client-side route (e.g. /dci-learning-academy/instructor).
           # The portal's built HTML references assets via absolute paths
           # (/dci-learning-academy/assets/...) so it works from any URL.
