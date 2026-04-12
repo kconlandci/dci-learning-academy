@@ -1,9 +1,12 @@
 import { useState, type FormEvent } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   computeStudentId,
   ensureStudentDoc,
+  saveInstructorSession,
   saveSession,
   validateAccessCode,
+  validateInstructorCode,
   type Session,
 } from "@dci/shared";
 import { Button } from "@dci/shared/ui";
@@ -32,6 +35,7 @@ function errorMessage(err: GateError): string {
 }
 
 export function Gate({ onAuthed }: GateProps) {
+  const navigate = useNavigate();
   const [accessCode, setAccessCode] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [busy, setBusy] = useState(false);
@@ -56,6 +60,16 @@ export function Gate({ onAuthed }: GateProps) {
     try {
       const codeOk = await validateAccessCode(trimmedCode);
       if (!codeOk) {
+        // Not a student code — check if it's the instructor code.
+        // If it matches, save the instructor session and redirect
+        // to /instructor so the dashboard loads without a second prompt.
+        const isInstructor = await validateInstructorCode(trimmedCode);
+        if (isInstructor) {
+          saveInstructorSession();
+          navigate("/instructor", { replace: true });
+          return;
+        }
+
         setError({ kind: "bad-code" });
         return;
       }
