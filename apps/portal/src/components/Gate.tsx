@@ -97,7 +97,7 @@ export function Gate({ onAuthed }: GateProps) {
       <div className="w-full max-w-md space-y-8">
         <header className="text-center space-y-4">
           <img
-            src={`${import.meta.env.BASE_URL}logo-wide.png.png`}
+            src={`${import.meta.env.BASE_URL}logo-wide.png`}
             alt="DCI Learning Academy"
             className="mx-auto h-14 w-auto"
           />

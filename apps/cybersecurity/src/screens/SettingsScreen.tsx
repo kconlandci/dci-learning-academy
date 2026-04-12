@@ -86,7 +86,7 @@ export default function SettingsScreen() {
         {/* App Info */}
         <div className="text-center mb-8">
           <img
-            src={`${import.meta.env.BASE_URL}logo-mark.png.png`}
+            src={`${import.meta.env.BASE_URL}logo-mark.png`}
             alt="DCI Cybersecurity Labs"
             className="w-14 h-14 rounded-2xl mx-auto mb-3"
           />
