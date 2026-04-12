@@ -81,7 +81,7 @@ export default function SettingsScreen() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 p-4 pb-24">
+    <div className="min-h-screen bg-white p-4 pb-24">
       <div className="max-w-lg mx-auto pt-6">
         {/* App Info */}
         <div className="text-center mb-8">
@@ -90,12 +90,12 @@ export default function SettingsScreen() {
             alt="DCI Cybersecurity Labs"
             className="w-14 h-14 rounded-2xl mx-auto mb-3"
           />
-          <h1 className="text-xl font-bold text-white">DCI Cybersecurity Labs</h1>
-          <p className="text-xs text-slate-400 mt-1">
+          <h1 className="text-xl font-bold text-[#1A1A1A]">DCI Cybersecurity Labs</h1>
+          <p className="text-xs text-gray-500 mt-1">
             Cyber Judgment Training
           </p>
-          <p className="text-[10px] text-slate-500 mt-1">v1.1.0</p>
-          <p className="text-xs text-slate-400 mt-3 max-w-xs mx-auto leading-relaxed">
+          <p className="text-[10px] text-gray-400 mt-1">v1.1.0</p>
+          <p className="text-xs text-gray-500 mt-3 max-w-xs mx-auto leading-relaxed">
             Practice real-world cybersecurity judgment through interactive
             workplace simulations.
           </p>
@@ -103,47 +103,47 @@ export default function SettingsScreen() {
 
         {/* Premium */}
         <section className="mb-6">
-          <h2 className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide mb-2 px-1">
+          <h2 className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-2 px-1">
             Premium
           </h2>
           <div className="space-y-1">
             <Link
               to="/upgrade"
-              className="flex items-center justify-between bg-slate-800 rounded-xl p-4 min-h-[48px] active:bg-slate-700 transition-colors"
+              className="flex items-center justify-between bg-[#F5F5F5] rounded-xl p-4 min-h-[48px] active:bg-gray-200 transition-colors"
             >
               <div className="flex items-center gap-3">
-                <Crown size={18} className="text-orange-400" />
-                <span className="text-sm font-medium text-white">
+                <Crown size={18} className="text-[#2A7F6F]" />
+                <span className="text-sm font-medium text-[#1A1A1A]">
                   {isPremium ? "DCI Cybersecurity Labs Pro (Active)" : "Upgrade to Pro"}
                 </span>
               </div>
-              <ChevronRight size={18} className="text-slate-500" />
+              <ChevronRight size={18} className="text-gray-400" />
             </Link>
             {!isPremium && (
               <button
                 onClick={handleRestore}
                 disabled={isRestoring}
-                className="flex items-center gap-3 w-full bg-slate-800 rounded-xl p-4 min-h-[48px] active:bg-slate-700 transition-colors text-left disabled:opacity-60"
+                className="flex items-center gap-3 w-full bg-[#F5F5F5] rounded-xl p-4 min-h-[48px] active:bg-gray-200 transition-colors text-left disabled:opacity-60"
               >
                 {isRestoring ? (
-                  <Loader2 size={16} className="text-slate-400 animate-spin" />
+                  <Loader2 size={16} className="text-gray-400 animate-spin" />
                 ) : (
-                  <RotateCcw size={16} className="text-slate-400" />
+                  <RotateCcw size={16} className="text-gray-400" />
                 )}
-                <span className="text-sm font-medium text-white">
+                <span className="text-sm font-medium text-[#1A1A1A]">
                   {isRestoring ? "Restoring..." : "Restore Purchases"}
                 </span>
               </button>
             )}
             {restoreMsg && (
-              <p className="text-xs text-slate-400 px-4 py-1">{restoreMsg}</p>
+              <p className="text-xs text-gray-500 px-4 py-1">{restoreMsg}</p>
             )}
           </div>
         </section>
 
         {/* Data */}
         <section className="mb-6">
-          <h2 className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide mb-2 px-1">
+          <h2 className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-2 px-1">
             Data
           </h2>
           <div className="space-y-1">
@@ -157,7 +157,7 @@ export default function SettingsScreen() {
 
         {/* Legal */}
         <section className="mb-6">
-          <h2 className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide mb-2 px-1">
+          <h2 className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-2 px-1">
             Legal
           </h2>
           <div className="space-y-1">
@@ -181,13 +181,13 @@ export default function SettingsScreen() {
 
         {/* Actions */}
         <section>
-          <h2 className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide mb-2 px-1">
+          <h2 className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-2 px-1">
             Actions
           </h2>
           <div className="space-y-1">
             <button
               onClick={handleResetProgress}
-              className="flex items-center gap-3 w-full bg-slate-800 rounded-xl p-4 min-h-[48px] active:bg-slate-700 transition-colors text-left"
+              className="flex items-center gap-3 w-full bg-[#F5F5F5] rounded-xl p-4 min-h-[48px] active:bg-gray-200 transition-colors text-left"
             >
               <Trash2 size={16} className="text-red-400" />
               <span className="text-sm font-medium text-red-400">
@@ -196,19 +196,19 @@ export default function SettingsScreen() {
             </button>
             <button
               onClick={handleSendFeedback}
-              className="flex items-center gap-3 w-full bg-slate-800 rounded-xl p-4 min-h-[48px] active:bg-slate-700 transition-colors text-left"
+              className="flex items-center gap-3 w-full bg-[#F5F5F5] rounded-xl p-4 min-h-[48px] active:bg-gray-200 transition-colors text-left"
             >
-              <Mail size={16} className="text-slate-400" />
-              <span className="text-sm font-medium text-white">
+              <Mail size={16} className="text-gray-400" />
+              <span className="text-sm font-medium text-[#1A1A1A]">
                 Send Feedback
               </span>
             </button>
             <button
               onClick={handleRateApp}
-              className="flex items-center gap-3 w-full bg-slate-800 rounded-xl p-4 min-h-[48px] active:bg-slate-700 transition-colors text-left"
+              className="flex items-center gap-3 w-full bg-[#F5F5F5] rounded-xl p-4 min-h-[48px] active:bg-gray-200 transition-colors text-left"
             >
-              <Star size={16} className="text-orange-400" />
-              <span className="text-sm font-medium text-white">
+              <Star size={16} className="text-[#2A7F6F]" />
+              <span className="text-sm font-medium text-[#1A1A1A]">
                 Rate This App
               </span>
             </button>
@@ -231,13 +231,13 @@ function SettingsRow({
   return (
     <Link
       to={to}
-      className="flex items-center justify-between bg-slate-800 rounded-xl p-4 min-h-[48px] active:bg-slate-700 transition-colors"
+      className="flex items-center justify-between bg-[#F5F5F5] rounded-xl p-4 min-h-[48px] active:bg-gray-200 transition-colors"
     >
       <div className="flex items-center gap-3">
-        <span className="text-slate-400">{icon}</span>
-        <span className="text-sm font-medium text-white">{label}</span>
+        <span className="text-gray-400">{icon}</span>
+        <span className="text-sm font-medium text-[#1A1A1A]">{label}</span>
       </div>
-      <ChevronRight size={18} className="text-slate-500" />
+      <ChevronRight size={18} className="text-gray-400" />
     </Link>
   );
 }

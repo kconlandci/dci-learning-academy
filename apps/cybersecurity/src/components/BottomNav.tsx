@@ -16,7 +16,7 @@ export default function BottomNav() {
   const location = useLocation();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-slate-950 border-t border-slate-800" style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}>
+    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200" style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}>
       <div className="max-w-lg mx-auto flex">
         {tabs.map((tab) => {
           const isActive =
@@ -30,7 +30,7 @@ export default function BottomNav() {
               to={tab.path}
               aria-label={tab.label}
               className={`flex-1 flex flex-col items-center justify-center min-h-[48px] py-2 transition-colors ${
-                isActive ? "text-orange-400" : "text-slate-500"
+                isActive ? "text-[#2A7F6F]" : "text-gray-400"
               }`}
             >
               <Icon size={20} />

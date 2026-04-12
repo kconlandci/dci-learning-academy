@@ -26,17 +26,17 @@ function ValidateButton({ manifest }: { manifest: LabManifest }) {
     <div className="inline-flex items-center gap-2">
       <button
         onClick={validate}
-        className="px-3 py-1.5 rounded bg-slate-700 text-slate-200 text-xs font-medium hover:bg-slate-600 transition-colors"
+        className="px-3 py-1.5 rounded bg-gray-200 text-gray-700 text-xs font-medium hover:bg-gray-300 transition-colors"
       >
         Validate
       </button>
       {result !== null && (
-        <span className={`text-xs font-mono ${result.ok ? "text-green-400" : "text-red-400"}`}>
+        <span className={`text-xs font-mono ${result.ok ? "text-green-600" : "text-red-500"}`}>
           {result.ok ? "PASS" : "FAIL"}
         </span>
       )}
       {result && !result.ok && (
-        <pre className="text-[10px] text-red-300 max-w-xs truncate">{result.error}</pre>
+        <pre className="text-[10px] text-red-400 max-w-xs truncate">{result.error}</pre>
       )}
     </div>
   );
@@ -63,32 +63,32 @@ export default function DevScreen() {
   const allRenderers: RendererType[] = ["action-rationale", "toggle-config", "investigate-decide", "triage-remediate"];
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-200 p-4 pb-24">
+    <div className="min-h-screen bg-white text-gray-700 p-4 pb-24">
       <div className="max-w-3xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-lg font-bold text-white">DCI Cybersecurity Labs Dev Preview</h1>
-            <p className="text-xs text-slate-400">{labCatalog.length} manifests loaded</p>
+            <h1 className="text-lg font-bold text-[#1A1A1A]">DCI Cybersecurity Labs Dev Preview</h1>
+            <p className="text-xs text-gray-500">{labCatalog.length} manifests loaded</p>
           </div>
-          <Link to="/" className="text-xs text-orange-400 hover:underline">
+          <Link to="/" className="text-xs text-[#2A7F6F] hover:underline">
             Home
           </Link>
         </div>
 
         {/* Coverage Report */}
-        <div className="bg-slate-900 border border-slate-800 rounded-lg p-4 mb-6 space-y-4">
-          <h2 className="text-sm font-semibold text-white">Content Coverage</h2>
+        <div className="bg-[#F5F5F5] border border-gray-200 rounded-lg p-4 mb-6 space-y-4">
+          <h2 className="text-sm font-semibold text-[#1A1A1A]">Content Coverage</h2>
 
           <div>
-            <h3 className="text-[10px] font-bold text-slate-500 uppercase mb-1">By Renderer ({totalScenarios} total scenarios)</h3>
+            <h3 className="text-[10px] font-bold text-gray-400 uppercase mb-1">By Renderer ({totalScenarios} total scenarios)</h3>
             <div className="flex flex-wrap gap-2">
               {allRenderers.map((r) => (
                 <span
                   key={r}
                   className={`px-2 py-1 rounded text-xs font-mono ${
                     (rendererCounts[r] || 0) < 2
-                      ? "bg-yellow-900/30 text-yellow-400 border border-yellow-500/30"
-                      : "bg-slate-800 text-slate-300"
+                      ? "bg-yellow-100 text-yellow-700 border border-yellow-300"
+                      : "bg-white text-gray-600"
                   }`}
                 >
                   {r}: {rendererCounts[r] || 0}
@@ -98,10 +98,10 @@ export default function DevScreen() {
           </div>
 
           <div>
-            <h3 className="text-[10px] font-bold text-slate-500 uppercase mb-1">By Difficulty</h3>
+            <h3 className="text-[10px] font-bold text-gray-400 uppercase mb-1">By Difficulty</h3>
             <div className="flex flex-wrap gap-2">
               {Object.entries(difficultyCounts).map(([k, v]) => (
-                <span key={k} className="px-2 py-1 rounded text-xs font-mono bg-slate-800 text-slate-300">
+                <span key={k} className="px-2 py-1 rounded text-xs font-mono bg-white text-gray-600">
                   {k}: {v}
                 </span>
               ))}
@@ -109,10 +109,10 @@ export default function DevScreen() {
           </div>
 
           <div>
-            <h3 className="text-[10px] font-bold text-slate-500 uppercase mb-1">By Track</h3>
+            <h3 className="text-[10px] font-bold text-gray-400 uppercase mb-1">By Track</h3>
             <div className="flex flex-wrap gap-2">
               {Object.entries(trackCounts).map(([k, v]) => (
-                <span key={k} className="px-2 py-1 rounded text-xs font-mono bg-slate-800 text-slate-300">
+                <span key={k} className="px-2 py-1 rounded text-xs font-mono bg-white text-gray-600">
                   {k}: {v}
                 </span>
               ))}
@@ -120,10 +120,10 @@ export default function DevScreen() {
           </div>
 
           <div>
-            <h3 className="text-[10px] font-bold text-slate-500 uppercase mb-1">By Access Level</h3>
+            <h3 className="text-[10px] font-bold text-gray-400 uppercase mb-1">By Access Level</h3>
             <div className="flex flex-wrap gap-2">
               {Object.entries(accessCounts).map(([k, v]) => (
-                <span key={k} className="px-2 py-1 rounded text-xs font-mono bg-slate-800 text-slate-300">
+                <span key={k} className="px-2 py-1 rounded text-xs font-mono bg-white text-gray-600">
                   {k}: {v}
                 </span>
               ))}
@@ -132,60 +132,60 @@ export default function DevScreen() {
         </div>
 
         {/* Progress Inspector */}
-        <div className="bg-slate-900 border border-slate-800 rounded-lg p-4 mb-6 space-y-3">
+        <div className="bg-[#F5F5F5] border border-gray-200 rounded-lg p-4 mb-6 space-y-3">
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-white">Progress Inspector</h2>
+            <h2 className="text-sm font-semibold text-[#1A1A1A]">Progress Inspector</h2>
             <button
               onClick={resetProgress}
-              className="px-3 py-1.5 rounded bg-red-900/30 text-red-400 text-xs font-medium hover:bg-red-900/50 transition-colors border border-red-500/30"
+              className="px-3 py-1.5 rounded bg-red-50 text-red-500 text-xs font-medium hover:bg-red-100 transition-colors border border-red-200"
             >
               Reset Progress
             </button>
           </div>
-          <div className="flex gap-4 text-xs text-slate-400">
+          <div className="flex gap-4 text-xs text-gray-500">
             <span>XP: {progress.xp}</span>
             <span>Streak: {progress.streakDays}d</span>
             <span>Completed: {getTotalCompleted()}</span>
           </div>
-          <pre className="text-[10px] text-slate-400 bg-slate-950 rounded p-3 overflow-auto max-h-48 font-mono">
+          <pre className="text-[10px] text-gray-300 bg-[#1E293B] rounded p-3 overflow-auto max-h-48 font-mono">
             {JSON.stringify(progress, null, 2)}
           </pre>
         </div>
 
         {/* Lab Manifests */}
-        <h2 className="text-sm font-semibold text-white mb-3">Lab Manifests</h2>
+        <h2 className="text-sm font-semibold text-[#1A1A1A] mb-3">Lab Manifests</h2>
         <div className="space-y-3">
           {labCatalog.map((lab) => (
             <div
               key={lab.id}
-              className="bg-slate-900 border border-slate-800 rounded-lg p-4 space-y-2"
+              className="bg-[#F5F5F5] border border-gray-200 rounded-lg p-4 space-y-2"
             >
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <h2 className="text-sm font-semibold text-white">{lab.title}</h2>
+                  <h2 className="text-sm font-semibold text-[#1A1A1A]">{lab.title}</h2>
                   <div className="flex flex-wrap gap-2 mt-1 text-[10px] font-mono">
-                    <span className="px-1.5 py-0.5 rounded bg-slate-800 text-slate-400">
+                    <span className="px-1.5 py-0.5 rounded bg-white text-gray-500">
                       {lab.tier}
                     </span>
-                    <span className="px-1.5 py-0.5 rounded bg-slate-800 text-slate-400">
+                    <span className="px-1.5 py-0.5 rounded bg-white text-gray-500">
                       {lab.track}
                     </span>
-                    <span className="px-1.5 py-0.5 rounded bg-slate-800 text-orange-300">
+                    <span className="px-1.5 py-0.5 rounded bg-white text-[#2A7F6F]">
                       {lab.rendererType}
                     </span>
                     <span
                       className={`px-1.5 py-0.5 rounded ${
                         lab.status === "published"
-                          ? "bg-green-900/30 text-green-400"
-                          : "bg-yellow-900/30 text-yellow-400"
+                          ? "bg-green-50 text-green-600"
+                          : "bg-yellow-50 text-yellow-600"
                       }`}
                     >
                       {lab.status}
                     </span>
-                    <span className="px-1.5 py-0.5 rounded bg-slate-800 text-slate-400">
+                    <span className="px-1.5 py-0.5 rounded bg-white text-gray-500">
                       {lab.scenarios.length} scenarios
                     </span>
-                    <span className="px-1.5 py-0.5 rounded bg-slate-800 text-slate-400">
+                    <span className="px-1.5 py-0.5 rounded bg-white text-gray-500">
                       {lab.accessLevel}
                     </span>
                   </div>

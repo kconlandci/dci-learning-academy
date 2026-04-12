@@ -34,7 +34,7 @@ const screens: OnboardingScreen[] = [
     body: "Practice real cybersecurity judgment in short, interactive scenarios.",
     icon: (
       <div className="mb-4">
-        <img src={`${import.meta.env.BASE_URL}logo-mark.png.png`} alt="DCI Cybersecurity Labs" className="w-20 h-20 rounded-2xl" />
+        <img src={`${import.meta.env.BASE_URL}logo-wide.png.png`} alt="DCI Cybersecurity Labs" className="h-14" />
       </div>
     ),
   },
@@ -43,16 +43,16 @@ const screens: OnboardingScreen[] = [
     body: "Read the scenario. Make your call. Get instant expert feedback.",
     icon: (
       <div className="flex items-center gap-4 mb-4">
-        <div className="w-14 h-14 rounded-xl bg-slate-800 flex items-center justify-center">
-          <Eye className="text-slate-300" size={24} />
+        <div className="w-14 h-14 rounded-xl bg-[#F5F5F5] flex items-center justify-center">
+          <Eye className="text-gray-600" size={24} />
         </div>
-        <div className="text-slate-500 text-lg">→</div>
-        <div className="w-14 h-14 rounded-xl bg-slate-800 flex items-center justify-center">
-          <Hand className="text-orange-400" size={24} />
+        <div className="text-gray-400 text-lg">&rarr;</div>
+        <div className="w-14 h-14 rounded-xl bg-[#F5F5F5] flex items-center justify-center">
+          <Hand className="text-[#2A7F6F]" size={24} />
         </div>
-        <div className="text-slate-500 text-lg">→</div>
-        <div className="w-14 h-14 rounded-xl bg-slate-800 flex items-center justify-center">
-          <CheckCircle className="text-green-400" size={24} />
+        <div className="text-gray-400 text-lg">&rarr;</div>
+        <div className="w-14 h-14 rounded-xl bg-[#F5F5F5] flex items-center justify-center">
+          <CheckCircle className="text-green-500" size={24} />
         </div>
       </div>
     ),
@@ -78,12 +78,12 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
   const screen = screens[page];
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950 flex flex-col items-center justify-center p-6">
+    <div className="fixed inset-0 z-50 bg-white flex flex-col items-center justify-center p-6">
       {/* Skip — only on non-consent screens */}
       {!screen.requiresConsent && (
         <button
           onClick={finish}
-          className="absolute top-4 right-4 text-xs text-slate-500 min-h-[48px] min-w-[48px] flex items-center justify-center"
+          className="absolute top-4 right-4 text-xs text-gray-400 min-h-[48px] min-w-[48px] flex items-center justify-center"
         >
           Skip
         </button>
@@ -92,8 +92,8 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
       {/* Content */}
       <div className="flex flex-col items-center text-center max-w-sm">
         {screen.icon}
-        <h1 className="text-2xl font-bold text-white mb-3">{screen.title}</h1>
-        <p className="text-sm text-slate-400 leading-relaxed mb-8">
+        <h1 className="text-2xl font-bold text-[#1A1A1A] mb-3">{screen.title}</h1>
+        <p className="text-sm text-gray-500 leading-relaxed mb-8">
           {screen.body}
         </p>
       </div>
@@ -105,9 +105,9 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
             type="checkbox"
             checked={consentChecked}
             onChange={(e) => setConsentChecked(e.target.checked)}
-            className="w-5 h-5 rounded accent-orange-500 shrink-0"
+            className="w-5 h-5 rounded accent-[#2A7F6F] shrink-0"
           />
-          <span className="text-xs text-slate-400 text-left">
+          <span className="text-xs text-gray-500 text-left">
             I understand this app is for educational purposes only
           </span>
         </label>
@@ -119,7 +119,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
           <div
             key={i}
             className={`w-2 h-2 rounded-full transition-colors ${
-              i === page ? "bg-orange-400" : "bg-slate-700"
+              i === page ? "bg-[#2A7F6F]" : "bg-gray-300"
             }`}
           />
         ))}
@@ -132,7 +132,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
           disabled={screen.requiresConsent && !consentChecked}
           className={`w-full max-w-xs py-4 rounded-xl font-semibold text-base transition-colors min-h-[48px] ${
             screen.requiresConsent && !consentChecked
-              ? "bg-slate-700 text-slate-500 cursor-not-allowed"
+              ? "bg-gray-200 text-gray-400 cursor-not-allowed"
               : "bg-orange-500 hover:bg-orange-600 text-white"
           }`}
         >
@@ -141,7 +141,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
       ) : (
         <button
           onClick={() => setPage((p) => p + 1)}
-          className="w-full max-w-xs py-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-semibold text-base transition-colors min-h-[48px]"
+          className="w-full max-w-xs py-4 rounded-xl bg-[#F5F5F5] hover:bg-gray-200 text-[#1A1A1A] font-semibold text-base transition-colors min-h-[48px]"
         >
           Next
         </button>

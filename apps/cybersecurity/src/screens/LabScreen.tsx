@@ -45,9 +45,9 @@ export default function LabScreen() {
 
   if (!manifest) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-white flex items-center justify-center p-4">
         <div className="text-center">
-          <p className="text-slate-400 mb-4">Lab not found.</p>
+          <p className="text-gray-500 mb-4">Lab not found.</p>
           <button
             onClick={() => navigate("/")}
             className="px-4 py-2 rounded-xl bg-orange-500 text-white font-medium"
@@ -62,8 +62,8 @@ export default function LabScreen() {
   // Wait for premium status to resolve before gating
   if (manifest.accessLevel === "premium" && isPremiumLoading) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
-        <p className="text-slate-400 text-sm">Loading...</p>
+      <div className="min-h-screen bg-white flex items-center justify-center p-4">
+        <p className="text-gray-500 text-sm">Loading...</p>
       </div>
     );
   }
@@ -71,11 +71,11 @@ export default function LabScreen() {
   // Premium gate: redirect non-premium users trying to access premium labs
   if (manifest.accessLevel === "premium" && !isPremium) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-white flex items-center justify-center p-4">
         <div className="text-center">
-          <Lock size={32} className="text-slate-500 mx-auto mb-3" />
-          <p className="text-sm font-medium text-white mb-1">Premium Lab</p>
-          <p className="text-xs text-slate-400 mb-4">
+          <Lock size={32} className="text-gray-400 mx-auto mb-3" />
+          <p className="text-sm font-medium text-[#1A1A1A] mb-1">Premium Lab</p>
+          <p className="text-xs text-gray-500 mb-4">
             This simulation requires DCI Cybersecurity Labs Pro.
           </p>
           <div className="flex gap-3 justify-center">
@@ -87,7 +87,7 @@ export default function LabScreen() {
             </button>
             <button
               onClick={() => navigate("/")}
-              className="px-4 py-2 rounded-xl bg-slate-700 text-slate-300 font-medium text-sm min-h-[44px]"
+              className="px-4 py-2 rounded-xl bg-[#F5F5F5] text-gray-600 font-medium text-sm min-h-[44px]"
             >
               Go Back
             </button>
@@ -125,12 +125,12 @@ export default function LabScreen() {
   const renderUpNext = () => {
     if (!recommendation) {
       return (
-        <div className="bg-slate-800 rounded-xl p-4 text-center">
-          <PartyPopper size={24} className="text-orange-400 mx-auto mb-2" />
-          <p className="text-sm font-semibold text-white mb-1">
+        <div className="bg-[#F5F5F5] rounded-xl p-4 text-center">
+          <PartyPopper size={24} className="text-[#2A7F6F] mx-auto mb-2" />
+          <p className="text-sm font-semibold text-[#1A1A1A] mb-1">
             You've completed all available labs!
           </p>
-          <p className="text-xs text-slate-400 mb-3">
+          <p className="text-xs text-gray-500 mb-3">
             More labs coming soon. Keep your streak alive by replaying favorites.
           </p>
           <button
@@ -146,18 +146,18 @@ export default function LabScreen() {
     const isRecPremium = recommendation.lab.accessLevel === "premium" && !isPremium;
 
     return (
-      <div className="bg-slate-800 rounded-xl p-4">
-        <p className="text-[10px] text-slate-500 uppercase tracking-wide font-semibold mb-1">
+      <div className="bg-[#F5F5F5] rounded-xl p-4">
+        <p className="text-[10px] text-gray-400 uppercase tracking-wide font-semibold mb-1">
           Up Next
         </p>
-        <p className="text-sm font-semibold text-white mb-0.5">
+        <p className="text-sm font-semibold text-[#1A1A1A] mb-0.5">
           {recommendation.lab.title}
         </p>
-        <p className="text-xs text-slate-400 mb-3">{recommendation.reason}</p>
+        <p className="text-xs text-gray-500 mb-3">{recommendation.reason}</p>
         {isRecPremium ? (
           <button
             onClick={() => navigate("/upgrade")}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-700 text-orange-300 text-sm font-medium min-h-[44px]"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-200 text-[#2A7F6F] text-sm font-medium min-h-[44px]"
           >
             <Lock size={14} /> Unlock with Premium
           </button>

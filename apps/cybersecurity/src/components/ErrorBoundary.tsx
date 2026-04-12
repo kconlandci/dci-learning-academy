@@ -31,15 +31,15 @@ export default class ErrorBoundary extends Component<Props, State> {
       if (this.props.fallback) return this.props.fallback;
 
       return (
-        <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6">
+        <div className="min-h-screen bg-white flex items-center justify-center p-6">
           <div className="text-center max-w-sm">
             <div className="w-16 h-16 rounded-2xl bg-red-500/15 flex items-center justify-center mx-auto mb-4">
-              <span className="text-3xl">⚠️</span>
+              <span className="text-3xl">&#9888;&#65039;</span>
             </div>
-            <h2 className="text-lg font-bold text-white mb-2">
+            <h2 className="text-lg font-bold text-[#1A1A1A] mb-2">
               This lab encountered an issue
             </h2>
-            <p className="text-sm text-slate-400 mb-6">
+            <p className="text-sm text-gray-500 mb-6">
               Something went wrong loading this lab. This has been logged and
               we'll look into it.
             </p>

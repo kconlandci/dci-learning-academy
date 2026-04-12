@@ -37,23 +37,23 @@ export default function TriageRemediateRenderer({ scenario, onSubmit, phase, fee
   return (
     <div className="space-y-4">
       {/* Title */}
-      <h2 className="text-lg font-semibold text-white">{s.title}</h2>
+      <h2 className="text-lg font-semibold text-[#1A1A1A]">{s.title}</h2>
 
       {/* Description */}
-      <div className="bg-slate-800 rounded-xl p-4">
-        <p className="text-sm text-slate-300 leading-relaxed">{s.description}</p>
+      <div className="bg-[#F5F5F5] rounded-xl p-4">
+        <p className="text-sm text-gray-600 leading-relaxed">{s.description}</p>
       </div>
 
-      {/* Evidence */}
+      {/* Evidence — keep dark for terminal/code style */}
       <div>
-        <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wide mb-2 flex items-center gap-2">
+        <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-2 flex items-center gap-2">
           <FileText size={14} />
           Evidence
         </h3>
         <div className="space-y-2">
           {s.evidence.map((ev, i) => (
-            <div key={i} className="bg-slate-800/50 rounded-xl p-3 border border-slate-700">
-              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+            <div key={i} className="bg-[#1E293B] rounded-xl p-3 border border-gray-700">
+              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
                 {ev.type}
               </span>
               <pre className="text-xs text-green-400 font-mono whitespace-pre-wrap leading-relaxed mt-1">
@@ -66,7 +66,7 @@ export default function TriageRemediateRenderer({ scenario, onSubmit, phase, fee
 
       {/* Step 1: Classification */}
       <div>
-        <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wide mb-2">
+        <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-2">
           Step 1 — Classify the Issue
         </h3>
         <div className="grid gap-2">
@@ -79,12 +79,12 @@ export default function TriageRemediateRenderer({ scenario, onSubmit, phase, fee
                 disabled={isLocked}
                 className={`min-h-[44px] p-3 rounded-xl border-2 text-left transition-all ${
                   isSelected
-                    ? "bg-blue-500/20 border-blue-500 text-blue-200"
-                    : "bg-slate-800 border-slate-700 text-slate-300 hover:border-slate-500"
+                    ? "bg-blue-500/15 border-blue-500 text-blue-700"
+                    : "bg-[#F5F5F5] border-gray-200 text-gray-700 hover:border-gray-400"
                 } ${isLocked ? "opacity-70 cursor-default" : "cursor-pointer"}`}
               >
                 <div className="text-sm font-medium">{c.label}</div>
-                <div className="text-xs text-slate-400 mt-0.5">{c.description}</div>
+                <div className="text-xs text-gray-500 mt-0.5">{c.description}</div>
               </button>
             );
           })}
@@ -93,7 +93,7 @@ export default function TriageRemediateRenderer({ scenario, onSubmit, phase, fee
 
       {/* Step 2: Remediation */}
       <div>
-        <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wide mb-2">
+        <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-2">
           Step 2 — Select Remediation
         </h3>
         <div className="grid gap-2">
@@ -106,12 +106,12 @@ export default function TriageRemediateRenderer({ scenario, onSubmit, phase, fee
                 disabled={isLocked}
                 className={`min-h-[44px] p-3 rounded-xl border-2 text-left transition-all ${
                   isSelected
-                    ? "bg-orange-500/20 border-orange-500 text-orange-200"
-                    : "bg-slate-800 border-slate-700 text-slate-300 hover:border-slate-500"
+                    ? "bg-[#2A7F6F]/15 border-[#2A7F6F] text-[#2A7F6F]"
+                    : "bg-[#F5F5F5] border-gray-200 text-gray-700 hover:border-gray-400"
                 } ${isLocked ? "opacity-70 cursor-default" : "cursor-pointer"}`}
               >
                 <div className="text-sm font-medium">{r.label}</div>
-                <div className="text-xs text-slate-400 mt-0.5">{r.description}</div>
+                <div className="text-xs text-gray-500 mt-0.5">{r.description}</div>
               </button>
             );
           })}
@@ -120,7 +120,7 @@ export default function TriageRemediateRenderer({ scenario, onSubmit, phase, fee
 
       {/* Step 3: Rationale */}
       <div>
-        <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wide mb-2">
+        <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-2">
           Step 3 — Justify Your Decision
         </h3>
         <div className="grid gap-2">
@@ -133,8 +133,8 @@ export default function TriageRemediateRenderer({ scenario, onSubmit, phase, fee
                 disabled={isLocked}
                 className={`min-h-[44px] p-3 rounded-xl border-2 text-left text-sm transition-all ${
                   isSelected
-                    ? "bg-orange-500/20 border-orange-500 text-orange-200"
-                    : "bg-slate-800 border-slate-700 text-slate-300 hover:border-slate-500"
+                    ? "bg-[#2A7F6F]/15 border-[#2A7F6F] text-[#2A7F6F]"
+                    : "bg-[#F5F5F5] border-gray-200 text-gray-700 hover:border-gray-400"
                 } ${isLocked ? "opacity-70 cursor-default" : "cursor-pointer"}`}
               >
                 {r.text}
@@ -149,7 +149,7 @@ export default function TriageRemediateRenderer({ scenario, onSubmit, phase, fee
         <button
           onClick={handleSubmit}
           disabled={!selectedClassification || !selectedRemediation || !selectedRationale}
-          className="w-full py-3 rounded-xl bg-orange-500 hover:bg-orange-600 disabled:bg-slate-700 disabled:text-slate-500 text-white font-semibold transition-colors"
+          className="w-full py-3 rounded-xl bg-orange-500 hover:bg-orange-600 disabled:bg-gray-200 disabled:text-gray-400 text-white font-semibold transition-colors"
         >
           Submit Answer
         </button>
@@ -168,19 +168,19 @@ export default function TriageRemediateRenderer({ scenario, onSubmit, phase, fee
         >
           <div className="flex items-center gap-2 mb-2">
             {feedbackResult.type === "perfect" ? (
-              <CheckCircle size={18} className="text-green-400" />
+              <CheckCircle size={18} className="text-green-600" />
             ) : feedbackResult.type === "partial" ? (
-              <CheckCircle size={18} className="text-yellow-400" />
+              <CheckCircle size={18} className="text-yellow-600" />
             ) : (
-              <XCircle size={18} className="text-red-400" />
+              <XCircle size={18} className="text-red-500" />
             )}
             <span
               className={`text-sm font-semibold capitalize ${
                 feedbackResult.type === "perfect"
-                  ? "text-green-400"
+                  ? "text-green-600"
                   : feedbackResult.type === "partial"
-                  ? "text-yellow-400"
-                  : "text-red-400"
+                  ? "text-yellow-600"
+                  : "text-red-500"
               }`}
             >
               {feedbackResult.type === "perfect"
@@ -190,7 +190,7 @@ export default function TriageRemediateRenderer({ scenario, onSubmit, phase, fee
                 : "Incorrect"}
             </span>
           </div>
-          <p className="text-sm text-slate-300">{feedbackResult.message}</p>
+          <p className="text-sm text-gray-600">{feedbackResult.message}</p>
         </div>
       )}
     </div>

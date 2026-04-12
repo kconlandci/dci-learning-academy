@@ -60,68 +60,68 @@ export default function AnalyticsScreen() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 p-4 pb-24">
+    <div className="min-h-screen bg-white p-4 pb-24">
       <div className="max-w-lg mx-auto pt-6">
         {/* Header */}
         <div className="flex items-center gap-3 mb-6">
           <button
             onClick={() => goBack(navigate)}
             aria-label="Go back"
-            className="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center active:bg-slate-700 transition-colors"
+            className="w-10 h-10 rounded-xl bg-[#F5F5F5] flex items-center justify-center active:bg-gray-200 transition-colors"
           >
-            <ArrowLeft size={18} className="text-slate-400" />
+            <ArrowLeft size={18} className="text-gray-500" />
           </button>
           <div>
-            <h1 className="text-lg font-bold text-white">Usage Stats</h1>
-            <p className="text-xs text-slate-500">Local analytics data</p>
+            <h1 className="text-lg font-bold text-[#1A1A1A]">Usage Stats</h1>
+            <p className="text-xs text-gray-400">Local analytics data</p>
           </div>
         </div>
 
         {/* Overview Cards */}
         <div className="grid grid-cols-2 gap-3 mb-6">
           <StatCard
-            icon={<BarChart3 size={16} className="text-blue-400" />}
+            icon={<BarChart3 size={16} className="text-blue-500" />}
             label="Sessions"
             value={String(summary.totalSessions)}
           />
           <StatCard
-            icon={<Clock size={16} className="text-purple-400" />}
+            icon={<Clock size={16} className="text-purple-500" />}
             label="Avg Session"
             value={formatDuration(summary.avgSessionSeconds)}
           />
           <StatCard
-            icon={<Trophy size={16} className="text-orange-400" />}
+            icon={<Trophy size={16} className="text-[#2A7F6F]" />}
             label="Avg Score"
-            value={summary.labsCompleted > 0 ? `${summary.avgScore}/100` : "—"}
+            value={summary.labsCompleted > 0 ? `${summary.avgScore}/100` : "\u2014"}
           />
           <StatCard
-            icon={<Target size={16} className="text-green-400" />}
+            icon={<Target size={16} className="text-green-500" />}
             label="Completion Rate"
-            value={summary.labsStarted > 0 ? `${summary.completionRate}%` : "—"}
+            value={summary.labsStarted > 0 ? `${summary.completionRate}%` : "\u2014"}
           />
         </div>
 
         {/* Started vs Completed */}
-        <div className="bg-slate-800 rounded-xl p-4 mb-6">
-          <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wide mb-3">
+        <div className="bg-[#F5F5F5] rounded-xl p-4 mb-6">
+          <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-3">
             Lab Funnel
           </h2>
           <div className="flex items-end gap-4">
             <div className="flex-1">
-              <div className="text-2xl font-bold text-white">{summary.labsStarted}</div>
-              <div className="text-xs text-slate-500">Started</div>
+              <div className="text-2xl font-bold text-[#1A1A1A]">{summary.labsStarted}</div>
+              <div className="text-xs text-gray-400">Started</div>
             </div>
-            <div className="text-slate-600 text-lg">&rarr;</div>
+            <div className="text-gray-300 text-lg">&rarr;</div>
             <div className="flex-1">
-              <div className="text-2xl font-bold text-green-400">{summary.labsCompleted}</div>
-              <div className="text-xs text-slate-500">Completed</div>
+              <div className="text-2xl font-bold text-green-500">{summary.labsCompleted}</div>
+              <div className="text-xs text-gray-400">Completed</div>
             </div>
           </div>
         </div>
 
         {/* Labs Per Day Chart */}
-        <div className="bg-slate-800 rounded-xl p-4 mb-6">
-          <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wide mb-3">
+        <div className="bg-[#F5F5F5] rounded-xl p-4 mb-6">
+          <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-3">
             Labs Completed (Last 14 Days)
           </h2>
           <div className="flex items-end gap-1" style={{ height: 100 }}>
@@ -135,7 +135,7 @@ export default function AnalyticsScreen() {
                 >
                   <div
                     className={`w-full rounded-t ${
-                      day.count > 0 ? "bg-orange-500" : "bg-slate-700"
+                      day.count > 0 ? "bg-[#2A7F6F]" : "bg-gray-200"
                     }`}
                     style={{ height: `${height}%`, minWidth: 4 }}
                     title={`${day.date}: ${day.count} labs`}
@@ -145,10 +145,10 @@ export default function AnalyticsScreen() {
             })}
           </div>
           <div className="flex justify-between mt-1">
-            <span className="text-[9px] text-slate-600">
+            <span className="text-[9px] text-gray-400">
               {summary.labsPerDay[0]?.date.slice(5)}
             </span>
-            <span className="text-[9px] text-slate-600">
+            <span className="text-[9px] text-gray-400">
               {summary.labsPerDay[summary.labsPerDay.length - 1]?.date.slice(5)}
             </span>
           </div>
@@ -156,20 +156,20 @@ export default function AnalyticsScreen() {
 
         {/* Top Labs */}
         {summary.topLabs.length > 0 && (
-          <div className="bg-slate-800 rounded-xl p-4 mb-6">
-            <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wide mb-3">
+          <div className="bg-[#F5F5F5] rounded-xl p-4 mb-6">
+            <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-3">
               Most Played Labs
             </h2>
             <div className="space-y-2">
               {summary.topLabs.map((lab, i) => (
                 <div key={lab.labId} className="flex items-center gap-3">
-                  <span className="w-5 h-5 rounded-full bg-slate-700 flex items-center justify-center text-[10px] text-slate-400 font-bold shrink-0">
+                  <span className="w-5 h-5 rounded-full bg-gray-200 flex items-center justify-center text-[10px] text-gray-500 font-bold shrink-0">
                     {i + 1}
                   </span>
-                  <span className="text-xs text-white flex-1 truncate">
+                  <span className="text-xs text-[#1A1A1A] flex-1 truncate">
                     {getLabTitle(lab.labId)}
                   </span>
-                  <span className="text-xs text-slate-500">{lab.count}x</span>
+                  <span className="text-xs text-gray-400">{lab.count}x</span>
                 </div>
               ))}
             </div>
@@ -179,7 +179,7 @@ export default function AnalyticsScreen() {
         {/* Clear Data */}
         <button
           onClick={handleClear}
-          className="flex items-center gap-3 w-full bg-slate-800 rounded-xl p-4 min-h-[48px] active:bg-slate-700 transition-colors text-left"
+          className="flex items-center gap-3 w-full bg-[#F5F5F5] rounded-xl p-4 min-h-[48px] active:bg-gray-200 transition-colors text-left"
         >
           <Trash2 size={16} className="text-red-400" />
           <span className="text-sm font-medium text-red-400">Clear Analytics Data</span>
@@ -199,10 +199,10 @@ function StatCard({
   value: string;
 }) {
   return (
-    <div className="bg-slate-800 rounded-xl p-4">
+    <div className="bg-[#F5F5F5] rounded-xl p-4">
       <div className="flex items-center gap-2 mb-2">{icon}</div>
-      <div className="text-lg font-bold text-white">{value}</div>
-      <div className="text-[10px] text-slate-500 uppercase tracking-wide">{label}</div>
+      <div className="text-lg font-bold text-[#1A1A1A]">{value}</div>
+      <div className="text-[10px] text-gray-400 uppercase tracking-wide">{label}</div>
     </div>
   );
 }

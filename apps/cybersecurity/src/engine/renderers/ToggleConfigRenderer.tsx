@@ -50,13 +50,13 @@ export default function ToggleConfigRenderer({ scenario, onSubmit, phase, feedba
   return (
     <div className="space-y-4">
       {/* Title + target */}
-      <h2 className="text-lg font-semibold text-white">{s.title}</h2>
-      <div className="bg-slate-800 rounded-xl p-4">
+      <h2 className="text-lg font-semibold text-[#1A1A1A]">{s.title}</h2>
+      <div className="bg-[#F5F5F5] rounded-xl p-4">
         <div className="flex justify-between text-sm mb-2">
-          <span className="text-slate-400">Target System</span>
-          <span className="text-orange-300 font-mono">{s.targetSystem}</span>
+          <span className="text-gray-500">Target System</span>
+          <span className="text-[#2A7F6F] font-mono">{s.targetSystem}</span>
         </div>
-        <p className="text-sm text-slate-300 leading-relaxed">{s.description}</p>
+        <p className="text-sm text-gray-600 leading-relaxed">{s.description}</p>
       </div>
 
       {/* Config items */}
@@ -74,34 +74,34 @@ export default function ToggleConfigRenderer({ scenario, onSubmit, phase, feedba
                   ? isCorrect
                     ? "border-green-500/40 bg-green-500/5"
                     : "border-red-500/40 bg-red-500/5"
-                  : "border-slate-700 bg-slate-800"
+                  : "border-gray-200 bg-[#F5F5F5]"
               }`}
             >
               <div className="flex items-center justify-between mb-1">
-                <span className="text-sm font-medium text-white">{item.label}</span>
+                <span className="text-sm font-medium text-[#1A1A1A]">{item.label}</span>
                 <button
                   onClick={() => cycleState(item.id, item.states)}
                   disabled={isLocked}
                   className={`min-w-[88px] min-h-[44px] px-4 py-2 rounded-lg text-xs font-bold uppercase transition-all ${
                     currentVal === item.states[0]
-                      ? "bg-yellow-500/20 border border-yellow-500/50 text-yellow-300"
-                      : "bg-slate-700 border border-slate-600 text-slate-300"
+                      ? "bg-yellow-500/15 border border-yellow-500/50 text-yellow-700"
+                      : "bg-gray-200 border border-gray-300 text-gray-600"
                   } ${isLocked ? "opacity-70 cursor-default" : "cursor-pointer active:scale-95"}`}
                 >
                   {currentVal}
                 </button>
               </div>
-              <p className="text-xs text-slate-400 leading-relaxed">{item.detail}</p>
+              <p className="text-xs text-gray-500 leading-relaxed">{item.detail}</p>
 
               {/* Feedback per-item */}
               {showResult && (
                 <div className="mt-2 flex items-start gap-2">
                   {isCorrect ? (
-                    <CheckCircle size={14} className="text-green-400 mt-0.5 shrink-0" />
+                    <CheckCircle size={14} className="text-green-600 mt-0.5 shrink-0" />
                   ) : (
-                    <XCircle size={14} className="text-red-400 mt-0.5 shrink-0" />
+                    <XCircle size={14} className="text-red-500 mt-0.5 shrink-0" />
                   )}
-                  <span className="text-xs text-slate-300">
+                  <span className="text-xs text-gray-600">
                     {isCorrect
                       ? rationaleMap.get(item.rationaleId) ?? "Correct."
                       : `Should be ${item.correctState}. ${rationaleMap.get(item.rationaleId) ?? ""}`}
@@ -136,19 +136,19 @@ export default function ToggleConfigRenderer({ scenario, onSubmit, phase, feedba
         >
           <div className="flex items-center gap-2 mb-2">
             {feedbackResult.type === "perfect" ? (
-              <CheckCircle size={18} className="text-green-400" />
+              <CheckCircle size={18} className="text-green-600" />
             ) : feedbackResult.type === "partial" ? (
-              <CheckCircle size={18} className="text-yellow-400" />
+              <CheckCircle size={18} className="text-yellow-600" />
             ) : (
-              <XCircle size={18} className="text-red-400" />
+              <XCircle size={18} className="text-red-500" />
             )}
             <span
               className={`text-sm font-semibold capitalize ${
                 feedbackResult.type === "perfect"
-                  ? "text-green-400"
+                  ? "text-green-600"
                   : feedbackResult.type === "partial"
-                  ? "text-yellow-400"
-                  : "text-red-400"
+                  ? "text-yellow-600"
+                  : "text-red-500"
               }`}
             >
               {feedbackResult.type === "perfect"
@@ -158,7 +158,7 @@ export default function ToggleConfigRenderer({ scenario, onSubmit, phase, feedba
                 : "Incorrect"}
             </span>
           </div>
-          <p className="text-sm text-slate-300">{feedbackResult.message}</p>
+          <p className="text-sm text-gray-600">{feedbackResult.message}</p>
         </div>
       )}
     </div>

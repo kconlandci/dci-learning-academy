@@ -10,11 +10,11 @@ import type { RendererProps } from "../LabEngine";
 import type { ActionRationaleScenario } from "../../types/manifest";
 
 const COLOR_MAP: Record<string, { selected: string; base: string }> = {
-  blue:   { selected: "bg-blue-500/20 border-blue-500 text-blue-300", base: "bg-slate-800 border-slate-700 text-slate-300 hover:border-slate-500" },
-  green:  { selected: "bg-green-500/20 border-green-500 text-green-300", base: "bg-slate-800 border-slate-700 text-slate-300 hover:border-slate-500" },
-  yellow: { selected: "bg-yellow-500/20 border-yellow-500 text-yellow-300", base: "bg-slate-800 border-slate-700 text-slate-300 hover:border-slate-500" },
-  orange: { selected: "bg-orange-500/20 border-orange-500 text-orange-300", base: "bg-slate-800 border-slate-700 text-slate-300 hover:border-slate-500" },
-  red:    { selected: "bg-red-500/20 border-red-500 text-red-300", base: "bg-slate-800 border-slate-700 text-slate-300 hover:border-slate-500" },
+  blue:   { selected: "bg-blue-500/15 border-blue-500 text-blue-700", base: "bg-[#F5F5F5] border-gray-200 text-gray-700 hover:border-gray-400" },
+  green:  { selected: "bg-green-500/15 border-green-500 text-green-700", base: "bg-[#F5F5F5] border-gray-200 text-gray-700 hover:border-gray-400" },
+  yellow: { selected: "bg-yellow-500/15 border-yellow-500 text-yellow-700", base: "bg-[#F5F5F5] border-gray-200 text-gray-700 hover:border-gray-400" },
+  orange: { selected: "bg-orange-500/15 border-orange-500 text-orange-700", base: "bg-[#F5F5F5] border-gray-200 text-gray-700 hover:border-gray-400" },
+  red:    { selected: "bg-red-500/15 border-red-500 text-red-700", base: "bg-[#F5F5F5] border-gray-200 text-gray-700 hover:border-gray-400" },
 };
 
 const DEFAULT_COLOR = COLOR_MAP.blue;
@@ -44,23 +44,23 @@ export default function ActionRationaleRenderer({ scenario, onSubmit, phase, fee
   return (
     <div className="space-y-4">
       {/* Scenario title */}
-      {s.title && <h2 className="text-lg font-semibold text-white">{s.title}</h2>}
+      {s.title && <h2 className="text-lg font-semibold text-[#1A1A1A]">{s.title}</h2>}
 
       {/* Context */}
-      <div className="bg-slate-800 rounded-xl p-4">
-        <p className="text-sm text-slate-300 leading-relaxed">{s.context}</p>
+      <div className="bg-[#F5F5F5] rounded-xl p-4">
+        <p className="text-sm text-gray-600 leading-relaxed">{s.context}</p>
       </div>
 
       {/* Display fields */}
       {s.displayFields.length > 0 && (
-        <div className="bg-slate-800 rounded-xl p-4 space-y-2">
+        <div className="bg-[#F5F5F5] rounded-xl p-4 space-y-2">
           {s.displayFields.map((field, i) => (
             <div key={i} className="flex justify-between text-sm">
-              <span className="text-slate-400">{field.label}</span>
+              <span className="text-gray-500">{field.label}</span>
               <span className={
-                field.emphasis === "critical" ? "text-red-400 font-medium" :
-                field.emphasis === "warn" ? "text-yellow-400 font-medium" :
-                "text-white"
+                field.emphasis === "critical" ? "text-red-500 font-medium" :
+                field.emphasis === "warn" ? "text-yellow-600 font-medium" :
+                "text-[#1A1A1A]"
               }>
                 {field.value}
               </span>
@@ -69,25 +69,25 @@ export default function ActionRationaleRenderer({ scenario, onSubmit, phase, fee
         </div>
       )}
 
-      {/* Evidence */}
+      {/* Evidence — keep dark for terminal/code style */}
       {s.evidence && s.evidence.length > 0 && (
-        <div className="bg-slate-800/50 rounded-xl p-4 font-mono text-xs text-green-400 space-y-1">
+        <div className="bg-[#1E293B] rounded-xl p-4 font-mono text-xs text-green-400 space-y-1">
           {s.evidence.map((e, i) => (
-            <div key={i}>→ {e}</div>
+            <div key={i}>&rarr; {e}</div>
           ))}
         </div>
       )}
 
-      {/* Log entry */}
+      {/* Log entry — keep dark for terminal/code style */}
       {s.logEntry && (
-        <div className="bg-slate-800/50 rounded-xl p-3 font-mono text-xs text-slate-300 whitespace-pre-wrap">
+        <div className="bg-[#1E293B] rounded-xl p-3 font-mono text-xs text-gray-300 whitespace-pre-wrap">
           {s.logEntry}
         </div>
       )}
 
       {/* Action selection */}
       <div>
-        <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wide mb-2">
+        <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-2">
           Choose Action
         </h3>
         <div className="grid gap-2">
@@ -112,7 +112,7 @@ export default function ActionRationaleRenderer({ scenario, onSubmit, phase, fee
 
       {/* Rationale selection */}
       <div>
-        <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wide mb-2">
+        <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-2">
           Justify Your Decision
         </h3>
         <div className="grid gap-2">
@@ -125,8 +125,8 @@ export default function ActionRationaleRenderer({ scenario, onSubmit, phase, fee
                 disabled={isLocked}
                 className={`p-3 rounded-xl border-2 text-left text-sm transition-all ${
                   isSelected
-                    ? "bg-orange-500/20 border-orange-500 text-orange-200"
-                    : "bg-slate-800 border-slate-700 text-slate-300 hover:border-slate-500"
+                    ? "bg-[#2A7F6F]/15 border-[#2A7F6F] text-[#2A7F6F]"
+                    : "bg-[#F5F5F5] border-gray-200 text-gray-700 hover:border-gray-400"
                 } ${isLocked ? "opacity-70 cursor-default" : "cursor-pointer"}`}
               >
                 {r.text}
@@ -141,7 +141,7 @@ export default function ActionRationaleRenderer({ scenario, onSubmit, phase, fee
         <button
           onClick={handleSubmit}
           disabled={!selectedAction || !selectedRationale}
-          className="w-full py-3 rounded-xl bg-orange-500 hover:bg-orange-600 disabled:bg-slate-700 disabled:text-slate-500 text-white font-semibold transition-colors"
+          className="w-full py-3 rounded-xl bg-orange-500 hover:bg-orange-600 disabled:bg-gray-200 disabled:text-gray-400 text-white font-semibold transition-colors"
         >
           Submit Answer
         </button>
@@ -158,21 +158,21 @@ export default function ActionRationaleRenderer({ scenario, onSubmit, phase, fee
         }`}>
           <div className="flex items-center gap-2 mb-2">
             {feedbackResult.type === "perfect" ? (
-              <CheckCircle size={18} className="text-green-400" />
+              <CheckCircle size={18} className="text-green-600" />
             ) : feedbackResult.type === "partial" ? (
-              <CheckCircle size={18} className="text-yellow-400" />
+              <CheckCircle size={18} className="text-yellow-600" />
             ) : (
-              <XCircle size={18} className="text-red-400" />
+              <XCircle size={18} className="text-red-500" />
             )}
             <span className={`text-sm font-semibold capitalize ${
-              feedbackResult.type === "perfect" ? "text-green-400" :
-              feedbackResult.type === "partial" ? "text-yellow-400" : "text-red-400"
+              feedbackResult.type === "perfect" ? "text-green-600" :
+              feedbackResult.type === "partial" ? "text-yellow-600" : "text-red-500"
             }`}>
               {feedbackResult.type === "perfect" ? "Correct!" :
                feedbackResult.type === "partial" ? "Partially Correct" : "Incorrect"}
             </span>
           </div>
-          <p className="text-sm text-slate-300">{feedbackResult.message}</p>
+          <p className="text-sm text-gray-600">{feedbackResult.message}</p>
         </div>
       )}
     </div>
