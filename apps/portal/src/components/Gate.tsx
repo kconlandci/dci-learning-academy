@@ -93,13 +93,15 @@ export function Gate({ onAuthed }: GateProps) {
   }
 
   return (
-    <main className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center p-6">
+    <main className="min-h-screen bg-white text-gray-900 flex items-center justify-center p-6">
       <div className="w-full max-w-md space-y-8">
-        <header className="text-center space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight">
-            DCI Learning Academy
-          </h1>
-          <p className="text-sm text-slate-400">
+        <header className="text-center space-y-4">
+          <img
+            src={`${import.meta.env.BASE_URL}logo-wide.png.png`}
+            alt="DCI Learning Academy"
+            className="mx-auto h-14 w-auto"
+          />
+          <p className="text-sm text-gray-500">
             Sign in with your class access code.
           </p>
         </header>
@@ -108,7 +110,7 @@ export function Gate({ onAuthed }: GateProps) {
           <div className="space-y-1.5">
             <label
               htmlFor="access-code"
-              className="block text-xs font-semibold uppercase tracking-wide text-slate-400"
+              className="block text-xs font-semibold uppercase tracking-wide text-gray-600"
             >
               Access code
             </label>
@@ -121,7 +123,7 @@ export function Gate({ onAuthed }: GateProps) {
               value={accessCode}
               onChange={(e) => setAccessCode(e.target.value)}
               disabled={busy}
-              className="w-full rounded-md bg-slate-900 border border-slate-800 focus:border-amber-500/60 focus:outline-none focus:ring-2 focus:ring-amber-500/30 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-600 disabled:opacity-60"
+              className="w-full rounded-md bg-white border border-gray-300 focus:border-[#2A7F6F] focus:outline-none focus:ring-2 focus:ring-[#2A7F6F]/30 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 disabled:opacity-60"
               placeholder="DCI-LABS"
             />
           </div>
@@ -129,7 +131,7 @@ export function Gate({ onAuthed }: GateProps) {
           <div className="space-y-1.5">
             <label
               htmlFor="display-name"
-              className="block text-xs font-semibold uppercase tracking-wide text-slate-400"
+              className="block text-xs font-semibold uppercase tracking-wide text-gray-600"
             >
               First name, last initial
             </label>
@@ -140,10 +142,10 @@ export function Gate({ onAuthed }: GateProps) {
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
               disabled={busy}
-              className="w-full rounded-md bg-slate-900 border border-slate-800 focus:border-amber-500/60 focus:outline-none focus:ring-2 focus:ring-amber-500/30 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-600 disabled:opacity-60"
+              className="w-full rounded-md bg-white border border-gray-300 focus:border-[#2A7F6F] focus:outline-none focus:ring-2 focus:ring-[#2A7F6F]/30 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 disabled:opacity-60"
               placeholder="Kevin C."
             />
-            <p className="text-[11px] text-slate-500">
+            <p className="text-[11px] text-gray-500">
               e.g. Kevin C. If another student in your class has the same
               initial, use two letters (Kevin Co.).
             </p>
@@ -152,7 +154,7 @@ export function Gate({ onAuthed }: GateProps) {
           {error && (
             <div
               role="alert"
-              className="rounded-md border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-300"
+              className="rounded-md border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-600"
             >
               {errorMessage(error)}
             </div>

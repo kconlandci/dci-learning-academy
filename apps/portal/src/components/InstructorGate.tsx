@@ -59,16 +59,18 @@ export function InstructorGate({ onAuthed }: InstructorGateProps) {
   }
 
   return (
-    <main className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center p-6">
+    <main className="min-h-screen bg-white text-gray-900 flex items-center justify-center p-6">
       <div className="w-full max-w-md space-y-8">
-        <header className="text-center space-y-2">
-          <p className="text-xs uppercase tracking-widest text-amber-400">
+        <header className="text-center space-y-4">
+          <img
+            src={`${import.meta.env.BASE_URL}logo-wide.png.png`}
+            alt="DCI Learning Academy"
+            className="mx-auto h-14 w-auto"
+          />
+          <p className="text-xs uppercase tracking-widest text-[#2A7F6F] font-semibold">
             Instructor
           </p>
-          <h1 className="text-3xl font-bold tracking-tight">
-            DCI Learning Academy
-          </h1>
-          <p className="text-sm text-slate-400">
+          <p className="text-sm text-gray-500">
             Enter your instructor code to view the class dashboard.
           </p>
         </header>
@@ -77,7 +79,7 @@ export function InstructorGate({ onAuthed }: InstructorGateProps) {
           <div className="space-y-1.5">
             <label
               htmlFor="instructor-code"
-              className="block text-xs font-semibold uppercase tracking-wide text-slate-400"
+              className="block text-xs font-semibold uppercase tracking-wide text-gray-600"
             >
               Instructor code
             </label>
@@ -89,14 +91,14 @@ export function InstructorGate({ onAuthed }: InstructorGateProps) {
               value={code}
               onChange={(e) => setCode(e.target.value)}
               disabled={busy}
-              className="w-full rounded-md bg-slate-900 border border-slate-800 focus:border-amber-500/60 focus:outline-none focus:ring-2 focus:ring-amber-500/30 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-600 disabled:opacity-60"
+              className="w-full rounded-md bg-white border border-gray-300 focus:border-[#2A7F6F] focus:outline-none focus:ring-2 focus:ring-[#2A7F6F]/30 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 disabled:opacity-60"
             />
           </div>
 
           {error && (
             <div
               role="alert"
-              className="rounded-md border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-300"
+              className="rounded-md border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-600"
             >
               {errorMessage(error)}
             </div>
@@ -107,10 +109,10 @@ export function InstructorGate({ onAuthed }: InstructorGateProps) {
           </Button>
         </form>
 
-        <p className="text-center text-xs text-slate-500">
+        <p className="text-center text-xs text-gray-500">
           <Link
             to="/"
-            className="hover:text-amber-400 underline underline-offset-4"
+            className="hover:text-[#2A7F6F] underline underline-offset-4 transition-colors"
           >
             Back to student sign in
           </Link>

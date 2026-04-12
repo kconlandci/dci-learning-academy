@@ -78,6 +78,13 @@ export const MODULES: Record<string, ModuleRebrand> = {
         pattern: /from ["']@capacitor\/(app|preferences|dialog|browser)["']/g,
         replacement: 'from "../capacitor-shim"',
       },
+      // Replace broken icon-512.png ref (deleted during rebrand) with DCI logo
+      // mark. Uses import.meta.env.BASE_URL so the path resolves under the
+      // production subpath (/dci-learning-academy/cybersecurity/).
+      {
+        pattern: /src="\/icon-512\.png"/g,
+        replacement: 'src={`${import.meta.env.BASE_URL}logo-mark.png.png`}',
+      },
       // Phase B: .gitignore must not swallow .env.example (upstream ignore
       // rule `.env.*` catches it otherwise). Append an un-ignore exception.
       // Idempotent because the replacement result no longer matches the
@@ -759,7 +766,7 @@ export default defineConfig(({ command }) => ({
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" href="/logo-mark.png.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>DCI Cybersecurity Labs</title>
   </head>

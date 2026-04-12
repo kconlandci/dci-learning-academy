@@ -97,18 +97,18 @@ export function InstructorDashboard({ onSignOut }: InstructorDashboardProps) {
   }, [rows]);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
-      <header className="border-b border-slate-800">
+    <div className="min-h-screen bg-white text-gray-900 flex flex-col">
+      <header className="bg-[#2A7F6F] text-white">
         <div className="mx-auto max-w-6xl px-6 py-5 flex items-center justify-between">
           <div>
-            <p className="text-[10px] uppercase tracking-widest text-amber-400">
+            <p className="text-[10px] uppercase tracking-widest text-teal-100">
               Instructor
             </p>
             <h1 className="text-lg font-semibold tracking-tight">
               Class Dashboard
             </h1>
           </div>
-          <p className="text-sm text-slate-400">
+          <p className="text-sm text-teal-100">
             {sorted ? `${sorted.length} student${sorted.length === 1 ? "" : "s"}` : ""}
           </p>
         </div>
@@ -118,26 +118,26 @@ export function InstructorDashboard({ onSignOut }: InstructorDashboardProps) {
         {error && (
           <div
             role="alert"
-            className="rounded-md border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-300 mb-6"
+            className="rounded-md border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-600 mb-6"
           >
             {error}
           </div>
         )}
 
         {!sorted && !error && (
-          <p className="text-sm text-slate-500">Loading students\u2026</p>
+          <p className="text-sm text-gray-500">Loading students\u2026</p>
         )}
 
         {sorted && sorted.length === 0 && !error && (
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-gray-500">
             No students yet. They&rsquo;ll appear here once the first one signs in.
           </p>
         )}
 
         {sorted && sorted.length > 0 && (
-          <div className="overflow-x-auto rounded-lg border border-slate-800">
+          <div className="overflow-x-auto rounded-lg border border-gray-200">
             <table className="w-full text-sm">
-              <thead className="bg-slate-900 text-left text-xs uppercase tracking-wide text-slate-400">
+              <thead className="bg-[#F5F5F5] text-left text-xs uppercase tracking-wide text-gray-600">
                 <tr>
                   <th className="px-4 py-3 font-semibold">Display Name</th>
                   <th className="px-4 py-3 font-semibold">Joined</th>
@@ -154,18 +154,20 @@ export function InstructorDashboard({ onSignOut }: InstructorDashboardProps) {
                 </tr>
               </thead>
               <tbody>
-                {sorted.map((row) => (
+                {sorted.map((row, i) => (
                   <tr
                     key={row.studentId}
-                    className="border-t border-slate-800 hover:bg-slate-900/40"
+                    className={`border-t border-gray-200 hover:bg-gray-50 ${
+                      i % 2 === 1 ? "bg-[#FAFAFA]" : ""
+                    }`}
                   >
-                    <td className="px-4 py-3 font-medium text-slate-100">
+                    <td className="px-4 py-3 font-medium text-gray-900">
                       {row.displayName}
                     </td>
-                    <td className="px-4 py-3 text-slate-400">
+                    <td className="px-4 py-3 text-gray-500">
                       {formatDate(row.createdAtMs)}
                     </td>
-                    <td className="px-4 py-3 text-slate-400">
+                    <td className="px-4 py-3 text-gray-500">
                       {formatDate(row.lastActivityMs)}
                     </td>
                     {MODULES.map((mod) => {
@@ -175,7 +177,7 @@ export function InstructorDashboard({ onSignOut }: InstructorDashboardProps) {
                         <td
                           key={mod.slug}
                           className={`px-4 py-3 whitespace-nowrap ${
-                            zero ? "text-slate-600" : "text-slate-200"
+                            zero ? "text-gray-400" : "text-gray-900"
                           }`}
                         >
                           {done}/{mod.labCount}

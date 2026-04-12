@@ -34,7 +34,7 @@ const screens: OnboardingScreen[] = [
     body: "Practice real cybersecurity judgment in short, interactive scenarios.",
     icon: (
       <div className="mb-4">
-        <img src="/icon-512.png" alt="DCI Cybersecurity Labs" className="w-20 h-20 rounded-2xl" />
+        <img src={`${import.meta.env.BASE_URL}logo-mark.png.png`} alt="DCI Cybersecurity Labs" className="w-20 h-20 rounded-2xl" />
       </div>
     ),
   },

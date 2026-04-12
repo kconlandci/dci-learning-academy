@@ -54,7 +54,7 @@ export default function HomeScreen() {
         <div className="max-w-lg mx-auto pt-6">
           {/* Header */}
           <div className="flex items-center gap-3 mb-4">
-            <img src="/icon-512.png" alt="DCI Cybersecurity Labs" className="w-10 h-10 rounded-xl" />
+            <img src={`${import.meta.env.BASE_URL}logo-mark.png.png`} alt="DCI Cybersecurity Labs" className="w-10 h-10 rounded-xl" />
             <div>
               <h1 className="text-xl font-bold text-white">DCI Cybersecurity Labs</h1>
               <p className="text-xs text-slate-400">
@@ -245,7 +245,7 @@ function PathCard({
         className="w-full p-4 flex items-center gap-3 min-h-[56px] active:bg-slate-750 transition-colors text-left"
       >
         <div className="w-10 h-10 rounded-lg bg-orange-500/10 flex items-center justify-center shrink-0">
-          {Icon ? <Icon size={18} className="text-orange-400" /> : <img src="/icon-512.png" alt="" className="w-5 h-5" />}
+          {Icon ? <Icon size={18} className="text-orange-400" /> : <img src={`${import.meta.env.BASE_URL}logo-mark.png.png`} alt="" className="w-5 h-5" />}
         </div>
         <div className="flex-1 min-w-0">
           <div className="text-sm font-medium text-white truncate">
