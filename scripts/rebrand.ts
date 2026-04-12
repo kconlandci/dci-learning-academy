@@ -377,11 +377,41 @@ async function main(): Promise<void> {
   const stubbed = await applyStubs(destPath, module.stubs);
   console.log(`[rebrand]   wrote ${stubbed} stub file${stubbed === 1 ? "" : "s"}`);
 
-  // 10. Provenance
+  // 10. Post-rebrand assertions
+  if (module.assertions && module.assertions.length > 0) {
+    console.log("[rebrand] checking post-rebrand assertions…");
+    let passed = 0;
+    for (const assertion of module.assertions) {
+      const absFile = path.resolve(destPath, assertion.file);
+      let content: string;
+      try {
+        content = await readFile(absFile, "utf8");
+      } catch {
+        console.error(
+          `[rebrand] ASSERTION FAILED: file not found: ${assertion.file}`,
+        );
+        console.error(`  ${assertion.description}`);
+        process.exit(1);
+      }
+      if (!content.includes(assertion.marker)) {
+        console.error(
+          `[rebrand] ASSERTION FAILED: marker "${assertion.marker}" not found in ${assertion.file}`,
+        );
+        console.error(`  ${assertion.description}`);
+        process.exit(1);
+      }
+      passed++;
+    }
+    console.log(
+      `[rebrand]   ${passed} assertion${passed === 1 ? "" : "s"} passed`,
+    );
+  }
+
+  // 11. Provenance
   await writeProvenance(destPath, module, sourcePath, git);
   console.log("[rebrand] wrote .rebrand-meta.json");
 
-  console.log("[rebrand] done. Next: pnpm install && pnpm --filter @dci/<slug> build");
+  console.log("[rebrand] done. Next: pnpm install && pnpm --filter @dci/<slug> typecheck && pnpm build");
 }
 
 main().catch((err) => {

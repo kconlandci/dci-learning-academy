@@ -26,6 +26,15 @@ export interface Replacement {
   replacement: string;
 }
 
+export interface PostRebrandAssertion {
+  /** File path relative to the dest root. */
+  file: string;
+  /** Substring that must appear in the file after all transforms. */
+  marker: string;
+  /** Human-readable description for the error message if missing. */
+  description: string;
+}
+
 export interface ModuleRebrand {
   /** Folder name under C:\Users\conla\OneDrive\Desktop\Forge Labs\ */
   sourceRepoName: string;
@@ -37,6 +46,8 @@ export interface ModuleRebrand {
   deletions: string[];
   /** Relative path → full file content. Written last, so stubs always win over replacements. */
   stubs: Record<string, string>;
+  /** Post-rebrand invariants: checked after all transforms, fail the run if missing. */
+  assertions?: PostRebrandAssertion[];
 }
 
 // Always-excluded copy patterns, shared by every module.
@@ -74,6 +85,43 @@ export const MODULES: Record<string, ModuleRebrand> = {
       {
         pattern: /^\.env\.\*\r?\n(?!!\.env\.example)/m,
         replacement: ".env.*\n!.env.example\n",
+      },
+      // Phase B: inject @dci/shared import into useProgress.ts for the
+      // Firestore progress mirror. Anchors on the localDate import (unique
+      // to useProgress.ts). If upstream ever removes that import, the
+      // post-rebrand assertion below catches the break.
+      {
+        pattern: /import \{ getLocalDateString \} from "\.\.\/utils\/localDate";/,
+        replacement:
+          'import { recordLabCompletion as recordToFirestore } from "@dci/shared";\n' +
+          'import { getLocalDateString } from "../utils/localDate";',
+      },
+      // Phase B: inject fire-and-forget Firestore mirror after the local
+      // mirrorToPreferences write inside recordLabCompletion. $1 captures
+      // the indentation so the block aligns with surrounding code.
+      {
+        pattern: /mirrorToPreferences\(next\);\r?\n(\s+)return next;/,
+        replacement:
+          "mirrorToPreferences(next);\n\n" +
+          "$1// ━━━ DCI PHASE B — Mirror completion to Firestore for instructor view ━━━\n" +
+          "$1// Fire-and-forget: never blocks the local state update.\n" +
+          "$1// studentId from localStorage, fires on every retake by design.\n" +
+          "$1const dciStudentId =\n" +
+          "$1  typeof localStorage !== \"undefined\"\n" +
+          "$1    ? localStorage.getItem(\"dci:student-id\")\n" +
+          "$1    : null;\n" +
+          "$1if (dciStudentId) {\n" +
+          "$1  recordToFirestore(dciStudentId, \"cybersecurity\", labId).catch(\n" +
+          "$1    (err) => {\n" +
+          "$1      console.warn(\n" +
+          "$1        \"[DCI] Failed to record lab completion to Firestore:\",\n" +
+          "$1        err,\n" +
+          "$1      );\n" +
+          "$1    },\n" +
+          "$1  );\n" +
+          "$1}\n" +
+          "$1// ━━━ END DCI PHASE B ━━━\n\n" +
+          "$1return next;",
       },
     ],
     deletions: [
@@ -722,5 +770,16 @@ export default defineConfig(({ command }) => ({
 </html>
 `,
     },
+    assertions: [
+      {
+        file: "src/hooks/useProgress.ts",
+        marker: "DCI PHASE B",
+        description:
+          "Firestore progress mirror hook must survive rebrand. " +
+          "If this assertion fires, the upstream anchor changed — " +
+          "check the import and mirrorToPreferences text replacements " +
+          "in rebrand.config.ts.",
+      },
+    ],
   },
 };
