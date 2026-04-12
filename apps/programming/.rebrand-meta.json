@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "rebrandScriptVersion": "1.0.0",
+  "module": {
+    "slug": "programming",
+    "sourceRepoName": "CodeForge"
+  },
+  "source": {
+    "path": "C:\\Users\\conla\\OneDrive\\Desktop\\Forge Labs\\CodeForge",
+    "gitCommit": "4b06e08d204d3356ea029df646d178bc76fcde29",
+    "gitBranch": "main"
+  },
+  "rebrandedAt": "2026-04-12T23:04:04.372Z"
+}

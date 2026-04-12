@@ -36,7 +36,7 @@ export const MODULES: readonly DciModule[] = [
     tagline: "Software development foundations with real coding exercises",
     sourceRepo: "CodeForge",
     labCount: 100,
-    available: false,
+    available: true,
   },
   {
     slug: "data-analytics",
