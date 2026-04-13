@@ -12,7 +12,7 @@ export function Landing({ session, onSignOut }: LandingProps) {
       <header className="border-b border-gray-200">
         <div className="mx-auto max-w-5xl px-6 py-4 flex items-center justify-between">
           <img
-            src={`${import.meta.env.BASE_URL}logo-wide.png.png`}
+            src={`${import.meta.env.BASE_URL}logo-wide.png`}
             alt="DCI Learning Academy"
             className="h-9 w-auto"
           />

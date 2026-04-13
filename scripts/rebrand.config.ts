@@ -83,7 +83,7 @@ export const MODULES: Record<string, ModuleRebrand> = {
       // production subpath (/dci-learning-academy/cybersecurity/).
       {
         pattern: /src="\/icon-512\.png"/g,
-        replacement: 'src={`${import.meta.env.BASE_URL}logo-mark.png.png`}',
+        replacement: 'src={`${import.meta.env.BASE_URL}logo-mark.png`}',
       },
       // Phase B: .gitignore must not swallow .env.example (upstream ignore
       // rule `.env.*` catches it otherwise). Append an un-ignore exception.
@@ -766,7 +766,7 @@ export default defineConfig(({ command }) => ({
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="/logo-mark.png.png" />
+    <link rel="icon" type="image/png" href="/logo-mark.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>DCI Cybersecurity Labs</title>
   </head>

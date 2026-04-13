@@ -54,7 +54,7 @@ export default function HomeScreen() {
         <div className="max-w-lg mx-auto pt-6">
           {/* Header */}
           <div className="flex items-center gap-3 mb-4">
-            <img src={`${import.meta.env.BASE_URL}logo-wide.png.png`} alt="DCI Cybersecurity Labs" className="h-8" />
+            <img src={`${import.meta.env.BASE_URL}logo-wide.png`} alt="DCI Cybersecurity Labs" className="h-8" />
             <div>
               <h1 className="text-xl font-bold text-[#1A1A1A]">DCI Cybersecurity Labs</h1>
               <p className="text-xs text-gray-500">
