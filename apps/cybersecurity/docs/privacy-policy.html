@@ -14,28 +14,28 @@
 </head>
 <body>
 <h1>DCI Cybersecurity Labs Privacy Policy</h1>
-<p class="updated">Last updated: March 2026</p>
+<p class="updated">Last updated: April 2026</p>
 
 <h2>1. Data Storage</h2>
-<p>DCI Cybersecurity Labs stores all progress data (completed labs, scores, streaks, XP) locally on your device using your browser's localStorage. This data does not leave your device.</p>
+<p>DCI Cybersecurity Labs stores progress data (completed labs and timestamps) in Google Cloud Firestore. Your progress is associated with a deterministic student identifier derived from your class access code and display name.</p>
 
-<h2>2. Authentication</h2>
-<p>DCI Cybersecurity Labs uses Firebase Anonymous Authentication to generate a random, anonymous user identifier (UID). This UID is not linked to any personal information such as your name, email, or phone number. It is used solely to support future features like progress sync and purchase restoration. Firebase may collect basic technical data (IP address, device type) as part of its standard operation — see <a href="https://firebase.google.com/support/privacy">Firebase Privacy</a> for details.</p>
+<h2>2. Student Identification</h2>
+<p>DCI Cybersecurity Labs does not use accounts, passwords, or personal authentication. Instead, a student identifier is computed as a SHA-256 hash of your class access code and display name. No email address, phone number, or other personally identifiable information is collected.</p>
 
-<h2>3. Personal Information</h2>
-<p>DCI Cybersecurity Labs does not collect, store, or transmit any personally identifiable information. No account creation is required. No email addresses, names, or phone numbers are collected.</p>
+<h2>3. Information Collected</h2>
+<p>The only information stored is your display name (first name and last initial), your computed student identifier, and lab completion timestamps. No payment information, device identifiers, or IP addresses are stored by the application.</p>
 
 <h2>4. Analytics and Tracking</h2>
-<p>The current version of DCI Cybersecurity Labs does not include any analytics, tracking pixels, advertising SDKs, or third-party data collection tools beyond Firebase Authentication.</p>
+<p>DCI Cybersecurity Labs tracks lab completions to display progress to students and instructors. No third-party analytics, advertising SDKs, or tracking tools are used.</p>
 
 <h2>5. Children's Privacy</h2>
 <p>DCI Cybersecurity Labs is designed for users aged 18 and older. We do not knowingly collect data from children under 18.</p>
 
 <h2>6. Data Deletion</h2>
-<p>You can delete all locally stored progress data at any time using the "Reset Progress" option in the app's Settings screen.</p>
+<p>You can delete all locally stored session data at any time by clearing your browser's localStorage for this site. Progress stored in Firestore can be removed by your instructor.</p>
 
 <h2>7. Changes to This Policy</h2>
-<p>When cloud sync, in-app purchases, or other features are added in future versions, this privacy policy will be updated to reflect those changes. Continued use of the app after policy changes constitutes acceptance.</p>
+<p>This privacy policy may be updated to reflect changes in the app's functionality. Continued use of the app after policy changes constitutes acceptance.</p>
 
 <h2>8. Contact</h2>
 <p>Questions about this privacy policy can be directed to: <a href="mailto:dci-cybersecurity.app@gmail.com">dci-cybersecurity.app@gmail.com</a></p>

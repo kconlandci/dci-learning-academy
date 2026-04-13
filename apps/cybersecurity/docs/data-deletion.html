@@ -18,14 +18,13 @@
 </head>
 <body>
 <h1>DCI Cybersecurity Labs — Delete Your Data</h1>
-<p class="updated">Last updated: March 2026</p>
+<p class="updated">Last updated: April 2026</p>
 
 <h2>What data does DCI Cybersecurity Labs store?</h2>
-<p>DCI Cybersecurity Labs stores all user data locally on your device. This includes completed labs, scores, XP, streaks, and learning progress. No personal information (name, email, phone number) is collected or stored.</p>
-<p>DCI Cybersecurity Labs also uses Firebase Anonymous Authentication, which generates a random anonymous identifier (UID) on your device. This UID is not linked to any personal information.</p>
+<p>DCI Cybersecurity Labs stores your display name, a computed student identifier (SHA-256 hash of your access code and display name), and lab completion timestamps in Google Cloud Firestore. Your browser also stores your session (access code, display name, student ID) in localStorage.</p>
 
-<h2>How to delete your data</h2>
-<p>You can delete all of your DCI Cybersecurity Labs data directly from the app:</p>
+<h2>How to delete your local data</h2>
+<p>You can delete your locally stored session data directly from the app:</p>
 
 <div class="steps">
   <div class="step"><span class="step-num">1</span> Open DCI Cybersecurity Labs</div>
@@ -34,13 +33,13 @@
   <div class="step"><span class="step-num">4</span> Confirm by tapping <strong>Reset Everything</strong></div>
 </div>
 
-<p>This will permanently delete all locally stored progress data, including completed labs, scores, XP, and streak history. This action cannot be undone.</p>
+<p>This clears all session data from your browser's localStorage. You can also clear localStorage manually via your browser's developer tools.</p>
+
+<h2>Firestore data</h2>
+<p>Progress data stored in Firestore (completed lab records and timestamps) can be removed by your instructor. Contact your instructor or email us to request deletion.</p>
 
 <h2>What gets deleted</h2>
-<p>All progress data stored in the app's local storage, including: completed lab records, best scores, attempt history, XP totals, XP history, streak counts, and scenario results.</p>
-
-<h2>What is not affected</h2>
-<p>The anonymous Firebase UID will be regenerated the next time you use the app. Uninstalling the app will also remove all locally stored data and the Firebase UID.</p>
+<p>Local deletion removes your stored session (access code, display name, student ID) from this browser. Firestore deletion removes your student document and all associated lab completion records.</p>
 
 <h2>Contact</h2>
 <p>If you have questions about data deletion, contact us at: <a href="mailto:dci-cybersecurity.app@gmail.com">dci-cybersecurity.app@gmail.com</a></p>

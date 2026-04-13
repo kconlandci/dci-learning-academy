@@ -1,20 +1,20 @@
 export const privacyPolicy = `DCI Programming Labs Privacy Policy
-Last updated: March 2026
+Last updated: April 2026
 
 1. Data Storage
-DCI Programming Labs stores progress data such as completed labs, scores, streaks, and XP locally on your device. This information is used to power your in-app learning experience.
+DCI Programming Labs stores progress data (completed labs and timestamps) in Google Cloud Firestore. Your progress is associated with a deterministic student identifier derived from your class access code and display name.
 
-2. Anonymous Authentication
-DCI Programming Labs uses Firebase Anonymous Authentication to create a random, anonymous user identifier (UID). This UID does not include your name, email address, or phone number. It is used only to support entitlement and restore flows.
+2. Student Identification
+DCI Programming Labs does not use accounts, passwords, or personal authentication. Instead, a student identifier is computed as a SHA-256 hash of your class access code and display name. No email address, phone number, or other personally identifiable information is collected.
 
-3. Purchase Processing
-If you unlock DCI Programming Labs Premium, the transaction is processed through Google Play and RevenueCat. RevenueCat receives the anonymous UID and purchase receipt needed to verify entitlement. Payment details are handled by the platform, not by DCI Programming Labs.
+3. Information Collected
+The only information stored is your display name (first name and last initial), your computed student identifier, and lab completion timestamps. No payment information, device identifiers, or IP addresses are stored by the application.
 
 4. Usage Analytics
-DCI Programming Labs stores lightweight usage analytics locally on your device, including labs started, labs completed, hints used, and session duration. These analytics support progress and usage summaries inside the app.
+DCI Programming Labs tracks lab completions to display progress to students and instructors. No third-party analytics, advertising SDKs, or tracking tools are used.
 
-5. Educational Use
-DCI Programming Labs is designed for learning and practice. The labs are simulated exercises focused on secure coding and software development decision-making.
+5. Classroom Use
+DCI Programming Labs is designed for instructor-led classroom environments. Access is controlled by a class access code provided by your instructor.
 
 6. Changes to This Policy
 This privacy policy may be updated to reflect changes in the app's features or services. Continued use of the app after updates constitutes acceptance of the revised policy.
@@ -23,7 +23,7 @@ This privacy policy may be updated to reflect changes in the app's features or s
 Questions about this privacy policy can be directed to: dci-programming.app@gmail.com`;
 
 export const termsOfService = `DCI Programming Labs Terms of Service
-Last updated: March 2026
+Last updated: April 2026
 
 By using DCI Programming Labs, you agree to the following terms:
 
@@ -40,10 +40,10 @@ You agree to use DCI Programming Labs content for lawful learning and defensive 
 DCI Programming Labs labs are designed to teach secure engineering judgment and may simplify real-world complexity. Content is provided "as is" without warranty of accuracy, completeness, or fitness for a particular purpose.
 
 5. Changes to the Service
-DCI Programming Labs may evolve over time, including changes to pricing, content, learning paths, and product features.
+DCI Programming Labs may evolve over time, including changes to content, learning paths, and product features.
 
 6. Age Requirement
-You must meet the age requirements applicable in your region to use this app and purchase premium content.
+You must be 18 years of age or older to use DCI Programming Labs.
 
 7. Contact
 Questions about these terms can be directed to: dci-programming.app@gmail.com`;
