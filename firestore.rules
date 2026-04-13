@@ -3,31 +3,73 @@ rules_version = '2';
 // DCI Learning Academy — Firestore security rules.
 //
 // MVP security model: no Firebase Auth. Student identity is derived from a
-// SHA-256 hash of (accessCode + ':' + normalizedDisplayName). Without the
-// access code an attacker cannot construct a valid students/{studentId}
-// path, so open read/write on that subtree is acceptable for the MVP.
+// SHA-256 hash of (normalizedAccessCode + ':' + normalizedDisplayName).
+// Without the access code an attacker cannot construct a valid
+// students/{studentId} path, so open reads on that subtree are acceptable.
 //
-// Revisit when/if we add real auth (Firebase Anonymous Auth at minimum).
+// Writes are validated: document shape must match the expected schema with
+// no extra fields. This rejects junk/malformed writes while keeping the
+// classroom trust model intact.
 
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Config lives at config/access and config/instructor.
-    // Clients can only `get` these two specific docs (used by the gates);
-    // they cannot `list` the collection or write to it.
+    // ── helpers ──────────────────────────────────────────────────────
+    // Valid module slugs (must match shared/src/modules.ts).
+    function isValidModule(val) {
+      return val in [
+        'cybersecurity',
+        'programming',
+        'data-analytics',
+        'cloud-computing',
+        'networking',
+        'it-support'
+      ];
+    }
+
+    // studentId in path must be a 64-char hex string (SHA-256 output).
+    function isValidStudentId(id) {
+      return id.matches('^[0-9a-f]{64}$');
+    }
+
+    // ── config ───────────────────────────────────────────────────────
+    // Clients can only `get` the access and instructor docs.
+    // No list, no write.
     match /config/{docId} {
       allow get: if docId in ['access', 'instructor'];
       allow list, write: if false;
     }
 
-    // Student docs and their progress subcollection.
-    // Open read/write, gated in practice by the secrecy of the access code
-    // (which is required to derive the studentId path).
+    // ── students ─────────────────────────────────────────────────────
     match /students/{studentId} {
-      allow read, write: if true;
+      allow read: if true;
 
+      // Validate document shape on create/update.
+      allow write: if isValidStudentId(studentId)
+        && request.resource.data.keys().hasOnly(['displayName', 'normalizedDisplayName', 'createdAt'])
+        && request.resource.data.displayName is string
+        && request.resource.data.displayName.size() >= 1
+        && request.resource.data.displayName.size() <= 100
+        && request.resource.data.normalizedDisplayName is string
+        && request.resource.data.normalizedDisplayName.size() >= 1
+        && request.resource.data.normalizedDisplayName.size() <= 100
+        && request.resource.data.createdAt is timestamp;
+
+      // ── progress subcollection ───────────────────────────────────
       match /progress/{progressId} {
-        allow read, write: if true;
+        allow read: if true;
+
+        // progressId must be {module}:{labId} format.
+        // Document must contain exactly module, labId, completedAt.
+        allow write: if isValidStudentId(studentId)
+          && progressId.matches('^[a-z0-9-]+:.+$')
+          && request.resource.data.keys().hasOnly(['module', 'labId', 'completedAt'])
+          && request.resource.data.module is string
+          && isValidModule(request.resource.data.module)
+          && request.resource.data.labId is string
+          && request.resource.data.labId.size() >= 1
+          && request.resource.data.labId.size() <= 200
+          && request.resource.data.completedAt is timestamp;
       }
     }
   }
