@@ -15,7 +15,7 @@ export {
 } from "./auth";
 
 // Student ID derivation
-export { normalizeDisplayName, computeStudentId } from "./studentId";
+export { normalizeDisplayName, normalizeAccessCode, computeStudentId } from "./studentId";
 
 // Progress tracking
 export {

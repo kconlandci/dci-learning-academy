@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import {
   computeStudentId,
   ensureStudentDoc,
+  normalizeAccessCode,
   saveInstructorSession,
   saveSession,
   validateAccessCode,
@@ -74,11 +75,12 @@ export function Gate({ onAuthed }: GateProps) {
         return;
       }
 
+      const normalizedCode = normalizeAccessCode(trimmedCode);
       const studentId = await computeStudentId(trimmedCode, trimmedName);
       await ensureStudentDoc(studentId, trimmedName);
 
       const session: Session = {
-        accessCode: trimmedCode,
+        accessCode: normalizedCode,
         displayName: trimmedName,
         studentId,
       };

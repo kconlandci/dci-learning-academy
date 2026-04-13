@@ -1,7 +1,7 @@
 /**
  * Student ID derivation.
  *
- * studentId is a deterministic SHA-256 of `accessCode:normalized(displayName)`.
+ * studentId is a deterministic SHA-256 of `normalized(accessCode):normalized(displayName)`.
  * Deriving (rather than storing a UUID in localStorage) means a student's
  * progress follows them across devices — classroom to homework — as long as
  * they use the same access code + display name. Browser-data clears also
@@ -37,15 +37,24 @@ export function normalizeDisplayName(name: string): string {
  * Uses Web Crypto (available in all evergreen browsers and secure contexts).
  * Output is a 64-character lowercase hex string.
  */
+/** Normalize an access code: trim + uppercase. */
+export function normalizeAccessCode(code: string): string {
+  return code.trim().toUpperCase();
+}
+
 export async function computeStudentId(
   accessCode: string,
   displayName: string,
 ): Promise<string> {
+  const normalizedCode = normalizeAccessCode(accessCode);
   const normalized = normalizeDisplayName(displayName);
+  if (!normalizedCode) {
+    throw new Error("Access code must contain at least one non-whitespace character");
+  }
   if (!normalized) {
     throw new Error("Display name must contain at least one non-whitespace character");
   }
-  const input = `${accessCode}:${normalized}`;
+  const input = `${normalizedCode}:${normalized}`;
   const bytes = new TextEncoder().encode(input);
   const hashBuffer = await crypto.subtle.digest("SHA-256", bytes);
   return Array.from(new Uint8Array(hashBuffer))
