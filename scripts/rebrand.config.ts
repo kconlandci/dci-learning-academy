@@ -811,7 +811,7 @@ export default defineConfig(({ command }) => ({
       // Replace broken icon-512.png ref with DCI logo mark
       {
         pattern: /src="\/icon-512\.png"/g,
-        replacement: 'src={`${import.meta.env.BASE_URL}logo-mark.png.png`}',
+        replacement: 'src={`${import.meta.env.BASE_URL}logo-mark.png`}',
       },
       // .gitignore: don't swallow .env.example
       {
@@ -1416,7 +1416,7 @@ export default defineConfig(({ command }) => ({
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="/logo-mark.png.png" />
+    <link rel="icon" type="image/png" href="/logo-mark.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>DCI Programming Labs</title>
   </head>

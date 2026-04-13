@@ -62,7 +62,7 @@ export default function SettingsScreen() {
         <div className="text-center mb-8">
           <div className="mx-auto mb-3 flex justify-center">
             <img
-              src={`${import.meta.env.BASE_URL}logo-wide.png.png`}
+              src={`${import.meta.env.BASE_URL}logo-wide.png`}
               alt="DCI Programming Labs"
               className="h-16"
             />

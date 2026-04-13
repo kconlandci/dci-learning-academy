@@ -75,7 +75,7 @@ export default function HomeScreen() {
         <div className="max-w-lg mx-auto pt-6">
           <div className="flex items-center gap-3 mb-4">
             <img
-              src={`${import.meta.env.BASE_URL}logo-wide.png.png`}
+              src={`${import.meta.env.BASE_URL}logo-wide.png`}
               alt="DCI Programming Labs"
               className="h-8"
             />

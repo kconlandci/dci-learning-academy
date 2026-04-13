@@ -30,7 +30,7 @@ const screens: OnboardingScreen[] = [
     icon: (
       <div className="mb-4 flex justify-center">
         <img
-          src={`${import.meta.env.BASE_URL}logo-wide.png.png`}
+          src={`${import.meta.env.BASE_URL}logo-wide.png`}
           alt="DCI Programming Labs"
           className="h-14"
         />
