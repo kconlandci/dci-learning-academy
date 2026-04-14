@@ -138,7 +138,7 @@ export default function ToggleConfigRenderer({ scenario, onSubmit, phase, feedba
             {feedbackResult.type === "perfect" ? (
               <CheckCircle size={18} className="text-green-400" />
             ) : feedbackResult.type === "partial" ? (
-              <CheckCircle size={18} className="text-yellow-400" />
+              <CheckCircle size={18} className="text-yellow-600" />
             ) : (
               <XCircle size={18} className="text-red-400" />
             )}
@@ -147,7 +147,7 @@ export default function ToggleConfigRenderer({ scenario, onSubmit, phase, feedba
                 feedbackResult.type === "perfect"
                   ? "text-green-400"
                   : feedbackResult.type === "partial"
-                  ? "text-yellow-400"
+                  ? "text-yellow-600"
                   : "text-red-400"
               }`}
             >

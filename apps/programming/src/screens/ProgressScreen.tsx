@@ -59,7 +59,7 @@ export default function ProgressScreen() {
             </div>
           </div>
           <div className="flex-1 bg-[#F5F5F5] rounded-xl p-4 text-center">
-            <Trophy size={20} className="text-yellow-400 mx-auto mb-1" />
+            <Trophy size={20} className="text-yellow-600 mx-auto mb-1" />
             <div className="text-2xl font-bold text-[#1A1A1A]">
               {progress.longestStreak}
             </div>

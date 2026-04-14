@@ -56,7 +56,7 @@ function getPerformanceTier(
   if (score >= thresholds.partial) {
     return {
       label: "PARTIAL",
-      color: "text-yellow-400",
+      color: "text-yellow-600",
       bg: "bg-yellow-500/10",
     };
   }
@@ -247,7 +247,7 @@ export default function LabEngine({
                 <span>Perfect answers</span>
                 <span>{perfectCount}</span>
               </div>
-              <div className="flex justify-between text-yellow-400">
+              <div className="flex justify-between text-yellow-600">
                 <span>Partial answers</span>
                 <span>{partialCount}</span>
               </div>

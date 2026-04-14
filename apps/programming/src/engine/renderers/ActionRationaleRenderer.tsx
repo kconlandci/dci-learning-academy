@@ -59,7 +59,7 @@ export default function ActionRationaleRenderer({ scenario, onSubmit, phase, fee
               <span className="text-gray-500">{field.label}</span>
               <span className={
                 field.emphasis === "critical" ? "text-red-400 font-medium" :
-                field.emphasis === "warn" ? "text-yellow-400 font-medium" :
+                field.emphasis === "warn" ? "text-yellow-600 font-medium" :
                 "text-[#1A1A1A]"
               }>
                 {field.value}
@@ -160,13 +160,13 @@ export default function ActionRationaleRenderer({ scenario, onSubmit, phase, fee
             {feedbackResult.type === "perfect" ? (
               <CheckCircle size={18} className="text-green-400" />
             ) : feedbackResult.type === "partial" ? (
-              <CheckCircle size={18} className="text-yellow-400" />
+              <CheckCircle size={18} className="text-yellow-600" />
             ) : (
               <XCircle size={18} className="text-red-400" />
             )}
             <span className={`text-sm font-semibold capitalize ${
               feedbackResult.type === "perfect" ? "text-green-400" :
-              feedbackResult.type === "partial" ? "text-yellow-400" : "text-red-400"
+              feedbackResult.type === "partial" ? "text-yellow-600" : "text-red-400"
             }`}>
               {feedbackResult.type === "perfect" ? "Correct!" :
                feedbackResult.type === "partial" ? "Partially Correct" : "Incorrect"}
