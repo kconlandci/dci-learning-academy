@@ -17,7 +17,7 @@ const LegalTextViewer = lazy(() => import("./components/LegalTextViewer"));
 
 function LazyFallback() {
   return (
-    <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+    <div className="min-h-screen bg-white flex items-center justify-center">
       <div className="w-4 h-4 border-2 border-amber-400 border-t-transparent rounded-full animate-spin" />
     </div>
   );

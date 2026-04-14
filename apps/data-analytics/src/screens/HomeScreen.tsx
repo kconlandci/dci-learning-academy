@@ -68,50 +68,50 @@ export default function HomeScreen() {
         <Onboarding onComplete={() => setShowOnboarding(false)} />
       )}
 
-      <div className="min-h-screen bg-slate-900 p-4 pb-24">
+      <div className="min-h-screen bg-white p-4 pb-24">
         <div className="max-w-lg mx-auto pt-6">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-11 h-11 rounded-2xl bg-amber-500/15 border border-amber-400/20 flex items-center justify-center">
-              <Database className="text-amber-400" size={22} />
+              <Database className="text-amber-600" size={22} />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-white">DCI Data Analytics Labs</h1>
-              <p className="text-xs text-slate-400">
+              <h1 className="text-xl font-bold text-[#1A1A1A]">DCI Data Analytics Labs</h1>
+              <p className="text-xs text-gray-500">
                 DCI Data Analytics Labs: Data Training
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-4 mb-6 px-1">
-            <div className="flex items-center gap-1.5 text-xs text-slate-400">
-              <Zap size={12} className="text-amber-400" />
+            <div className="flex items-center gap-1.5 text-xs text-gray-500">
+              <Zap size={12} className="text-amber-600" />
               <span className="font-medium">{progress.xp} XP</span>
             </div>
             {progress.streakDays > 0 && (
-              <div className="flex items-center gap-1.5 text-xs text-slate-400">
-                <Flame size={12} className="text-amber-400" />
+              <div className="flex items-center gap-1.5 text-xs text-gray-500">
+                <Flame size={12} className="text-amber-600" />
                 <span className="font-medium">
                   {progress.streakDays} day streak
                 </span>
               </div>
             )}
-            <div className="text-xs text-slate-500">
+            <div className="text-xs text-gray-400">
               {completedCount}/{publishedLabs.length} completed
             </div>
           </div>
 
           {activePath && (
             <section className="mb-6">
-              <div className="bg-slate-800 rounded-xl p-4">
+              <div className="bg-[#F5F5F5] rounded-xl p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <h2 className="text-sm font-semibold text-white">
+                  <h2 className="text-sm font-semibold text-[#1A1A1A]">
                     Continue: {activePath.path.name}
                   </h2>
-                  <span className="text-[10px] text-slate-400">
+                  <span className="text-[10px] text-gray-500">
                     {activePath.completedCount}/{activePath.path.labIds.length}
                   </span>
                 </div>
-                <div className="h-1.5 bg-slate-700 rounded-full overflow-hidden mb-3">
+                <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden mb-3">
                   <div
                     className="h-full bg-amber-500 rounded-full transition-all"
                     style={{
@@ -124,14 +124,14 @@ export default function HomeScreen() {
                   />
                 </div>
                 <div className="flex items-center justify-between gap-3">
-                  <span className="text-xs text-slate-400">
+                  <span className="text-xs text-gray-500">
                     {labCatalog.find((lab) => lab.id === activePath.nextLabId)
                       ?.title ?? "Next lab"}
                   </span>
                   <button
                     onClick={() => navigate(`/lab/${activePath.nextLabId}`)}
                     aria-label="Continue learning path"
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500 text-white text-xs font-medium min-h-[36px] active:bg-amber-600 transition-colors"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500 text-[#1A1A1A] text-xs font-medium min-h-[36px] active:bg-amber-600 transition-colors"
                   >
                     <Play size={12} /> Continue
                   </button>
@@ -141,7 +141,7 @@ export default function HomeScreen() {
           )}
 
           <section className="mb-8">
-            <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wide mb-3">
+            <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">
               Learning Paths
             </h2>
             <div className="space-y-3">
@@ -174,22 +174,22 @@ export default function HomeScreen() {
               onClick={() => setShowAllLabs(!showAllLabs)}
               className="flex items-center gap-2 w-full mb-3 min-h-[44px]"
             >
-              <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wide">
+              <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
                 All Labs
               </h2>
               <ChevronDown
                 size={14}
-                className={`text-slate-500 transition-transform ${
+                className={`text-gray-400 transition-transform ${
                   showAllLabs ? "rotate-180" : ""
                 }`}
               />
-              <span className="text-[10px] text-slate-500 ml-auto">
+              <span className="text-[10px] text-gray-400 ml-auto">
                 {publishedLabs.length} labs
               </span>
             </button>
             {showAllLabs && (
               <>
-                <h3 className="text-xs text-slate-500 mb-2 px-1">Free</h3>
+                <h3 className="text-xs text-gray-400 mb-2 px-1">Free</h3>
                 <div className="space-y-2 mb-4">
                   {freeLabs.map((lab) => (
                     <LabCard
@@ -201,7 +201,7 @@ export default function HomeScreen() {
                 </div>
                 {premiumLabs.length > 0 && (
                   <>
-                    <h3 className="text-xs text-slate-500 mb-2 px-1">
+                    <h3 className="text-xs text-gray-400 mb-2 px-1">
                       Premium
                     </h3>
                     <div className="space-y-2">
@@ -253,27 +253,27 @@ function PathCard({
       : uniqueTiers[0] ?? "";
 
   return (
-    <div className="bg-slate-800 rounded-xl overflow-hidden">
+    <div className="bg-[#F5F5F5] rounded-xl overflow-hidden">
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full p-4 flex items-center gap-3 min-h-[56px] active:bg-slate-700 transition-colors text-left"
+        className="w-full p-4 flex items-center gap-3 min-h-[56px] active:bg-gray-200 transition-colors text-left"
       >
         <div className="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center shrink-0">
-          <Icon size={18} className="text-amber-400" />
+          <Icon size={18} className="text-amber-600" />
         </div>
         <div className="flex-1 min-w-0">
-          <div className="text-sm font-medium text-white truncate">
+          <div className="text-sm font-medium text-[#1A1A1A] truncate">
             {path.title}
           </div>
           <div className="flex items-center gap-2 mt-0.5">
-            <span className="text-[10px] text-slate-500 capitalize">
+            <span className="text-[10px] text-gray-400 capitalize">
               {tierLabel}
             </span>
-            <span className="text-[10px] text-slate-500">
+            <span className="text-[10px] text-gray-400">
               {completedCount}/{total}
             </span>
           </div>
-          <div className="h-1 bg-slate-700 rounded-full overflow-hidden mt-1.5 w-full max-w-[120px]">
+          <div className="h-1 bg-gray-200 rounded-full overflow-hidden mt-1.5 w-full max-w-[120px]">
             <div
               className="h-full bg-amber-500 rounded-full transition-all"
               style={{ width: `${total > 0 ? (completedCount / total) * 100 : 0}%` }}
@@ -282,7 +282,7 @@ function PathCard({
         </div>
         <ChevronDown
           size={16}
-          className={`text-slate-500 shrink-0 transition-transform ${
+          className={`text-gray-400 shrink-0 transition-transform ${
             expanded ? "rotate-180" : ""
           }`}
         />
@@ -290,7 +290,7 @@ function PathCard({
 
       {expanded && (
         <div className="px-4 pb-4 space-y-1.5">
-          <p className="text-xs text-slate-400 mb-2">{path.description}</p>
+          <p className="text-xs text-gray-500 mb-2">{path.description}</p>
           {path.labIds.map((labId, index) => {
             const lab = labCatalog.find((candidate) => candidate.id === labId);
             if (!lab) return null;
@@ -302,17 +302,17 @@ function PathCard({
                 key={labId}
                 to={isLocked ? "/upgrade" : `/lab/${labId}`}
                 className={`flex items-center gap-2 py-2 px-2 rounded-lg min-h-[44px] ${
-                  isLocked ? "opacity-60" : "active:bg-slate-700"
+                  isLocked ? "opacity-60" : "active:bg-gray-200"
                 } transition-colors`}
               >
-                <span className="w-5 h-5 rounded-full bg-slate-700 flex items-center justify-center text-[10px] text-slate-400 font-bold shrink-0">
+                <span className="w-5 h-5 rounded-full bg-gray-200 flex items-center justify-center text-[10px] text-gray-500 font-bold shrink-0">
                   {labProgress?.completed ? (
                     <CheckCircle size={14} className="text-green-400" />
                   ) : (
                     index + 1
                   )}
                 </span>
-                <span className="text-xs text-white flex-1 truncate">
+                <span className="text-xs text-[#1A1A1A] flex-1 truncate">
                   {lab.title}
                 </span>
                 {labProgress?.completed && (
@@ -321,7 +321,7 @@ function PathCard({
                   </span>
                 )}
                 {isLocked ? (
-                  <Lock size={12} className="text-slate-500 shrink-0" />
+                  <Lock size={12} className="text-gray-400 shrink-0" />
                 ) : (
                   <ChevronRight size={14} className="text-slate-600 shrink-0" />
                 )}
@@ -356,14 +356,14 @@ function LabCard({
   return (
     <Link
       to={locked ? "/upgrade" : `/lab/${lab.id}`}
-      className={`block bg-slate-800 rounded-xl p-3 transition-colors ${
-        locked ? "opacity-70 active:opacity-80" : "active:bg-slate-700"
+      className={`block bg-[#F5F5F5] rounded-xl p-3 transition-colors ${
+        locked ? "opacity-70 active:opacity-80" : "active:bg-gray-200"
       }`}
     >
       <div className="flex items-center justify-between gap-3">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-0.5">
-            <span className="text-xs font-medium text-white truncate">
+            <span className="text-xs font-medium text-[#1A1A1A] truncate">
               {lab.title}
             </span>
           </div>
@@ -373,7 +373,7 @@ function LabCard({
             >
               {lab.tier}
             </span>
-            <span className="text-[10px] text-slate-500">
+            <span className="text-[10px] text-gray-400">
               ~{lab.estimatedMinutes} min
             </span>
             {labProgress?.completed && (
@@ -385,7 +385,7 @@ function LabCard({
           </div>
         </div>
         {locked ? (
-          <Lock size={14} className="text-slate-500 shrink-0" />
+          <Lock size={14} className="text-gray-400 shrink-0" />
         ) : (
           <ChevronRight size={16} className="text-slate-600 shrink-0" />
         )}

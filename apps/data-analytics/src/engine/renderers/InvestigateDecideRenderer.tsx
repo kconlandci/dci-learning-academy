@@ -45,14 +45,14 @@ export default function InvestigateDecideRenderer({ scenario, onSubmit, phase, f
   return (
     <div className="space-y-4">
       {/* Title + objective */}
-      <h2 className="text-lg font-semibold text-white">{s.title}</h2>
-      <div className="bg-slate-800 rounded-xl p-4">
-        <p className="text-sm text-slate-300 leading-relaxed">{s.objective}</p>
+      <h2 className="text-lg font-semibold text-[#1A1A1A]">{s.title}</h2>
+      <div className="bg-[#F5F5F5] rounded-xl p-4">
+        <p className="text-sm text-gray-500 leading-relaxed">{s.objective}</p>
       </div>
 
       {/* Investigation sources */}
       <div>
-        <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wide mb-2 flex items-center gap-2">
+        <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2 flex items-center gap-2">
           <Search size={14} />
           Investigation Sources
         </h3>
@@ -62,21 +62,21 @@ export default function InvestigateDecideRenderer({ scenario, onSubmit, phase, f
             const isExpanded = expandedSource === src.id;
 
             return (
-              <div key={src.id} className="rounded-xl border-2 border-slate-700 bg-slate-800 overflow-hidden">
+              <div key={src.id} className="rounded-xl border-2 border-gray-200 bg-[#F5F5F5] overflow-hidden">
                 <button
                   onClick={() => toggleSource(src.id)}
                   disabled={isLocked}
                   className={`w-full min-h-[44px] px-4 py-3 flex items-center justify-between text-left transition-all ${
-                    isLocked ? "cursor-default" : "cursor-pointer active:bg-slate-700/50"
+                    isLocked ? "cursor-default" : "cursor-pointer active:bg-gray-200/50"
                   }`}
                 >
                   <div className="flex items-center gap-2">
                     {isViewed ? (
-                      <Eye size={14} className="text-amber-400" />
+                      <Eye size={14} className="text-amber-600" />
                     ) : (
-                      <EyeOff size={14} className="text-slate-500" />
+                      <EyeOff size={14} className="text-gray-400" />
                     )}
-                    <span className={`text-sm font-medium ${isViewed ? "text-white" : "text-slate-400"}`}>
+                    <span className={`text-sm font-medium ${isViewed ? "text-[#1A1A1A]" : "text-gray-500"}`}>
                       {src.label}
                     </span>
                   </div>
@@ -87,8 +87,8 @@ export default function InvestigateDecideRenderer({ scenario, onSubmit, phase, f
                   )}
                 </button>
                 {isExpanded && (
-                  <div className="px-4 pb-3 border-t border-slate-700">
-                    <pre className="text-xs text-green-400 font-mono whitespace-pre-wrap leading-relaxed mt-2 bg-slate-900/50 rounded-lg p-3">
+                  <div className="px-4 pb-3 border-t border-gray-200">
+                    <pre className="text-xs text-green-400 font-mono whitespace-pre-wrap leading-relaxed mt-2 bg-white/50 rounded-lg p-3">
                       {src.content}
                     </pre>
                   </div>
@@ -101,7 +101,7 @@ export default function InvestigateDecideRenderer({ scenario, onSubmit, phase, f
 
       {/* Action selection */}
       <div>
-        <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wide mb-2">
+        <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">
           Choose Action
         </h3>
         <div className="grid gap-2">
@@ -115,7 +115,7 @@ export default function InvestigateDecideRenderer({ scenario, onSubmit, phase, f
                 className={`min-h-[44px] p-3 rounded-xl border-2 text-left text-sm font-medium transition-all ${
                   isSelected
                     ? "bg-amber-500/20 border-amber-500 text-amber-200"
-                    : "bg-slate-800 border-slate-700 text-slate-300 hover:border-slate-500"
+                    : "bg-[#F5F5F5] border-gray-200 text-gray-500 hover:border-gray-400"
                 } ${isLocked ? "opacity-70 cursor-default" : "cursor-pointer"}`}
               >
                 {action.label}
@@ -127,7 +127,7 @@ export default function InvestigateDecideRenderer({ scenario, onSubmit, phase, f
 
       {/* Rationale selection */}
       <div>
-        <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wide mb-2">
+        <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">
           Justify Your Decision
         </h3>
         <div className="grid gap-2">
@@ -141,7 +141,7 @@ export default function InvestigateDecideRenderer({ scenario, onSubmit, phase, f
                 className={`min-h-[44px] p-3 rounded-xl border-2 text-left text-sm transition-all ${
                   isSelected
                     ? "bg-amber-500/20 border-amber-500 text-amber-200"
-                    : "bg-slate-800 border-slate-700 text-slate-300 hover:border-slate-500"
+                    : "bg-[#F5F5F5] border-gray-200 text-gray-500 hover:border-gray-400"
                 } ${isLocked ? "opacity-70 cursor-default" : "cursor-pointer"}`}
               >
                 {r.text}
@@ -156,7 +156,7 @@ export default function InvestigateDecideRenderer({ scenario, onSubmit, phase, f
         <button
           onClick={handleSubmit}
           disabled={!selectedAction || !selectedRationale}
-          className="w-full py-3 rounded-xl bg-amber-500 hover:bg-amber-600 disabled:bg-slate-700 disabled:text-slate-500 text-white font-semibold transition-colors"
+          className="w-full py-3 rounded-xl bg-amber-500 hover:bg-amber-600 disabled:bg-gray-200 disabled:text-gray-400 text-[#1A1A1A] font-semibold transition-colors"
         >
           Submit Answer
         </button>
@@ -178,7 +178,7 @@ export default function InvestigateDecideRenderer({ scenario, onSubmit, phase, f
               {feedbackResult.type === "perfect" ? (
                 <CheckCircle size={18} className="text-green-400" />
               ) : feedbackResult.type === "partial" ? (
-                <CheckCircle size={18} className="text-yellow-400" />
+                <CheckCircle size={18} className="text-yellow-600" />
               ) : (
                 <XCircle size={18} className="text-red-400" />
               )}
@@ -187,7 +187,7 @@ export default function InvestigateDecideRenderer({ scenario, onSubmit, phase, f
                   feedbackResult.type === "perfect"
                     ? "text-green-400"
                     : feedbackResult.type === "partial"
-                    ? "text-yellow-400"
+                    ? "text-yellow-600"
                     : "text-red-400"
                 }`}
               >
@@ -198,7 +198,7 @@ export default function InvestigateDecideRenderer({ scenario, onSubmit, phase, f
                   : "Incorrect"}
               </span>
             </div>
-            <p className="text-sm text-slate-300">{feedbackResult.message}</p>
+            <p className="text-sm text-gray-500">{feedbackResult.message}</p>
           </div>
 
           {/* Critical source feedback */}

@@ -53,7 +53,7 @@ interface LabEngineProps {
 
 function getPerformanceTier(score: number, thresholds: ScoringConfig["passingThresholds"]) {
   if (score >= thresholds.pass) return { label: "PASS", color: "text-green-400", bg: "bg-green-500/10" };
-  if (score >= thresholds.partial) return { label: "PARTIAL", color: "text-yellow-400", bg: "bg-yellow-500/10" };
+  if (score >= thresholds.partial) return { label: "PARTIAL", color: "text-yellow-600", bg: "bg-yellow-500/10" };
   return { label: "NEEDS IMPROVEMENT", color: "text-red-400", bg: "bg-red-500/10" };
 }
 
@@ -138,20 +138,20 @@ export default function LabEngine({
   // --- INTRO ---
   if (phase === "intro") {
     return (
-      <div className="min-h-screen bg-slate-900 p-4">
+      <div className="min-h-screen bg-white p-4">
         <div className="max-w-lg mx-auto pt-8">
           {/* Header */}
           <div className="flex items-center gap-3 mb-6">
             <div className="w-12 h-12 rounded-xl bg-amber-500/20 flex items-center justify-center">
-              <Database className="text-amber-400" size={24} />
+              <Database className="text-amber-600" size={24} />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-white">{manifest.title}</h1>
+              <h1 className="text-xl font-bold text-[#1A1A1A]">{manifest.title}</h1>
               <div className="flex gap-2 mt-1">
                 <span className="px-2 py-0.5 rounded text-xs font-medium bg-blue-500/20 text-blue-300">
                   {manifest.tier}
                 </span>
-                <span className="px-2 py-0.5 rounded text-xs font-medium bg-slate-700 text-slate-300">
+                <span className="px-2 py-0.5 rounded text-xs font-medium bg-gray-200 text-gray-500">
                   {manifest.track}
                 </span>
               </div>
@@ -159,17 +159,17 @@ export default function LabEngine({
           </div>
 
           {/* Description */}
-          <p className="text-slate-300 mb-6">{manifest.description}</p>
+          <p className="text-gray-500 mb-6">{manifest.description}</p>
 
           {/* Objectives */}
-          <div className="bg-slate-800 rounded-xl p-4 mb-6">
-            <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wide mb-3">
+          <div className="bg-[#F5F5F5] rounded-xl p-4 mb-6">
+            <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">
               Learning Objectives
             </h2>
             <ul className="space-y-2">
               {manifest.learningObjectives.map((obj, i) => (
-                <li key={i} className="flex items-start gap-2 text-sm text-slate-300">
-                  <Target size={14} className="text-amber-400 mt-0.5 shrink-0" />
+                <li key={i} className="flex items-start gap-2 text-sm text-gray-500">
+                  <Target size={14} className="text-amber-600 mt-0.5 shrink-0" />
                   {obj}
                 </li>
               ))}
@@ -177,7 +177,7 @@ export default function LabEngine({
           </div>
 
           {/* Meta */}
-          <div className="flex gap-4 text-sm text-slate-400 mb-8">
+          <div className="flex gap-4 text-sm text-gray-500 mb-8">
             <span>{manifest.scenarios.length} scenarios</span>
             <span>~{manifest.estimatedMinutes} min</span>
             <span className="capitalize">{manifest.difficulty}</span>
@@ -187,7 +187,7 @@ export default function LabEngine({
           <button
             onClick={() => setPhase("active")}
             aria-label="Start lab"
-            className="w-full py-3.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-semibold text-lg transition-colors flex items-center justify-center gap-2"
+            className="w-full py-3.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-[#1A1A1A] font-semibold text-lg transition-colors flex items-center justify-center gap-2"
           >
             Start Lab <ArrowRight size={20} />
           </button>
@@ -195,7 +195,7 @@ export default function LabEngine({
           <button
             onClick={onExit}
             aria-label="Back to catalog"
-            className="w-full mt-3 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 text-sm transition-colors"
+            className="w-full mt-3 py-2.5 rounded-xl bg-[#F5F5F5] hover:bg-gray-200 text-gray-500 text-sm transition-colors"
           >
             Back to Catalog
           </button>
@@ -212,33 +212,33 @@ export default function LabEngine({
     const wrongCount = history.filter((h) => h.type === "wrong").length;
 
     return (
-      <div className="min-h-screen bg-slate-900 p-4">
+      <div className="min-h-screen bg-white p-4">
         <div className="max-w-lg mx-auto pt-8">
           {/* Score */}
           <div className={`rounded-2xl p-6 text-center mb-6 ${tier.bg}`}>
             <Trophy className={`mx-auto mb-2 ${tier.color}`} size={40} />
             <div className={`text-5xl font-bold ${tier.color}`}>{score}</div>
-            <div className="text-slate-400 text-sm mt-1">out of {manifest.scoring.maxScore}</div>
+            <div className="text-gray-500 text-sm mt-1">out of {manifest.scoring.maxScore}</div>
             <div className={`text-lg font-semibold mt-2 ${tier.color}`}>{tier.label}</div>
           </div>
 
           {/* Breakdown */}
-          <div className="bg-slate-800 rounded-xl p-4 mb-6">
-            <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wide mb-3">
+          <div className="bg-[#F5F5F5] rounded-xl p-4 mb-6">
+            <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">
               Breakdown
             </h2>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between text-green-400">
                 <span>Perfect answers</span><span>{perfectCount}</span>
               </div>
-              <div className="flex justify-between text-yellow-400">
+              <div className="flex justify-between text-yellow-600">
                 <span>Partial answers</span><span>{partialCount}</span>
               </div>
               <div className="flex justify-between text-red-400">
                 <span>Wrong answers</span><span>{wrongCount}</span>
               </div>
               {hintsUsed > 0 && (
-                <div className="flex justify-between text-slate-400">
+                <div className="flex justify-between text-gray-500">
                   <span>Hints used ({hintsUsed} x -{manifest.scoring.hintPenalty})</span>
                   <span>-{hintsUsed * manifest.scoring.hintPenalty}</span>
                 </div>
@@ -247,23 +247,23 @@ export default function LabEngine({
           </div>
 
           {/* Career Insight */}
-          <div className="bg-slate-800 rounded-xl p-4 mb-6">
+          <div className="bg-[#F5F5F5] rounded-xl p-4 mb-6">
             <div className="flex items-center gap-2 mb-2">
-              <Lightbulb size={16} className="text-amber-400" />
-              <h2 className="text-sm font-semibold text-amber-400">Career Insight</h2>
+              <Lightbulb size={16} className="text-amber-600" />
+              <h2 className="text-sm font-semibold text-amber-600">Career Insight</h2>
             </div>
-            <p className="text-sm text-slate-300">{manifest.careerInsight}</p>
+            <p className="text-sm text-gray-500">{manifest.careerInsight}</p>
           </div>
 
           {/* Tool Relevance */}
-          <div className="bg-slate-800 rounded-xl p-4 mb-6">
+          <div className="bg-[#F5F5F5] rounded-xl p-4 mb-6">
             <div className="flex items-center gap-2 mb-2">
-              <Wrench size={16} className="text-slate-400" />
-              <h2 className="text-sm font-semibold text-slate-400">Related Tools</h2>
+              <Wrench size={16} className="text-gray-500" />
+              <h2 className="text-sm font-semibold text-gray-500">Related Tools</h2>
             </div>
             <div className="flex flex-wrap gap-2">
               {manifest.toolRelevance.map((tool, i) => (
-                <span key={i} className="px-2 py-1 rounded bg-slate-700 text-xs text-slate-300">
+                <span key={i} className="px-2 py-1 rounded bg-gray-200 text-xs text-gray-500">
                   {tool}
                 </span>
               ))}
@@ -277,14 +277,14 @@ export default function LabEngine({
           <button
             onClick={restart}
             aria-label="Retry lab"
-            className="w-full py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-medium transition-colors flex items-center justify-center gap-2 mb-3"
+            className="w-full py-3 rounded-xl bg-[#F5F5F5] hover:bg-gray-200 text-[#1A1A1A] font-medium transition-colors flex items-center justify-center gap-2 mb-3"
           >
             <RotateCcw size={18} /> Retry Lab
           </button>
           <button
             onClick={onExit}
             aria-label="Back to catalog"
-            className="w-full py-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-semibold transition-colors"
+            className="w-full py-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-[#1A1A1A] font-semibold transition-colors"
           >
             Back to Catalog
           </button>
@@ -295,29 +295,29 @@ export default function LabEngine({
 
   // --- ACTIVE + FEEDBACK (delegated to renderer) ---
   return (
-    <div className="min-h-screen bg-slate-900">
+    <div className="min-h-screen bg-white">
       {/* Sticky header */}
-      <div className="sticky top-0 z-10 bg-slate-900/95 backdrop-blur border-b border-slate-800 px-4 py-3">
+      <div className="sticky top-0 z-10 bg-white/95 backdrop-blur border-b border-gray-200 px-4 py-3">
         <div className="max-w-lg mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Database size={18} className="text-amber-400" />
-            <span className="text-sm font-medium text-white truncate max-w-[180px]">
+            <Database size={18} className="text-amber-600" />
+            <span className="text-sm font-medium text-[#1A1A1A] truncate max-w-[180px]">
               {manifest.title}
             </span>
           </div>
           <div className="flex items-center gap-3">
             {/* Scenario counter */}
-            <span className="text-xs text-slate-400">
+            <span className="text-xs text-gray-500">
               {scenarioIndex + 1}/{manifest.scenarios.length}
             </span>
             {/* Score */}
-            <span className="text-sm font-bold text-amber-400">{score}</span>
+            <span className="text-sm font-bold text-amber-600">{score}</span>
             {/* Hint button */}
             {phase === "active" && hintsUsed < 3 && (
               <button
                 onClick={useHint}
                 aria-label={`Use hint (${3 - hintsUsed} remaining)`}
-                className="flex items-center gap-1 px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 text-xs transition-colors"
+                className="flex items-center gap-1 px-2 py-1 rounded-lg bg-[#F5F5F5] hover:bg-gray-200 text-gray-500 text-xs transition-colors"
               >
                 <HelpCircle size={14} />
                 <span>{3 - hintsUsed}</span>
@@ -331,7 +331,7 @@ export default function LabEngine({
       {hintVisible && phase === "active" && (
         <div className="max-w-lg mx-auto px-4 pt-3">
           <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-3 flex items-start gap-2">
-            <AlertTriangle size={16} className="text-amber-400 mt-0.5 shrink-0" />
+            <AlertTriangle size={16} className="text-amber-600 mt-0.5 shrink-0" />
             <p className="text-sm text-amber-200">{manifest.hints[hintsUsed - 1]}</p>
           </div>
         </div>
@@ -350,12 +350,12 @@ export default function LabEngine({
 
       {/* Next button (feedback phase only) — sticky at bottom */}
       {phase === "feedback" && (
-        <div className="sticky bottom-0 z-10 bg-slate-900/95 backdrop-blur border-t border-slate-800 px-4 py-3">
+        <div className="sticky bottom-0 z-10 bg-white/95 backdrop-blur border-t border-gray-200 px-4 py-3">
           <div className="max-w-lg mx-auto">
             <button
               onClick={advance}
               aria-label={isLastScenario ? "View results" : "Next scenario"}
-              className="w-full py-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-semibold transition-colors flex items-center justify-center gap-2"
+              className="w-full py-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-[#1A1A1A] font-semibold transition-colors flex items-center justify-center gap-2"
             >
               {isLastScenario ? "View Results" : "Next Scenario"}
               <ChevronRight size={18} />
