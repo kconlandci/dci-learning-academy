@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "rebrandScriptVersion": "1.0.0",
+  "module": {
+    "slug": "networking",
+    "sourceRepoName": "NetForge"
+  },
+  "source": {
+    "path": "C:\\Users\\conla\\OneDrive\\Desktop\\Forge Labs\\NetForge",
+    "gitCommit": "12de0168f297eb56cdf520da7adde5e5c14aaad1",
+    "gitBranch": "main"
+  },
+  "rebrandedAt": "2026-04-14T13:21:00.260Z"
+}

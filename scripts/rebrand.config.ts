@@ -1439,4 +1439,652 @@ export default defineConfig(({ command }) => ({
       },
     ],
   },
+
+  networking: {
+    sourceRepoName: "NetForge",
+    destSlug: "networking",
+    textReplacements: [
+      // Identifier form FIRST — NetForgeProgress etc.
+      { pattern: /NetForge(?=[A-Za-z0-9_])/g, replacement: "DciNetworking" },
+      // Brand name — display form.
+      { pattern: /NetForge/g, replacement: "DCI Networking Labs" },
+      { pattern: /netforge/g, replacement: "dci-networking" },
+      { pattern: /NETFORGE/g, replacement: "DCI_NETWORKING" },
+      // "Forge Labs" → "DCI Learning Academy"
+      { pattern: /Forge Labs Pro/g, replacement: "DCI Learning Academy" },
+      { pattern: /Forge Labs/g, replacement: "DCI Learning Academy" },
+      // Redirect Capacitor imports to local web-only shim
+      {
+        pattern: /from ["']@capacitor\/(app|preferences|dialog|browser)["']/g,
+        replacement: 'from "../capacitor-shim"',
+      },
+      // Replace broken icon-512.png ref with DCI logo mark
+      {
+        pattern: /src="\/icon-512\.png"/g,
+        replacement: 'src={`${import.meta.env.BASE_URL}logo-mark.png`}',
+      },
+      // .gitignore: don't swallow .env.example
+      {
+        pattern: /^\.env\.\*\r?\n(?!!\.env\.example)/m,
+        replacement: ".env.*\n!.env.example\n",
+      },
+      // Phase B: inject @dci/shared import into useProgress.ts
+      {
+        pattern: /import \{ getLocalDateString \} from "\.\.\/utils\/localDate";/,
+        replacement:
+          'import { recordLabCompletion as recordToFirestore } from "@dci/shared";\n' +
+          'import { getLocalDateString } from "../utils/localDate";',
+      },
+      // Phase B: inject Firestore mirror after mirrorToPreferences
+      {
+        pattern: /mirrorToPreferences\(next\);\r?\n(\s+)return next;/,
+        replacement:
+          "mirrorToPreferences(next);\n\n" +
+          "$1// ━━━ DCI PHASE B — Mirror completion to Firestore for instructor view ━━━\n" +
+          "$1// Fire-and-forget: never blocks the local state update.\n" +
+          "$1// studentId from localStorage, fires on every retake by design.\n" +
+          "$1const dciStudentId =\n" +
+          "$1  typeof localStorage !== \"undefined\"\n" +
+          "$1    ? localStorage.getItem(\"dci:student-id\")\n" +
+          "$1    : null;\n" +
+          "$1if (dciStudentId) {\n" +
+          "$1  recordToFirestore(dciStudentId, \"networking\", labId).catch(\n" +
+          "$1    (err) => {\n" +
+          "$1      console.warn(\n" +
+          "$1        \"[DCI] Failed to record lab completion to Firestore:\",\n" +
+          "$1        err,\n" +
+          "$1      );\n" +
+          "$1    },\n" +
+          "$1  );\n" +
+          "$1}\n" +
+          "$1// ━━━ END DCI PHASE B ━━━\n\n" +
+          "$1return next;",
+      },
+    ],
+    deletions: [
+      "android/**",
+      "capacitor.config.*",
+      "dist/**",
+      "*.jks",
+      "*.pem",
+      "package-lock.json",
+      "**/*release-key*",
+      "**/*upload-key*",
+      "LAUNCH-GUIDE.md",
+      "PROJECT-STATUS.md",
+      "store-listing-copy.md",
+      "production-access-answers.md",
+      "icon.png",
+      "public/icon-512.png",
+      "src/config/revenuecat.ts",
+      "src/screens/UpgradeScreen.tsx",
+      "**/FoundersPack*",
+      "**/founders-pack*",
+      "**/InAppReview*",
+      "**/in-app-review*",
+      "**/*revenuecat*",
+      ".claude/**",
+      "node_modules/**",
+    ],
+    stubs: {
+      "src/hooks/usePremiumStatus.ts": `// Stubbed by scripts/rebrand.ts — DCI Learning Academy unlocks all content.
+interface PremiumStatus {
+  isPremium: boolean;
+  isLoading: boolean;
+  refreshPremiumStatus: () => Promise<void>;
+}
+
+export function usePremiumStatus(): PremiumStatus {
+  return {
+    isPremium: true,
+    isLoading: false,
+    refreshPremiumStatus: async () => {},
+  };
+}
+
+export async function setPremiumStatus(_isPremium: boolean): Promise<void> {
+  // no-op
+}
+`,
+
+      "src/hooks/usePurchase.ts": `// Stubbed by scripts/rebrand.ts — no monetization in the DCI classroom build.
+export type PurchaseError = "cancelled" | "already_owned" | "network" | "unknown";
+
+interface PurchaseResult {
+  success: boolean;
+  error?: PurchaseError;
+}
+
+interface UsePurchase {
+  purchase: (productId: string, isSubscription?: boolean) => Promise<PurchaseResult>;
+  restore: () => Promise<PurchaseResult>;
+  isPurchasing: boolean;
+  isRestoring: boolean;
+}
+
+export function usePurchase(): UsePurchase {
+  return {
+    purchase: async () => ({ success: false, error: "unknown" }),
+    restore: async () => ({ success: false, error: "unknown" }),
+    isPurchasing: false,
+    isRestoring: false,
+  };
+}
+`,
+
+      "src/components/ErrorBoundary.tsx": `import { Component, type ReactNode, type ErrorInfo } from "react";
+
+interface Props {
+  children: ReactNode;
+  fallback?: ReactNode;
+  onError?: (error: Error, errorInfo: ErrorInfo) => void;
+}
+
+interface State {
+  hasError: boolean;
+  error: Error | null;
+}
+
+export default class ErrorBoundary extends Component<Props, State> {
+  constructor(props: Props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error: Error): State {
+    return { hasError: true, error };
+  }
+
+  override componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error("[DCI Networking Labs] Lab error:", error, errorInfo);
+    this.props.onError?.(error, errorInfo);
+  }
+
+  override render() {
+    if (this.state.hasError) {
+      if (this.props.fallback) return this.props.fallback;
+
+      return (
+        <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6">
+          <div className="text-center max-w-sm">
+            <div className="w-16 h-16 rounded-2xl bg-red-500/15 flex items-center justify-center mx-auto mb-4">
+              <span className="text-3xl">\u26A0\uFE0F</span>
+            </div>
+            <h2 className="text-lg font-bold text-white mb-2">
+              This lab encountered an issue
+            </h2>
+            <p className="text-sm text-slate-400 mb-6">
+              Something went wrong loading this lab. This has been logged and
+              we'll look into it.
+            </p>
+            <a
+              href="/"
+              className="inline-block px-6 py-3 rounded-xl bg-orange-500 text-white font-semibold text-sm min-h-[48px] leading-[48px]"
+            >
+              Back to Home
+            </a>
+          </div>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+`,
+
+      "src/hooks/useAppReview.ts": `// Stubbed by scripts/rebrand.ts — no native review prompt in the classroom web build.
+export function useAppReview() {
+  return {
+    maybeRequestReview: async (_totalCompleted: number) => {},
+  };
+}
+`,
+
+      "src/hooks/useAndroidBackButton.ts": `// Stubbed by scripts/rebrand.ts — no Capacitor back-button handling in web.
+export function useAndroidBackButton(): void {
+  // no-op
+}
+`,
+
+      "src/hooks/useAnalytics.ts": `// Stubbed by scripts/rebrand.ts — analytics removed for DCI classroom build.
+interface LabsPerDayBucket {
+  date: string;
+  count: number;
+}
+
+interface TopLab {
+  labId: string;
+  count: number;
+}
+
+interface AnalyticsSummary {
+  totalSessions: number;
+  avgSessionSeconds: number;
+  labsStarted: number;
+  labsCompleted: number;
+  completionRate: number;
+  avgScore: number;
+  labsPerDay: LabsPerDayBucket[];
+  topLabs: TopLab[];
+}
+
+export function trackAppOpened(): void {}
+export function trackSessionEnd(): void {}
+export function trackAppResumed(): void {}
+export function trackLabStarted(_labId: string): void {}
+export function trackLabCompleted(
+  _labId: string,
+  _score: number,
+  _durationSeconds: number,
+): void {}
+export function trackHintUsed(_labId: string, _scenarioIndex: number): void {}
+export function trackPathStarted(_pathId: string): void {}
+
+export function getAnalyticsSummary(): AnalyticsSummary {
+  const days: LabsPerDayBucket[] = [];
+  const now = new Date();
+  for (let i = 13; i >= 0; i--) {
+    const d = new Date(now);
+    d.setDate(now.getDate() - i);
+    days.push({ date: d.toISOString().slice(0, 10), count: 0 });
+  }
+  return {
+    totalSessions: 0,
+    avgSessionSeconds: 0,
+    labsStarted: 0,
+    labsCompleted: 0,
+    completionRate: 0,
+    avgScore: 0,
+    labsPerDay: days,
+    topLabs: [],
+  };
+}
+
+export function clearAnalytics(): void {
+  // no-op
+}
+
+export function useAnalytics() {
+  return {
+    trackAppOpened,
+    trackSessionEnd,
+    trackAppResumed,
+    trackLabStarted,
+    trackLabCompleted,
+    trackHintUsed,
+    trackPathStarted,
+  };
+}
+`,
+
+      "src/contexts/AuthContext.tsx": `// Stubbed by scripts/rebrand.ts — DCI has its own access code + student ID flow.
+import { createContext, useContext, type ReactNode } from "react";
+
+interface AuthContextType {
+  uid: string | null;
+  isAuthReady: boolean;
+}
+
+const AuthContext = createContext<AuthContextType>({
+  uid: null,
+  isAuthReady: true,
+});
+
+export function AuthProvider({ children }: { children: ReactNode }) {
+  return (
+    <AuthContext.Provider value={{ uid: null, isAuthReady: true }}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+export function useAuth(): AuthContextType {
+  return useContext(AuthContext);
+}
+`,
+
+      "src/config/firebase.ts": `// Stubbed by scripts/rebrand.ts — progress tracking wired through @dci/shared.
+export const app = null;
+export const auth = null;
+`,
+
+      "src/App.tsx": `// Stubbed by scripts/rebrand.ts — gutted version of the original NetForge App.tsx.
+import { lazy, Suspense } from "react";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import HomeScreen from "./screens/HomeScreen";
+import LabScreen from "./screens/LabScreen";
+import ProgressScreen from "./screens/ProgressScreen";
+import SettingsScreen from "./screens/SettingsScreen";
+import BottomNav from "./components/BottomNav";
+import ErrorBoundary from "./components/ErrorBoundary";
+import { privacyPolicy, termsOfService, disclaimer } from "./data/legal";
+import { IS_DEV } from "./config";
+import { AuthProvider } from "./contexts/AuthContext";
+
+const DevScreen = lazy(() => import("./screens/DevScreen"));
+const AnalyticsScreen = lazy(() => import("./screens/AnalyticsScreen"));
+const LegalTextViewer = lazy(() => import("./components/LegalTextViewer"));
+
+function LazyFallback() {
+  return (
+    <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+      <div className="w-4 h-4 border-2 border-amber-400 border-t-transparent rounded-full animate-spin" />
+    </div>
+  );
+}
+
+function AppLayout() {
+  const location = useLocation();
+
+  const hideNav =
+    location.pathname.startsWith("/lab/") ||
+    location.pathname.startsWith("/settings/");
+
+  return (
+    <Suspense fallback={<LazyFallback />}>
+      <Routes>
+        <Route path="/" element={<HomeScreen />} />
+        <Route path="/lab/:labId" element={<LabScreen />} />
+        <Route path="/progress" element={<ProgressScreen />} />
+        <Route path="/settings" element={<SettingsScreen />} />
+        <Route
+          path="/settings/privacy"
+          element={<LegalTextViewer title="Privacy Policy" content={privacyPolicy} />}
+        />
+        <Route
+          path="/settings/terms"
+          element={<LegalTextViewer title="Terms of Service" content={termsOfService} />}
+        />
+        <Route
+          path="/settings/disclaimer"
+          element={<LegalTextViewer title="Disclaimer" content={disclaimer} />}
+        />
+        <Route path="/settings/analytics" element={<AnalyticsScreen />} />
+        {IS_DEV && <Route path="/dev" element={<DevScreen />} />}
+        <Route path="*" element={<HomeScreen />} />
+      </Routes>
+      {!hideNav && <BottomNav />}
+    </Suspense>
+  );
+}
+
+export default function App() {
+  return (
+    <ErrorBoundary>
+      <AuthProvider>
+        <BrowserRouter basename="/dci-learning-academy/networking">
+          <AppLayout />
+        </BrowserRouter>
+      </AuthProvider>
+    </ErrorBoundary>
+  );
+}
+`,
+
+      "src/capacitor-shim.ts": `// Stubbed by scripts/rebrand.ts — web fallbacks for @capacitor/* modules.
+interface ListenerHandle {
+  remove: () => void;
+}
+
+type AppEvent = "pause" | "resume" | "backButton";
+type AppListener = (...args: unknown[]) => void;
+
+function addAppListener(event: AppEvent, callback: AppListener): Promise<ListenerHandle> {
+  if (event === "pause") {
+    const visHandler = () => {
+      if (document.visibilityState === "hidden") callback();
+    };
+    const unloadHandler = () => callback();
+    document.addEventListener("visibilitychange", visHandler);
+    window.addEventListener("beforeunload", unloadHandler);
+    return Promise.resolve({
+      remove: () => {
+        document.removeEventListener("visibilitychange", visHandler);
+        window.removeEventListener("beforeunload", unloadHandler);
+      },
+    });
+  }
+  if (event === "resume") {
+    const visHandler = () => {
+      if (document.visibilityState === "visible") callback();
+    };
+    document.addEventListener("visibilitychange", visHandler);
+    return Promise.resolve({
+      remove: () => document.removeEventListener("visibilitychange", visHandler),
+    });
+  }
+  return Promise.resolve({ remove: () => {} });
+}
+
+export const App = {
+  addListener: addAppListener,
+  exitApp: () => {},
+};
+
+export const Preferences = {
+  async get({ key }: { key: string }): Promise<{ value: string | null }> {
+    return { value: typeof localStorage !== "undefined" ? localStorage.getItem(key) : null };
+  },
+  async set({ key, value }: { key: string; value: string }): Promise<void> {
+    if (typeof localStorage !== "undefined") localStorage.setItem(key, value);
+  },
+  async remove({ key }: { key: string }): Promise<void> {
+    if (typeof localStorage !== "undefined") localStorage.removeItem(key);
+  },
+};
+
+interface ConfirmOptions {
+  title?: string;
+  message: string;
+  okButtonTitle?: string;
+  cancelButtonTitle?: string;
+}
+
+export const Dialog = {
+  async confirm({ message }: ConfirmOptions): Promise<{ value: boolean }> {
+    const value = typeof window !== "undefined" ? window.confirm(message) : false;
+    return { value };
+  },
+  async alert({ message }: { title?: string; message: string }): Promise<void> {
+    if (typeof window !== "undefined") window.alert(message);
+  },
+};
+
+export const Browser = {
+  async open({ url }: { url: string }): Promise<void> {
+    if (typeof window !== "undefined") window.open(url, "_blank", "noopener,noreferrer");
+  },
+  async close(): Promise<void> {},
+};
+`,
+
+      "src/main.tsx": `import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import { loadSession } from "@dci/shared";
+import "./firebase-init";
+import "./index.css";
+import App from "./App";
+
+const PORTAL_ROOT =
+  import.meta.env.BASE_URL.replace(/\\/networking\\/?$/, "/") || "/";
+
+if (!loadSession()) {
+  window.location.replace(PORTAL_ROOT);
+} else {
+  const root = document.getElementById("root");
+  if (!root) throw new Error("Root element not found");
+
+  createRoot(root).render(
+    <StrictMode>
+      <App />
+    </StrictMode>,
+  );
+}
+`,
+
+      "src/firebase-init.ts": `/**
+ * Networking-side Firebase bootstrap.
+ */
+import { initFirebase } from "@dci/shared";
+
+const env = import.meta.env;
+
+function required(key: keyof ImportMetaEnv): string {
+  const value = env[key];
+  if (typeof value !== "string" || value.length === 0) {
+    throw new Error(
+      \`Missing required env var \${key}. Copy apps/networking/.env.example to apps/networking/.env and fill in the Firebase console values.\`,
+    );
+  }
+  return value;
+}
+
+initFirebase({
+  apiKey: required("VITE_FIREBASE_API_KEY"),
+  authDomain: required("VITE_FIREBASE_AUTH_DOMAIN"),
+  projectId: required("VITE_FIREBASE_PROJECT_ID"),
+  storageBucket: required("VITE_FIREBASE_STORAGE_BUCKET"),
+  messagingSenderId: required("VITE_FIREBASE_MESSAGING_SENDER_ID"),
+  appId: required("VITE_FIREBASE_APP_ID"),
+});
+`,
+
+      "src/vite-env.d.ts": `/// <reference types="vite/client" />
+
+interface ImportMetaEnv {
+  readonly VITE_FIREBASE_API_KEY: string;
+  readonly VITE_FIREBASE_AUTH_DOMAIN: string;
+  readonly VITE_FIREBASE_PROJECT_ID: string;
+  readonly VITE_FIREBASE_STORAGE_BUCKET: string;
+  readonly VITE_FIREBASE_MESSAGING_SENDER_ID: string;
+  readonly VITE_FIREBASE_APP_ID: string;
+}
+
+interface ImportMeta {
+  readonly env: ImportMetaEnv;
+}
+`,
+
+      ".env.example": `# Firebase Web SDK config — copy to .env and fill in from the Firebase console.
+VITE_FIREBASE_API_KEY=
+VITE_FIREBASE_AUTH_DOMAIN=
+VITE_FIREBASE_PROJECT_ID=
+VITE_FIREBASE_STORAGE_BUCKET=
+VITE_FIREBASE_MESSAGING_SENDER_ID=
+VITE_FIREBASE_APP_ID=
+`,
+
+      "package.json": `{
+  "name": "@dci/networking",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc -b --noEmit"
+  },
+  "dependencies": {
+    "@dci/shared": "workspace:*",
+    "firebase": "^12.11.0",
+    "lucide-react": "^0.577.0",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "react-router-dom": "^7.13.1",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.2.2",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.1",
+    "tailwindcss": "^4.2.2",
+    "typescript": "~5.9.3",
+    "vite": "^8.0.1"
+  }
+}
+`,
+
+      "vite.config.ts": `import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import tailwindcss from "@tailwindcss/vite";
+
+export default defineConfig(({ command }) => ({
+  plugins: [react(), tailwindcss()],
+  base: command === "build" ? "/dci-learning-academy/networking/" : "/",
+  build: {
+    outDir: "dist",
+    sourcemap: true,
+  },
+}));
+`,
+
+      "tsconfig.json": `{
+  "files": [],
+  "references": [
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.node.json" }
+  ]
+}
+`,
+
+      "tsconfig.app.json": `{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+    "useDefineForClassFields": true,
+    "types": ["vite/client"],
+    "allowImportingTsExtensions": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "noUncheckedSideEffectImports": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false
+  },
+  "include": ["src"]
+}
+`,
+
+      "tsconfig.node.json": `{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
+    "types": ["node"],
+    "moduleDetection": "force",
+    "noEmit": true,
+    "composite": true
+  },
+  "include": ["vite.config.ts"]
+}
+`,
+
+      "index.html": `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/logo-mark.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DCI Networking Labs</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+`,
+    },
+    assertions: [
+      {
+        file: "src/hooks/useProgress.ts",
+        marker: "DCI PHASE B",
+        description:
+          "Firestore progress mirror hook must survive rebrand. " +
+          "If this assertion fires, the upstream anchor changed — " +
+          "check the import and mirrorToPreferences text replacements " +
+          "in rebrand.config.ts.",
+      },
+    ],
+  },
 };
