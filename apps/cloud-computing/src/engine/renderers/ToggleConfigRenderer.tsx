@@ -84,7 +84,7 @@ export default function ToggleConfigRenderer({ scenario, onSubmit, phase, feedba
                   disabled={isLocked}
                   className={`min-w-[88px] min-h-[44px] px-4 py-2 rounded-lg text-xs font-bold uppercase transition-all ${
                     currentVal === item.states[0]
-                      ? "bg-yellow-500/20 border border-yellow-500/50 text-yellow-300"
+                      ? "bg-yellow-500/20 border border-yellow-500/50 text-yellow-600"
                       : "bg-gray-200 border border-gray-300 text-gray-500"
                   } ${isLocked ? "opacity-70 cursor-default" : "cursor-pointer active:scale-95"}`}
                 >
@@ -138,7 +138,7 @@ export default function ToggleConfigRenderer({ scenario, onSubmit, phase, feedba
             {feedbackResult.type === "perfect" ? (
               <CheckCircle size={18} className="text-green-400" />
             ) : feedbackResult.type === "partial" ? (
-              <CheckCircle size={18} className="text-yellow-400" />
+              <CheckCircle size={18} className="text-yellow-600" />
             ) : (
               <XCircle size={18} className="text-red-400" />
             )}
@@ -147,7 +147,7 @@ export default function ToggleConfigRenderer({ scenario, onSubmit, phase, feedba
                 feedbackResult.type === "perfect"
                   ? "text-green-400"
                   : feedbackResult.type === "partial"
-                  ? "text-yellow-400"
+                  ? "text-yellow-600"
                   : "text-red-400"
               }`}
             >

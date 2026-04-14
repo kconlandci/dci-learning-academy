@@ -52,7 +52,7 @@ interface LabEngineProps {
 
 function getPerformanceTier(score: number, thresholds: ScoringConfig["passingThresholds"]) {
   if (score >= thresholds.pass) return { label: "PASS", color: "text-green-400", bg: "bg-green-500/10" };
-  if (score >= thresholds.partial) return { label: "PARTIAL", color: "text-yellow-400", bg: "bg-yellow-500/10" };
+  if (score >= thresholds.partial) return { label: "PARTIAL", color: "text-yellow-600", bg: "bg-yellow-500/10" };
   return { label: "NEEDS IMPROVEMENT", color: "text-red-400", bg: "bg-red-500/10" };
 }
 
@@ -221,7 +221,7 @@ export default function LabEngine({ manifest, renderer: Renderer, onExit, onLabC
               <div className="flex justify-between text-green-400">
                 <span>Perfect answers</span><span>{perfectCount}</span>
               </div>
-              <div className="flex justify-between text-yellow-400">
+              <div className="flex justify-between text-yellow-600">
                 <span>Partial answers</span><span>{partialCount}</span>
               </div>
               <div className="flex justify-between text-red-400">
@@ -321,7 +321,7 @@ export default function LabEngine({ manifest, renderer: Renderer, onExit, onLabC
       {hintVisible && phase === "active" && (
         <div className="max-w-lg mx-auto px-4 pt-3">
           <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-3 flex items-start gap-2">
-            <AlertTriangle size={16} className="text-amber-400 mt-0.5 shrink-0" />
+            <AlertTriangle size={16} className="text-amber-600 mt-0.5 shrink-0" />
             <p className="text-sm text-amber-200">{manifest.hints[hintsUsed - 1]}</p>
           </div>
         </div>
