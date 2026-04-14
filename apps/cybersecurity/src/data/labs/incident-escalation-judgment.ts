@@ -9,7 +9,7 @@ export const incidentEscalationJudgmentLab: LabManifest = {
   tier: "advanced",
   track: "incident-response",
   difficulty: "challenging",
-  accessLevel: "premium",
+  accessLevel: "free",
   tags: [
     "incident-response",
     "escalation",

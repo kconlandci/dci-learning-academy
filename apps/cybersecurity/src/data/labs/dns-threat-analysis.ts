@@ -9,7 +9,7 @@ export const dnsThreatAnalysisLab: LabManifest = {
   tier: "advanced",
   track: "detection-hunting",
   difficulty: "challenging",
-  accessLevel: "premium",
+  accessLevel: "free",
   tags: [
     "dns",
     "threat-hunting",

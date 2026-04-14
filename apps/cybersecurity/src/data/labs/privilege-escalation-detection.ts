@@ -9,7 +9,7 @@ export const privilegeEscalationDetectionLab: LabManifest = {
   tier: "intermediate",
   track: "detection-hunting",
   difficulty: "moderate",
-  accessLevel: "premium",
+  accessLevel: "free",
   tags: [
     "privilege-escalation",
     "detection",

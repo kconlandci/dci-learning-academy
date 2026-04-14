@@ -9,7 +9,7 @@ export const endpointHardeningAuditLab: LabManifest = {
   tier: "intermediate",
   track: "vulnerability-hardening",
   difficulty: "moderate",
-  accessLevel: "premium",
+  accessLevel: "free",
   tags: [
     "endpoint-security",
     "cis-benchmark",

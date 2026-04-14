@@ -9,7 +9,7 @@ export const bruteForceSprayDetectionLab: LabManifest = {
   tier: "intermediate",
   track: "detection-hunting",
   difficulty: "moderate",
-  accessLevel: "premium",
+  accessLevel: "free",
   tags: ["brute-force", "password-spray", "impossible-travel", "detection-engineering", "triage"],
 
   description:

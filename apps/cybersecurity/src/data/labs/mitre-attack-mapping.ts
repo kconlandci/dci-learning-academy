@@ -9,7 +9,7 @@ export const mitreAttackMappingLab: LabManifest = {
   tier: "advanced",
   track: "detection-hunting",
   difficulty: "challenging",
-  accessLevel: "premium",
+  accessLevel: "free",
   tags: [
     "mitre-attack",
     "threat-mapping",

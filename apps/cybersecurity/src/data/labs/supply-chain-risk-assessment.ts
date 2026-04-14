@@ -9,7 +9,7 @@ export const supplyChainRiskAssessmentLab: LabManifest = {
   tier: "advanced",
   track: "vulnerability-hardening",
   difficulty: "challenging",
-  accessLevel: "premium",
+  accessLevel: "free",
   tags: [
     "supply-chain",
     "vendor-risk",

@@ -9,7 +9,7 @@ export const securityPolicyExceptionReviewLab: LabManifest = {
   tier: "advanced",
   track: "vulnerability-hardening",
   difficulty: "challenging",
-  accessLevel: "premium",
+  accessLevel: "free",
   tags: [
     "security-policy",
     "exception-management",

@@ -9,7 +9,7 @@ export const healthcareComplianceIncidentLab: LabManifest = {
   tier: "advanced",
   track: "incident-response",
   difficulty: "challenging",
-  accessLevel: "premium",
+  accessLevel: "free",
   tags: [
     "hipaa",
     "healthcare",

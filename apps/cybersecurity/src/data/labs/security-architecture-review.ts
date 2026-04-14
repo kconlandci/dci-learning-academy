@@ -9,7 +9,7 @@ export const securityArchitectureReviewLab: LabManifest = {
   tier: "advanced",
   track: "vulnerability-hardening",
   difficulty: "challenging",
-  accessLevel: "premium",
+  accessLevel: "free",
   tags: ["architecture", "design-review", "zero-trust", "defense-in-depth", "threat-modeling", "secure-design"],
 
   description:

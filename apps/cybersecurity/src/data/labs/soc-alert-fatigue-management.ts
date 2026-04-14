@@ -9,7 +9,7 @@ export const socAlertFatigueManagementLab: LabManifest = {
   tier: "intermediate",
   track: "blue-team-foundations",
   difficulty: "moderate",
-  accessLevel: "premium",
+  accessLevel: "free",
   tags: [
     "siem",
     "alert-tuning",

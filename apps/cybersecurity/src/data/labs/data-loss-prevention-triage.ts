@@ -9,7 +9,7 @@ export const dataLossPreventionTriageLab: LabManifest = {
   tier: "intermediate",
   track: "detection-hunting",
   difficulty: "moderate",
-  accessLevel: "premium",
+  accessLevel: "free",
   tags: [
     "dlp",
     "data-loss-prevention",

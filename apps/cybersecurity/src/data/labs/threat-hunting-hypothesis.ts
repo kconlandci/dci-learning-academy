@@ -9,7 +9,7 @@ export const threatHuntingHypothesisLab: LabManifest = {
   tier: "advanced",
   track: "blue-team-foundations",
   difficulty: "challenging",
-  accessLevel: "premium",
+  accessLevel: "free",
   tags: ["threat-hunting", "hypothesis", "mitre-attack", "proactive-defense", "detection", "analytics"],
 
   description:

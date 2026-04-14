@@ -9,7 +9,7 @@ export const zeroTrustAccessReviewLab: LabManifest = {
   tier: "advanced",
   track: "identity-access",
   difficulty: "challenging",
-  accessLevel: "premium",
+  accessLevel: "free",
   tags: [
     "zero-trust",
     "vpn",

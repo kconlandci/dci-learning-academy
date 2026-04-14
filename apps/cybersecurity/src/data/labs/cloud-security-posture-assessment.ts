@@ -9,7 +9,7 @@ export const cloudSecurityPostureAssessmentLab: LabManifest = {
   tier: "advanced",
   track: "cloud-security",
   difficulty: "challenging",
-  accessLevel: "premium",
+  accessLevel: "free",
   tags: [
     "aws",
     "azure",

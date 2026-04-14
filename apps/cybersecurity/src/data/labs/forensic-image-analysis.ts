@@ -9,7 +9,7 @@ export const forensicImageAnalysisLab: LabManifest = {
   tier: "advanced",
   track: "detection-hunting",
   difficulty: "challenging",
-  accessLevel: "premium",
+  accessLevel: "free",
   tags: [
     "forensics",
     "disk-image",

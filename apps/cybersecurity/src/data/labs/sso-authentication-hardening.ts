@@ -9,7 +9,7 @@ export const ssoAuthenticationHardeningLab: LabManifest = {
   tier: "intermediate",
   track: "identity-access",
   difficulty: "moderate",
-  accessLevel: "premium",
+  accessLevel: "free",
   tags: [
     "sso",
     "saml",

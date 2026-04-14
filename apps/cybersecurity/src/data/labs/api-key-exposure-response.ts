@@ -9,7 +9,7 @@ export const apiKeyExposureResponseLab: LabManifest = {
   tier: "intermediate",
   track: "identity-access",
   difficulty: "moderate",
-  accessLevel: "premium",
+  accessLevel: "free",
   tags: [
     "api-keys",
     "credential-exposure",

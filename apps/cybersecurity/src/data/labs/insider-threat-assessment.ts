@@ -9,7 +9,7 @@ export const insiderThreatAssessmentLab: LabManifest = {
   tier: "intermediate",
   track: "detection-hunting",
   difficulty: "moderate",
-  accessLevel: "premium",
+  accessLevel: "free",
   tags: [
     "insider-threat",
     "dlp",

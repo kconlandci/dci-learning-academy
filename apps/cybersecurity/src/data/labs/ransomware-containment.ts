@@ -9,7 +9,7 @@ export const ransomwareContainmentLab: LabManifest = {
   tier: "intermediate",
   track: "incident-response",
   difficulty: "moderate",
-  accessLevel: "premium",
+  accessLevel: "free",
   tags: [
     "ransomware",
     "incident-response",

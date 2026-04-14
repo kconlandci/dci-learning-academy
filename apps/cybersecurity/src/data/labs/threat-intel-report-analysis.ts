@@ -9,7 +9,7 @@ export const threatIntelReportAnalysisLab: LabManifest = {
   tier: "advanced",
   track: "detection-hunting",
   difficulty: "challenging",
-  accessLevel: "premium",
+  accessLevel: "free",
   tags: [
     "threat-intelligence",
     "ioc-analysis",

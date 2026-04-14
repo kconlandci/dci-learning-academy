@@ -43,7 +43,6 @@ export const learningPaths: LearningPath[] = [
       "deepfake-voice-phishing",
       "docker-escape-detection",
       "lolbins-detection",
-      // --- PREMIUM labs (moderate → challenging) ---
       "privilege-escalation-detection",
       "brute-force-spray-detection",
       "log-hunter-lateral-movement",
@@ -83,7 +82,6 @@ export const learningPaths: LearningPath[] = [
       "command-injection-patterns",
       "hipaa-technical-safeguards",
       "sox-it-controls-review",
-      // --- PREMIUM labs (moderate → challenging) ---
       "network-segmentation-plan",
       "certificate-management-audit",
       "endpoint-hardening-audit",
@@ -116,7 +114,6 @@ export const learningPaths: LearningPath[] = [
       "shadow-it-discovery",
       "social-media-osint-awareness",
       "database-security-response",
-      // --- PREMIUM labs (moderate → challenging) ---
       "ransomware-containment",
       "insider-threat-assessment",
       "vulnerability-prioritization",
@@ -153,7 +150,6 @@ export const learningPaths: LearningPath[] = [
       "golden-ticket-detection",
       "ad-hardening-review",
       "oauth-token-theft-detection",
-      // --- PREMIUM labs (moderate → challenging) ---
       "sso-authentication-hardening",
       "api-key-exposure-response",
       "cloud-iam-misconfiguration",

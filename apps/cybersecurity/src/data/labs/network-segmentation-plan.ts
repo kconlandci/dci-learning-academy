@@ -9,7 +9,7 @@ export const networkSegmentationPlanLab: LabManifest = {
   tier: "intermediate",
   track: "network-defense",
   difficulty: "moderate",
-  accessLevel: "premium",
+  accessLevel: "free",
   tags: ["segmentation", "zones", "dmz", "vlan", "network-architecture", "defense-in-depth"],
 
   description:

@@ -9,7 +9,7 @@ export const cloudContainerSecurityLab: LabManifest = {
   tier: "intermediate",
   track: "cloud-security",
   difficulty: "moderate",
-  accessLevel: "premium",
+  accessLevel: "free",
   tags: [
     "kubernetes",
     "containers",

@@ -9,7 +9,7 @@ export const logHunterLateralMovementLab: LabManifest = {
   tier: "intermediate",
   track: "detection-hunting",
   difficulty: "moderate",
-  accessLevel: "premium",
+  accessLevel: "free",
   tags: ["lateral-movement", "wmi", "kerberoasting", "log-analysis", "threat-hunting", "mitre-att&ck"],
 
   description:

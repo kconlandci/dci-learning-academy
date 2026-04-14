@@ -9,7 +9,7 @@ export const cloudLoggingInvestigationLab: LabManifest = {
   tier: "intermediate",
   track: "cloud-security",
   difficulty: "moderate",
-  accessLevel: "premium",
+  accessLevel: "free",
   tags: [
     "cloud-security",
     "cloudtrail",

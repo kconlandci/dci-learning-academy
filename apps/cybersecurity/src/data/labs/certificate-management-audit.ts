@@ -9,7 +9,7 @@ export const certificateManagementAuditLab: LabManifest = {
   tier: "intermediate",
   track: "network-defense",
   difficulty: "moderate",
-  accessLevel: "premium",
+  accessLevel: "free",
   tags: [
     "tls",
     "ssl",

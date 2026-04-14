@@ -9,7 +9,7 @@ export const redTeamBlueTeamScenarioLab: LabManifest = {
   tier: "advanced",
   track: "incident-response",
   difficulty: "challenging",
-  accessLevel: "premium",
+  accessLevel: "free",
   tags: [
     "red-team",
     "blue-team",
