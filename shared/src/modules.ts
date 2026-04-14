@@ -60,7 +60,7 @@ export const MODULES: readonly DciModule[] = [
     tagline: "Network concepts, protocols, and troubleshooting skills",
     sourceRepo: "NetForge",
     labCount: 100,
-    available: false,
+    available: true,
   },
   {
     slug: "it-support",
