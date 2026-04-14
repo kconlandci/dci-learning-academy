@@ -68,7 +68,7 @@ export const MODULES: readonly DciModule[] = [
     tagline: "Help desk skills and IT support fundamentals",
     sourceRepo: "TechForge",
     labCount: 100,
-    available: false,
+    available: true,
   },
 ] as const;
 
