@@ -1,5 +1,5 @@
 import { useNavigate, Link } from "react-router-dom";
-import { Cpu, ChevronRight, Crown, FileText, Scale, AlertTriangle, Trash2, Mail, Star, BarChart3 } from "lucide-react";
+import { ChevronRight, Crown, FileText, Scale, AlertTriangle, Trash2, Mail, Star, BarChart3 } from "lucide-react";
 import { useProgress } from "../hooks/useProgress";
 import { useAuth } from "../contexts/AuthContext";
 import { Dialog } from "../capacitor-shim";
@@ -33,9 +33,11 @@ export default function SettingsScreen() {
     <div className="min-h-screen bg-white p-4 pb-24">
       <div className="max-w-lg mx-auto pt-6">
         <div className="text-center mb-8">
-          <div className="w-14 h-14 rounded-2xl bg-sky-500/20 flex items-center justify-center mx-auto mb-3">
-            <Cpu className="text-sky-400" size={28} />
-          </div>
+          <img
+            src={`${import.meta.env.BASE_URL}logo-mark.png`}
+            alt="DCI IT Support Labs"
+            className="w-14 h-14 rounded-2xl mx-auto mb-3"
+          />
           <h1 className="text-xl font-bold text-[#1A1A1A]">DCI IT Support Labs</h1>
           <p className="text-xs text-gray-500 mt-1">IT Decision Training</p>
           <p className="text-[10px] text-gray-400 mt-1">v0.1.0</p>

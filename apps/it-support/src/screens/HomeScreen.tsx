@@ -50,13 +50,11 @@ export default function HomeScreen() {
       <div className="min-h-screen bg-white p-4 pb-24">
         <div className="max-w-lg mx-auto pt-6">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-xl bg-sky-500/20 flex items-center justify-center">
-              <Cpu className="text-sky-400" size={22} />
-            </div>
-            <div>
-              <h1 className="text-xl font-bold text-[#1A1A1A]">DCI IT Support Labs</h1>
-              <p className="text-xs text-gray-500">IT Decision Simulator</p>
-            </div>
+            <img
+              src={`${import.meta.env.BASE_URL}logo-wide.png`}
+              alt="DCI IT Support Labs"
+              className="h-8"
+            />
           </div>
           <div className="flex items-center gap-4 mb-6 px-1">
             <div className="flex items-center gap-1.5 text-xs text-gray-500">
