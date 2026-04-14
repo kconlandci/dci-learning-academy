@@ -44,7 +44,7 @@ export const MODULES: readonly DciModule[] = [
     tagline: "Data exploration, analysis, and visualization practice",
     sourceRepo: "DataForge",
     labCount: 100,
-    available: false,
+    available: true,
   },
   {
     slug: "cloud-computing",
