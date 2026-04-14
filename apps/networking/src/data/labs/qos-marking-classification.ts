@@ -8,7 +8,7 @@ const lab: LabManifest = {
   tier: "intermediate",
   track: "network-fundamentals",
   difficulty: "challenging",
-  accessLevel: "premium",
+  accessLevel: "free",
   tags: ["qos", "dscp", "traffic-classification", "priority"],
   description:
     "Prioritize network traffic with QoS markings by classifying traffic types and assigning appropriate DSCP values.",

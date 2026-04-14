@@ -8,7 +8,7 @@ const lab: LabManifest = {
   tier: "advanced",
   track: "network-security",
   difficulty: "challenging",
-  accessLevel: "premium",
+  accessLevel: "free",
   tags: ["siem", "correlation", "log-analysis", "incident-detection", "splunk", "network-forensics"],
   description:
     "Correlate SIEM alerts with network flow data, firewall logs, and endpoint telemetry to identify true security incidents and determine the scope and severity of detected threats.",

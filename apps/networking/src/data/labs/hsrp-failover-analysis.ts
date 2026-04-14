@@ -9,7 +9,7 @@ const lab: LabManifest = {
   tier: "intermediate",
   track: "routing-switching",
   difficulty: "moderate",
-  accessLevel: "premium",
+  accessLevel: "free",
   tags: ["hsrp", "fhrp", "redundancy", "failover"],
 
   description:

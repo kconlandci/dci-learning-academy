@@ -9,7 +9,7 @@ const lab: LabManifest = {
   tier: "advanced",
   track: "routing-switching",
   difficulty: "challenging",
-  accessLevel: "premium",
+  accessLevel: "free",
   tags: ["ospf", "multi-area", "abr", "stub-area", "nssa"],
 
   description:

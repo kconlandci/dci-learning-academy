@@ -8,7 +8,7 @@ const lab: LabManifest = {
   tier: "intermediate",
   track: "network-fundamentals",
   difficulty: "challenging",
-  accessLevel: "premium",
+  accessLevel: "free",
   tags: ["encapsulation", "802.1q", "ppp", "gre", "trunk"],
   description:
     "Identify and resolve encapsulation mismatches between network devices including VLAN trunking, WAN encapsulation, and tunnel protocols.",

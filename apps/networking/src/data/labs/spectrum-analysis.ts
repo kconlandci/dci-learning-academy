@@ -8,7 +8,7 @@ const lab: LabManifest = {
   tier: "advanced",
   track: "wireless-networking",
   difficulty: "challenging",
-  accessLevel: "premium",
+  accessLevel: "free",
   tags: ["spectrum", "rf", "analysis", "interference", "chanalyzer"],
   description:
     "Analyze RF spectrum captures to identify, classify, and remediate complex interference patterns from radar, industrial equipment, and rogue transmitters affecting wireless network performance.",

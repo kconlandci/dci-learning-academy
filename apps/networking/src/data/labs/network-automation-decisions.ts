@@ -8,7 +8,7 @@ const lab: LabManifest = {
   tier: "advanced",
   track: "network-services",
   difficulty: "challenging",
-  accessLevel: "premium",
+  accessLevel: "free",
   tags: ["automation", "ansible", "python", "netconf", "restconf", "api"],
   description:
     "Choose the appropriate network automation approach by triaging operational requirements and selecting the right tools and protocols.",

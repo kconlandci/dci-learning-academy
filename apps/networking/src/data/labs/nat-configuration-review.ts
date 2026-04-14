@@ -8,7 +8,7 @@ const lab: LabManifest = {
   tier: "intermediate",
   track: "network-fundamentals",
   difficulty: "moderate",
-  accessLevel: "premium",
+  accessLevel: "free",
   tags: ["nat", "pat", "static-nat", "firewall", "addressing"],
   description:
     "Review and fix Network Address Translation configurations including static NAT, dynamic NAT, and PAT overload issues.",

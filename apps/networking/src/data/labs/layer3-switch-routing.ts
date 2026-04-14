@@ -9,7 +9,7 @@ const lab: LabManifest = {
   tier: "advanced",
   track: "routing-switching",
   difficulty: "challenging",
-  accessLevel: "premium",
+  accessLevel: "free",
   tags: ["layer-3-switch", "svi", "routed-port", "ip-routing", "triage"],
 
   description:

@@ -9,7 +9,7 @@ const lab: LabManifest = {
   tier: "intermediate",
   track: "routing-switching",
   difficulty: "moderate",
-  accessLevel: "premium",
+  accessLevel: "free",
   tags: ["bgp", "peering", "ebgp", "ibgp", "troubleshooting"],
 
   description:

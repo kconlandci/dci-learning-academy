@@ -8,7 +8,7 @@ const lab: LabManifest = {
   tier: "advanced",
   track: "wireless-networking",
   difficulty: "challenging",
-  accessLevel: "premium",
+  accessLevel: "free",
   tags: ["wids", "wips", "rogue-ap", "evil-twin", "deauth-attack"],
   description:
     "Respond to wireless intrusion detection system alerts including rogue APs, evil twin attacks, deauthentication floods, and unauthorized client associations.",

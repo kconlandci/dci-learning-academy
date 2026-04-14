@@ -38,7 +38,6 @@ export const learningPaths: LearningPath[] = [
       "mac-address-filtering",
       "broadcast-domain-design",
       "tcp-handshake-diagnosis",
-      // --- PREMIUM (6) ---
       "encapsulation-troubleshooting",
       "nat-configuration-review",
       "vlsm-subnetting",
@@ -69,7 +68,6 @@ export const learningPaths: LearningPath[] = [
       "acl-traffic-filtering",
       "etherchannel-setup",
       "ospf-neighbor-troubleshooting",
-      // --- PREMIUM (8) ---
       "bgp-peering-troubleshooting",
       "hsrp-failover-analysis",
       "ospf-area-design",
@@ -100,7 +98,6 @@ export const learningPaths: LearningPath[] = [
       "captive-portal-setup",
       "wireless-bridge-config",
       "mesh-network-troubleshooting",
-      // --- PREMIUM (5) ---
       "controller-based-wifi",
       "spectrum-analysis",
       "wireless-ids-response",
@@ -128,7 +125,6 @@ export const learningPaths: LearningPath[] = [
       "ssl-tls-inspection",
       "network-segmentation-security",
       "radius-authentication-debug",
-      // --- PREMIUM (5) ---
       "ipsec-tunnel-troubleshooting",
       "waf-rule-tuning",
       "zero-trust-network-design",
@@ -156,7 +152,6 @@ export const learningPaths: LearningPath[] = [
       "ftp-tftp-server-setup",
       "smtp-relay-troubleshooting",
       "proxy-server-configuration",
-      // --- PREMIUM (5) ---
       "cloud-dns-architecture",
       "infrastructure-monitoring-design",
       "ip-telephony-qos",
@@ -184,7 +179,6 @@ export const learningPaths: LearningPath[] = [
       "duplex-mismatch-detection",
       "mtu-path-discovery",
       "dns-network-troubleshooting",
-      // --- PREMIUM (5) ---
       "asymmetric-routing-diagnosis",
       "intermittent-connectivity-analysis",
       "network-outage-rca",

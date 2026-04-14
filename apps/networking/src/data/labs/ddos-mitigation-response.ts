@@ -8,7 +8,7 @@ const lab: LabManifest = {
   tier: "advanced",
   track: "network-security",
   difficulty: "challenging",
-  accessLevel: "premium",
+  accessLevel: "free",
   tags: ["ddos", "mitigation", "volumetric", "application-layer", "scrubbing", "rate-limiting"],
   description:
     "Identify DDoS attack vectors from live traffic analysis and implement appropriate mitigation strategies including scrubbing, rate limiting, and application-layer defenses.",

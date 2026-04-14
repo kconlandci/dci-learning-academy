@@ -8,7 +8,7 @@ const lab: LabManifest = {
   tier: "advanced",
   track: "wireless-networking",
   difficulty: "challenging",
-  accessLevel: "premium",
+  accessLevel: "free",
   tags: ["802.1x", "radius", "eap", "authentication", "certificates"],
   description:
     "Investigate and resolve 802.1X wireless authentication failures including EAP negotiation errors, RADIUS server issues, certificate validation failures, and dynamic VLAN assignment problems.",

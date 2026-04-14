@@ -9,7 +9,7 @@ const lab: LabManifest = {
   tier: "advanced",
   track: "network-troubleshooting",
   difficulty: "challenging",
-  accessLevel: "premium",
+  accessLevel: "free",
   tags: [
     "asymmetric-routing",
     "firewall",

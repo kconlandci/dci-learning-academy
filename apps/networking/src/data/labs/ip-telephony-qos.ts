@@ -8,7 +8,7 @@ const lab: LabManifest = {
   tier: "advanced",
   track: "network-services",
   difficulty: "challenging",
-  accessLevel: "premium",
+  accessLevel: "free",
   tags: ["voip", "qos", "jitter", "packet-loss", "ip-telephony", "rtp"],
   description:
     "Triage VoIP quality issues by analyzing jitter, latency, and packet loss metrics to classify root causes and apply targeted remediations.",

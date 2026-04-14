@@ -8,7 +8,7 @@ const lab: LabManifest = {
   tier: "intermediate",
   track: "network-fundamentals",
   difficulty: "challenging",
-  accessLevel: "premium",
+  accessLevel: "free",
   tags: ["baseline", "monitoring", "performance", "snmp", "anomaly-detection"],
   description:
     "Analyze deviations from network performance baselines to identify emerging issues before they cause outages.",

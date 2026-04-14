@@ -8,7 +8,7 @@ const lab: LabManifest = {
   tier: "advanced",
   track: "network-services",
   difficulty: "challenging",
-  accessLevel: "premium",
+  accessLevel: "free",
   tags: ["cloud-dns", "hybrid-dns", "split-horizon", "route53", "private-zones"],
   description:
     "Design cloud DNS architecture for hybrid environments including split-horizon DNS, private hosted zones, and conditional forwarding.",

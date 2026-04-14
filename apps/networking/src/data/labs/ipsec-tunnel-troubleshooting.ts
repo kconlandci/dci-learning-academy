@@ -8,7 +8,7 @@ const lab: LabManifest = {
   tier: "advanced",
   track: "network-security",
   difficulty: "challenging",
-  accessLevel: "premium",
+  accessLevel: "free",
   tags: ["ipsec", "vpn", "tunnel", "phase1", "phase2", "crypto-map", "ikev2"],
   description:
     "Diagnose and remediate IPSec VPN tunnel failures including IKE Phase 1/Phase 2 mismatches, crypto map misconfigurations, and SA lifetime negotiation issues between site-to-site peers.",

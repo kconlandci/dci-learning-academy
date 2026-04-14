@@ -8,7 +8,7 @@ const lab: LabManifest = {
   tier: "intermediate",
   track: "network-fundamentals",
   difficulty: "challenging",
-  accessLevel: "premium",
+  accessLevel: "free",
   tags: ["vlsm", "subnetting", "cidr", "ip-addressing", "network-design"],
   description:
     "Configure Variable Length Subnet Masking for efficient IP address allocation across networks of varying sizes.",

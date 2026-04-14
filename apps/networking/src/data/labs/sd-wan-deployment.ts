@@ -8,7 +8,7 @@ const lab: LabManifest = {
   tier: "advanced",
   track: "network-services",
   difficulty: "challenging",
-  accessLevel: "premium",
+  accessLevel: "free",
   tags: ["sd-wan", "wan-optimization", "overlay", "ipsec", "mpls"],
   description:
     "Plan SD-WAN deployment strategy including transport selection, overlay design, application-aware routing policies, and migration from traditional MPLS.",

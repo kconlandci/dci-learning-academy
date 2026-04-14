@@ -8,7 +8,7 @@ const lab: LabManifest = {
   tier: "advanced",
   track: "network-security",
   difficulty: "challenging",
-  accessLevel: "premium",
+  accessLevel: "free",
   tags: ["zero-trust", "microsegmentation", "identity", "continuous-verification", "sdp", "ztna"],
   description:
     "Design zero-trust network architecture decisions involving microsegmentation policies, identity-based access controls, and continuous verification mechanisms for enterprise environments.",

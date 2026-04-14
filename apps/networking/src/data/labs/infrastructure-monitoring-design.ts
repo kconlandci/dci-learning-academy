@@ -8,7 +8,7 @@ const lab: LabManifest = {
   tier: "advanced",
   track: "network-services",
   difficulty: "challenging",
-  accessLevel: "premium",
+  accessLevel: "free",
   tags: ["monitoring", "observability", "prometheus", "grafana", "alerting", "siem"],
   description:
     "Design a comprehensive network monitoring stack by triaging monitoring requirements and selecting appropriate tools, metrics, and alerting strategies.",

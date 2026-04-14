@@ -8,7 +8,7 @@ const lab: LabManifest = {
   tier: "intermediate",
   track: "network-fundamentals",
   difficulty: "challenging",
-  accessLevel: "premium",
+  accessLevel: "free",
   tags: ["multicast", "igmp", "pim", "group-addressing"],
   description:
     "Classify and address multicast routing issues including IGMP membership problems, PIM neighbor failures, and multicast addressing errors.",

@@ -8,7 +8,7 @@ const lab: LabManifest = {
   tier: "advanced",
   track: "wireless-networking",
   difficulty: "challenging",
-  accessLevel: "premium",
+  accessLevel: "free",
   tags: ["high-density", "stadium", "venue", "capacity", "design"],
   description:
     "Design and triage high-density Wi-Fi deployments for stadiums, convention centers, and auditoriums where thousands of devices compete for wireless resources simultaneously.",

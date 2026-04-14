@@ -8,7 +8,7 @@ const lab: LabManifest = {
   tier: "advanced",
   track: "wireless-networking",
   difficulty: "challenging",
-  accessLevel: "premium",
+  accessLevel: "free",
   tags: ["wlc", "controller", "capwap", "enterprise", "triage"],
   description:
     "Triage and remediate issues on wireless LAN controllers including AP join failures, CAPWAP tunnel problems, license exhaustion, and high availability failover events.",

@@ -8,7 +8,7 @@ const lab: LabManifest = {
   tier: "advanced",
   track: "network-security",
   difficulty: "challenging",
-  accessLevel: "premium",
+  accessLevel: "free",
   tags: ["waf", "web-security", "false-positive", "owasp", "modsecurity", "rule-tuning"],
   description:
     "Fine-tune WAF rules to reduce false positives while maintaining protection against OWASP Top 10 threats, balancing security posture with application availability.",
