@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "rebrandScriptVersion": "1.0.0",
+  "module": {
+    "slug": "data-analytics",
+    "sourceRepoName": "DataForge"
+  },
+  "source": {
+    "path": "C:\\Users\\conla\\OneDrive\\Desktop\\Forge Labs\\DataForge",
+    "gitCommit": "b2de5a8b48d3de470773ce4f4893cb90c27173f6",
+    "gitBranch": "main"
+  },
+  "rebrandedAt": "2026-04-14T18:14:22.208Z"
+}
