@@ -52,7 +52,7 @@ export const MODULES: readonly DciModule[] = [
     tagline: "Cloud platform fundamentals and infrastructure basics",
     sourceRepo: "CloudForge",
     labCount: 100,
-    available: false,
+    available: true,
   },
   {
     slug: "networking",
