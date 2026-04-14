@@ -71,15 +71,11 @@ export default function HomeScreen() {
       <div className="min-h-screen bg-white p-4 pb-24">
         <div className="max-w-lg mx-auto pt-6">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-11 h-11 rounded-2xl bg-amber-500/15 border border-amber-400/20 flex items-center justify-center">
-              <Database className="text-amber-600" size={22} />
-            </div>
-            <div>
-              <h1 className="text-xl font-bold text-[#1A1A1A]">DCI Data Analytics Labs</h1>
-              <p className="text-xs text-gray-500">
-                DCI Data Analytics Labs: Data Training
-              </p>
-            </div>
+            <img
+              src={`${import.meta.env.BASE_URL}logo-wide.png`}
+              alt="DCI Data Analytics Labs"
+              className="h-8"
+            />
           </div>
 
           <div className="flex items-center gap-4 mb-6 px-1">

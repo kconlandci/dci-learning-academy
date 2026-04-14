@@ -4,7 +4,6 @@ import {
   BarChart3,
   ChevronRight,
   Crown,
-  Database,
   FileText,
   Mail,
   Scale,
@@ -55,9 +54,11 @@ export default function SettingsScreen() {
     <div className="min-h-screen bg-white p-4 pb-24">
       <div className="max-w-lg mx-auto pt-6">
         <div className="text-center mb-8">
-          <div className="w-14 h-14 rounded-2xl bg-amber-500/20 flex items-center justify-center mx-auto mb-3">
-            <Database className="text-amber-600" size={28} />
-          </div>
+          <img
+            src={`${import.meta.env.BASE_URL}logo-mark.png`}
+            alt="DCI Data Analytics Labs"
+            className="w-14 h-14 rounded-2xl mx-auto mb-3"
+          />
           <h1 className="text-xl font-bold text-[#1A1A1A]">DCI Data Analytics Labs</h1>
           <p className="text-xs text-gray-500 mt-1">DCI Data Analytics Labs: Data Training</p>
           <p className="text-[10px] text-gray-400 mt-1">v1.0.0</p>
