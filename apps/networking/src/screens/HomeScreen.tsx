@@ -20,7 +20,6 @@ import { useProgress } from "../hooks/useProgress";
 import { usePremiumStatus } from "../hooks/usePremiumStatus";
 import { useActivePath } from "../hooks/useRecommendedLab";
 import { useAuth } from "../contexts/AuthContext";
-import Onboarding, { isOnboardingComplete } from "../components/Onboarding";
 import type { LearningPath } from "../data/paths";
 
 const ICON_MAP: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {
@@ -33,7 +32,6 @@ const ICON_MAP: Record<string, React.ComponentType<{ size?: number; className?: 
 };
 
 export default function HomeScreen() {
-  const [showOnboarding, setShowOnboarding] = useState(!isOnboardingComplete());
   const [showAllLabs, setShowAllLabs] = useState(false);
   const navigate = useNavigate();
   const { uid } = useAuth();
@@ -51,12 +49,7 @@ export default function HomeScreen() {
   const activePath = useActivePath(progress.labs);
 
   return (
-    <>
-      {showOnboarding && (
-        <Onboarding onComplete={() => setShowOnboarding(false)} />
-      )}
-
-      <div className="min-h-screen bg-white p-4 pb-24">
+    <div className="min-h-screen bg-white p-4 pb-24">
         <div className="max-w-lg mx-auto pt-6">
           {/* Header */}
           <div className="flex items-center gap-3 mb-4">
@@ -211,7 +204,6 @@ export default function HomeScreen() {
           </section>
         </div>
       </div>
-    </>
   );
 }
 

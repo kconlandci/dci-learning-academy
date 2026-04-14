@@ -15,7 +15,6 @@ import {
   Workflow,
   Zap,
 } from "lucide-react";
-import Onboarding, { isOnboardingComplete } from "../components/Onboarding";
 import { useAuth } from "../contexts/AuthContext";
 import { labCatalog } from "../data/catalog";
 import { learningPaths } from "../data/paths";
@@ -39,7 +38,6 @@ const ICON_MAP: Record<
 const tierOrder = ["beginner", "intermediate", "advanced"];
 
 export default function HomeScreen() {
-  const [showOnboarding, setShowOnboarding] = useState(!isOnboardingComplete());
   const [showAllLabs, setShowAllLabs] = useState(false);
   const navigate = useNavigate();
   const { uid } = useAuth();
@@ -66,12 +64,7 @@ export default function HomeScreen() {
   const activePath = useActivePath(progress.labs);
 
   return (
-    <>
-      {showOnboarding && (
-        <Onboarding onComplete={() => setShowOnboarding(false)} />
-      )}
-
-      <div className="min-h-screen bg-white p-4 pb-24">
+    <div className="min-h-screen bg-white p-4 pb-24">
         <div className="max-w-lg mx-auto pt-6">
           <div className="flex items-center gap-3 mb-4">
             <img
@@ -219,7 +212,6 @@ export default function HomeScreen() {
           </section>
         </div>
       </div>
-    </>
   );
 }
 
