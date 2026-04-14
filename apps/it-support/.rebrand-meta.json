@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "rebrandScriptVersion": "1.0.0",
+  "module": {
+    "slug": "it-support",
+    "sourceRepoName": "TechForge"
+  },
+  "source": {
+    "path": "C:\\Users\\conla\\OneDrive\\Desktop\\Forge Labs\\TechForge",
+    "gitCommit": "0bfd01fdeb2b5f6ac5082bba53f74b8fa1f2ca7c",
+    "gitBranch": "main"
+  },
+  "rebrandedAt": "2026-04-14T20:40:18.580Z"
+}
