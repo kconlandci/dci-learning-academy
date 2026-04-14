@@ -1,0 +1,162 @@
+import type { LabManifest } from "../../types/manifest";
+
+export const securityIncidentCloudLab: LabManifest = {
+  schemaVersion: "1.1",
+  id: "security-incident-cloud",
+  version: 1,
+  title: "Cloud Security Incident Response",
+  tier: "beginner",
+  track: "cloud-security",
+  difficulty: "moderate",
+  accessLevel: "free",
+  tags: ["security", "incident-response", "aws-guardduty", "forensics", "compromise", "containment"],
+  description:
+    "Triage and respond to cloud security incidents including compromised EC2 instances, unauthorized IAM usage, and S3 data exfiltration. Practice containment, evidence preservation, and remediation decisions under realistic time pressure.",
+  estimatedMinutes: 15,
+  learningObjectives: [
+    "Classify cloud security incidents by severity and type",
+    "Apply the correct containment strategy for a compromised EC2 instance",
+    "Preserve forensic evidence before remediating a cloud incident",
+    "Distinguish between credential compromise and malware-based incidents",
+    "Follow the correct order of incident response phases in cloud environments",
+  ],
+  sortOrder: 507,
+  status: "published",
+  prerequisites: [],
+  rendererType: "triage-remediate",
+  scenarios: [
+    {
+      type: "triage-remediate",
+      id: "sir-s1-ec2-cryptominer",
+      title: "EC2 Instance Running Cryptominer",
+      description:
+        "AWS GuardDuty triggers a HIGH severity finding: `CryptoCurrency:EC2/BitcoinTool.B` for instance `i-0abc123def456789`. The instance is running in the production VPC and hosts a customer-facing API. CloudWatch shows CPU utilization spiked to 98% three hours ago.",
+      evidence: [
+        { type: "guardduty", content: "Finding: CryptoCurrency:EC2/BitcoinTool.B — HIGH severity. Instance i-0abc123def456789 is communicating with a known cryptocurrency mining pool at 192.0.2.45:3333." },
+        { type: "cloudwatch", content: "CPU Utilization: 98% sustained for 3 hours (baseline: 12%). Network out: 450 MB/hour (baseline: 8 MB/hour)." },
+        { type: "cloudtrail", content: "No unusual API calls from the instance profile role in the past 24 hours." },
+        { type: "vpc-flow-log", content: "Outbound connections established to 192.0.2.45 (mining pool), 198.51.100.12 (unknown), and 203.0.113.8 (unknown) on non-standard ports." },
+      ],
+      classifications: [
+        { id: "c1", label: "Malware Infection — Cryptomining", description: "The instance is infected with cryptomining malware, abusing cloud compute resources." },
+        { id: "c2", label: "Insider Threat — Unauthorized Resource Use", description: "An authorized user is deliberately running a miner on company infrastructure." },
+        { id: "c3", label: "Data Exfiltration", description: "Sensitive data is being exfiltrated to external servers." },
+        { id: "c4", label: "DDoS Amplification Attack", description: "The instance is being used as part of a DDoS botnet." },
+      ],
+      correctClassificationId: "c1",
+      remediations: [
+        { id: "rem1", label: "Terminate the instance immediately", description: "Delete the EC2 instance to stop the cryptomining activity." },
+        { id: "rem2", label: "Isolate the instance (quarantine security group), take forensic snapshot, then terminate", description: "Immediately replace the instance security group with a deny-all quarantine SG, create an EBS snapshot for forensics, then terminate the instance and replace from a clean AMI." },
+        { id: "rem3", label: "SSH into the instance and kill the mining process", description: "Connect to the running instance, identify and kill the miner process, then clean up the malware." },
+        { id: "rem4", label: "Block the mining pool IP in the security group and monitor", description: "Add a deny rule for the known mining pool IP and continue running the instance." },
+      ],
+      correctRemediationId: "rem2",
+      rationales: [
+        { id: "r1", text: "The GuardDuty finding, mining pool communications, and CPU spike are consistent with a cryptomining malware infection on the instance." },
+        { id: "r2", text: "Isolating first preserves the attack chain evidence, the forensic snapshot preserves memory artifacts via disk, and then terminating and replacing from a clean AMI fully remediates the incident." },
+        { id: "r3", text: "Immediate termination without snapshots destroys forensic evidence needed to understand the initial access vector and prevent recurrence." },
+        { id: "r4", text: "SSHing into an actively compromised instance risks further compromise of your credentials and may tamper with evidence needed for forensic analysis." },
+      ],
+      correctRationaleId: "r2",
+      feedback: {
+        perfect: "Correct classification and remediation. Isolate-snapshot-terminate-replace is the standard cloud incident response playbook for compromised instances.",
+        partial: "One choice is correct. For the other, remember that cloud incident response prioritizes evidence preservation before remediation — immediate termination loses forensic data.",
+        wrong: "Review cloud incident response fundamentals. Compromised instances should be isolated and snapshotted before termination to preserve evidence for root cause analysis.",
+      },
+    },
+    {
+      type: "triage-remediate",
+      id: "sir-s2-iam-key-leaked",
+      title: "IAM Access Key Exposed in Public GitHub Repo",
+      description:
+        "GitHub's secret scanning alerts your security team that an AWS IAM access key for `deploy-svc-user` was committed to a public repository 47 minutes ago. The key has `PowerUserAccess` attached. CloudTrail shows the key has been used 3 times in the past 20 minutes from an IP in Eastern Europe.",
+      evidence: [
+        { type: "github-alert", content: "Secret scanning alert: AWS access key AKIA... detected in public repo 'acmecorp/deploy-scripts', committed 47 minutes ago." },
+        { type: "cloudtrail", content: "Last 3 API calls using this key: ec2:DescribeInstances (198.51.100.77), s3:ListBuckets (198.51.100.77), iam:ListUsers (198.51.100.77). All from IP 198.51.100.77 (Romania)." },
+        { type: "normal-usage", content: "Normal usage of this key: Always from 10.0.0.0/8 (internal CI/CD), never outside business hours." },
+        { type: "key-permissions", content: "deploy-svc-user policy: PowerUserAccess (allows all actions except IAM management)" },
+      ],
+      classifications: [
+        { id: "c1", label: "Credential Compromise — Exposed Access Key", description: "An IAM access key was publicly exposed and is being actively used by an unauthorized third party." },
+        { id: "c2", label: "Insider Threat — Developer Testing from Remote Location", description: "A developer may be testing from a personal machine abroad." },
+        { id: "c3", label: "Account Misconfiguration — Key Rotation Failure", description: "An old key was accidentally left active and committed to source control." },
+        { id: "c4", label: "Reconnaissance Activity — Internal User", description: "An internal user is running enumeration commands to understand the environment." },
+      ],
+      correctClassificationId: "c1",
+      remediations: [
+        { id: "rem1", label: "Email the developer who committed the key and ask them to rotate it", description: "Contact the developer responsible for the commit and request they handle key rotation." },
+        { id: "rem2", label: "Immediately disable the key in IAM, invalidate any STS tokens issued by it, then investigate CloudTrail for any actions taken", description: "Disable the access key immediately to stop active use, revoke all active sessions derived from it, then perform a full CloudTrail investigation to determine the blast radius." },
+        { id: "rem3", label: "Rotate the key by generating a new one and updating the CI/CD pipeline", description: "Create a new access key, update the pipeline, and delete the old key." },
+        { id: "rem4", label: "Add an IAM condition to restrict the key to internal IPs and monitor", description: "Update the IAM policy to add an aws:SourceIp condition restricting use to 10.0.0.0/8." },
+      ],
+      correctRemediationId: "rem2",
+      rationales: [
+        { id: "r1", text: "The combination of public exposure, usage from a foreign IP outside business hours with enumeration commands, and no legitimate reason for international access confirms active credential compromise." },
+        { id: "r2", text: "Disabling immediately stops active exfiltration or further reconnaissance. Revoking STS tokens invalidates any temporary credentials derived from the key. CloudTrail investigation determines what resources were accessed or modified." },
+        { id: "r3", text: "Emailing the developer while an attacker has active access wastes critical response time. A confirmed public key with foreign usage must be treated as compromised." },
+        { id: "r4", text: "Rotating without immediately disabling leaves the exposed key active during the rotation window. An attacker can continue using it until deletion is confirmed." },
+      ],
+      correctRationaleId: "r1",
+      feedback: {
+        perfect: "Correct. Active usage from a foreign IP 47 minutes after public exposure is confirmed compromise. Disable immediately, revoke sessions, then investigate blast radius.",
+        partial: "One choice is correct. For the other, consider the speed required — an attacker with PowerUserAccess has minutes to cause significant damage. Immediate disable, not rotation.",
+        wrong: "This scenario is an active credential compromise, not a misconfiguration. Immediate disablement is required. Every minute of delay allows the attacker to expand their foothold.",
+      },
+    },
+    {
+      type: "triage-remediate",
+      id: "sir-s3-s3-data-exfil",
+      title: "Suspicious S3 Bucket Data Access Pattern",
+      description:
+        "AWS Macie generates a HIGH severity finding that an S3 bucket `prod-customer-records` containing 2.3 million customer records had 890 GB of data accessed and downloaded in a single 4-hour window last night. Normal access patterns are under 5 GB per day.",
+      evidence: [
+        { type: "macie", content: "Amazon Macie finding: Large-scale data access anomaly. Bucket: prod-customer-records. Data accessed: 890 GB over 4 hours (22:00-02:00 UTC)." },
+        { type: "cloudtrail", content: "API calls: s3:GetObject × 2,847,391 calls using IAM role 'analytics-etl-role'. Source IP: 203.0.113.99 (not a known AWS IP range)." },
+        { type: "iam-context", content: "analytics-etl-role is attached to an EC2 instance in the analytics VPC. The instance running the ETL job was terminated 2 days ago but the role is still active." },
+        { type: "bucket-config", content: "Bucket has no S3 Block Public Access. Bucket policy allows s3:GetObject from the analytics-etl-role with no IP condition." },
+      ],
+      classifications: [
+        { id: "c1", label: "Data Exfiltration via Compromised IAM Role", description: "An attacker obtained the analytics IAM role credentials and is exfiltrating customer data at scale." },
+        { id: "c2", label: "Misconfigured ETL Job — Data Overread", description: "A legitimate ETL job is accessing more data than expected due to a query error." },
+        { id: "c3", label: "Authorized Bulk Export — Not Anomalous", description: "The data science team ran a large authorized export for model training." },
+        { id: "c4", label: "S3 Replication Misconfiguration", description: "An unintended S3 replication rule is copying data to an uncontrolled destination." },
+      ],
+      correctClassificationId: "c1",
+      remediations: [
+        { id: "rem1", label: "Disable the analytics-etl-role and enable S3 Block Public Access, then investigate", description: "Immediately disable the role to stop ongoing access, enable Block Public Access on the bucket, then investigate the scope via CloudTrail." },
+        { id: "rem2", label: "Enable S3 server access logging to investigate the source", description: "Enable logging to get more information before taking any action." },
+        { id: "rem3", label: "Notify the data science team and ask if they ran a bulk export last night", description: "Check with the team responsible for the analytics ETL pipeline before taking action." },
+        { id: "rem4", label: "Apply an S3 bucket policy to block the external IP and monitor", description: "Add a bucket policy deny for 203.0.113.99 to stop the current access pattern." },
+      ],
+      correctRemediationId: "rem1",
+      rationales: [
+        { id: "r1", text: "The source IP outside AWS ranges, access via a role whose associated instance was terminated 2 days ago, and overnight timing all indicate the role credentials were stolen and are being actively used." },
+        { id: "r2", text: "Disabling the role stops ongoing exfiltration. Block Public Access prevents the bucket being made public. CloudTrail analysis determines the full scope of what was accessed." },
+        { id: "r3", text: "When 2.3 million customer records are actively being exfiltrated, any delay to investigate or ask teams introduces unacceptable risk. Contain first, investigate second." },
+        { id: "r4", text: "Blocking only the current IP is insufficient — the attacker can trivially rotate IPs. The role credentials must be disabled to close all access paths." },
+      ],
+      correctRationaleId: "r1",
+      feedback: {
+        perfect: "Correct. Active exfiltration requires immediate containment. Disable the role, block public access, then investigate — in that order.",
+        partial: "One choice is correct. Remember: in active exfiltration, contain first. An IP block is too easily bypassed; the IAM role credentials themselves must be revoked.",
+        wrong: "Delaying containment while investigating allows the exfiltration to continue. 2.3 million customer records are at risk — immediate role disablement is the only acceptable first action.",
+      },
+    },
+  ],
+  hints: [
+    "The cloud incident response order is: Detect → Contain → Preserve Evidence → Eradicate → Recover → Lessons Learned. Never eradicate (terminate) before containing and preserving evidence.",
+    "When an IAM access key or role is compromised, disabling the key stops new API calls, but you must also revoke active IAM sessions to invalidate any STS temporary credentials already issued.",
+    "Always check CloudTrail for the blast radius after a compromise — look at what API calls were made, what resources were modified, and whether any new backdoor credentials (IAM users, access keys) were created.",
+  ],
+  scoring: {
+    maxScore: 100,
+    hintPenalty: 5,
+    penalties: { perfect: 0, partial: 10, wrong: 20 },
+    passingThresholds: { pass: 80, partial: 50 },
+  },
+  careerInsight:
+    "Cloud incident response is one of the highest-demand specializations in security. Companies pay significant premiums for engineers who can triage AWS/Azure/GCP incidents confidently. This skill set is directly tested in SANS FOR509, AWS Security Specialty, and cloud red team certifications.",
+  toolRelevance: ["AWS GuardDuty", "Amazon Macie", "AWS CloudTrail", "AWS Security Hub", "VPC Flow Logs", "AWS IAM", "Amazon Detective"],
+  createdAt: "2026-03-28",
+  updatedAt: "2026-03-28",
+};

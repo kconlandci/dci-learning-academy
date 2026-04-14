@@ -1,0 +1,256 @@
+import type { LabManifest } from "../../types/manifest";
+
+export const cloudwatchAlarmSetupLab: LabManifest = {
+  schemaVersion: "1.1",
+  id: "cloudwatch-alarm-setup",
+  version: 1,
+  title: "CloudWatch Alarm Setup",
+  tier: "beginner",
+  track: "cloud-operations",
+  difficulty: "easy",
+  accessLevel: "free",
+  tags: ["aws", "cloudwatch", "monitoring", "alerting", "observability"],
+  description:
+    "Configure CloudWatch alarms with correct thresholds, evaluation periods, and notification targets to ensure meaningful, actionable alerts without alert fatigue.",
+  estimatedMinutes: 9,
+  learningObjectives: [
+    "Set appropriate alarm thresholds based on workload characteristics",
+    "Configure evaluation periods to avoid flapping alarms",
+    "Select the correct CloudWatch statistic for each metric type",
+    "Route alarms to the right notification targets via SNS",
+  ],
+  sortOrder: 601,
+  status: "published",
+  prerequisites: [],
+  rendererType: "toggle-config",
+  scenarios: [
+    {
+      type: "toggle-config",
+      id: "cloudwatch-s1",
+      title: "EC2 CPU Alarm Configuration",
+      description:
+        "Configure a CloudWatch alarm for an EC2 web server running a Node.js API. The server should alert on sustained high CPU but must not fire on short-lived spikes during deployments or cron jobs that run for under 2 minutes.",
+      targetSystem: "CloudWatch Alarm — EC2 CPUUtilization",
+      items: [
+        {
+          id: "threshold",
+          label: "CPU Threshold",
+          detail: "The percentage at which the alarm transitions to ALARM state.",
+          currentState: "70%",
+          correctState: "85%",
+          states: ["50%", "70%", "85%", "95%"],
+          rationaleId: "r-threshold",
+        },
+        {
+          id: "evaluation-periods",
+          label: "Evaluation Periods",
+          detail: "Number of consecutive periods that must breach the threshold before alarming.",
+          currentState: "1",
+          correctState: "3",
+          states: ["1", "2", "3", "5"],
+          rationaleId: "r-eval-periods",
+        },
+        {
+          id: "period",
+          label: "Period (seconds)",
+          detail: "How often CloudWatch collects and evaluates the metric.",
+          currentState: "300",
+          correctState: "60",
+          states: ["60", "120", "300", "900"],
+          rationaleId: "r-period",
+        },
+        {
+          id: "statistic",
+          label: "Statistic",
+          detail: "The aggregation function applied to data points within each period.",
+          currentState: "Maximum",
+          correctState: "Average",
+          states: ["Minimum", "Average", "Maximum", "Sum"],
+          rationaleId: "r-statistic",
+        },
+      ],
+      rationales: [
+        {
+          id: "r-threshold",
+          text: "85% is the right balance for a web server CPU alarm. 70% fires too eagerly during normal load spikes, causing alert fatigue. 95% is too late — response times are already degraded well before CPU hits 95%.",
+        },
+        {
+          id: "r-eval-periods",
+          text: "Three consecutive periods (3 × 60s = 3 minutes) filters out sub-2-minute deployment spikes while still catching genuine sustained load. With 1 period, any 60-second spike triggers an alert.",
+        },
+        {
+          id: "r-period",
+          text: "A 60-second period gives granular data points needed to accurately count 3 consecutive breaches. A 300-second period means each evaluation window is 5 minutes — too coarse to distinguish a 2-minute spike from sustained load.",
+        },
+        {
+          id: "r-statistic",
+          text: "Average CPU utilization over a 60-second period reflects true sustained load. Maximum would fire on a single 1-second burst within the evaluation period, which is exactly the noisy alarm behavior we want to avoid.",
+        },
+      ],
+      feedback: {
+        perfect: "Well configured. The combination of 85% threshold, 3 evaluation periods at 60-second resolution using Average statistic will reliably catch sustained CPU issues while ignoring deployment noise.",
+        partial: "Some settings are correct but others will still cause noisy alarms. Review the evaluation period and statistic together — they work as a unit to define 'sustained' behavior.",
+        wrong: "This configuration will either miss real problems or generate constant false alarms. Focus on what 'sustained high CPU' means in terms of time (evaluation periods × period length) and what metric best represents it (Average vs Maximum).",
+      },
+    },
+    {
+      type: "toggle-config",
+      id: "cloudwatch-s2",
+      title: "RDS Alarm Configuration",
+      description:
+        "An RDS MySQL instance serves a transactional application. Configure alarms to catch storage exhaustion before it causes an outage, and connection saturation before queries start failing. The instance has 100 GB storage and max_connections set to 500.",
+      targetSystem: "CloudWatch Alarms — RDS FreeStorageSpace & DatabaseConnections",
+      items: [
+        {
+          id: "storage-threshold",
+          label: "FreeStorageSpace Threshold",
+          detail: "Alarm when free storage drops below this value (in GB). Instance has 100 GB total.",
+          currentState: "5 GB",
+          correctState: "20 GB",
+          states: ["1 GB", "5 GB", "20 GB", "50 GB"],
+          rationaleId: "r-storage-threshold",
+        },
+        {
+          id: "storage-action",
+          label: "Storage Alarm Action",
+          detail: "What happens when the FreeStorageSpace alarm fires.",
+          currentState: "Notify on-call via SNS",
+          correctState: "Notify on-call via SNS + trigger Lambda to increase storage",
+          states: [
+            "Log to S3 only",
+            "Notify on-call via SNS",
+            "Notify on-call via SNS + trigger Lambda to increase storage",
+            "Auto-reboot the RDS instance",
+          ],
+          rationaleId: "r-storage-action",
+        },
+        {
+          id: "connections-threshold",
+          label: "DatabaseConnections Threshold",
+          detail: "Alarm when active connections exceed this count. max_connections = 500.",
+          currentState: "500",
+          correctState: "400",
+          states: ["200", "350", "400", "500"],
+          rationaleId: "r-connections-threshold",
+        },
+        {
+          id: "connections-statistic",
+          label: "DatabaseConnections Statistic",
+          detail: "Aggregation function for the connections metric.",
+          currentState: "Average",
+          correctState: "Maximum",
+          states: ["Minimum", "Average", "Maximum", "Sum"],
+          rationaleId: "r-connections-statistic",
+        },
+      ],
+      rationales: [
+        {
+          id: "r-storage-threshold",
+          text: "20 GB (20% of total) gives enough runway to respond before an outage. At 5 GB, a busy transaction log or batch insert could exhaust the remaining space before an engineer can act. Early warning enables a proactive response.",
+        },
+        {
+          id: "r-storage-action",
+          text: "Pairing human notification with automated storage expansion (RDS storage autoscaling via Lambda) provides both immediate remediation and human awareness. Logging only means no one acts. Auto-rebooting an RDS instance on storage issues does nothing to fix the underlying problem.",
+        },
+        {
+          id: "r-connections-threshold",
+          text: "Alarming at 400 (80% of max_connections=500) provides a 100-connection buffer. At exactly 500, new connections are already being refused. The goal is to alert while there is still headroom to investigate and act.",
+        },
+        {
+          id: "r-connections-statistic",
+          text: "Use Maximum for connection count alarms. Average can hide short-lived connection spikes that exhaust the pool momentarily. A single Maximum period at 480 connections is more actionable than an average that stays at 250.",
+        },
+      ],
+      feedback: {
+        perfect: "Correct configuration. Early thresholds with automated remediation for storage and Maximum-based alerting for connections is the professional approach to RDS observability.",
+        partial: "You have the right ideas but the thresholds or statistics need adjustment. Remember: alarm when there's still time to act, not when the damage is already done.",
+        wrong: "These settings will either alert too late or use the wrong statistics. For resource exhaustion alarms, set thresholds at 70–80% of capacity, not at the limit itself.",
+      },
+    },
+    {
+      type: "toggle-config",
+      id: "cloudwatch-s3",
+      title: "ALB Latency Alarm Configuration",
+      description:
+        "Configure a CloudWatch alarm for Application Load Balancer target response time. The SLA requires 99% of requests complete under 500ms. The team wants to alert on P99 latency degradation before the SLA is breached, without generating noise from occasional slow requests.",
+      targetSystem: "CloudWatch Alarm — ALB TargetResponseTime",
+      items: [
+        {
+          id: "latency-statistic",
+          label: "Latistic Statistic",
+          detail: "The aggregation method for TargetResponseTime. P99 latency requires a specific statistic type.",
+          currentState: "Average",
+          correctState: "p99",
+          states: ["Average", "p50", "p95", "p99"],
+          rationaleId: "r-latency-statistic",
+        },
+        {
+          id: "latency-threshold",
+          label: "Latency Threshold (seconds)",
+          detail: "Alarm when the selected statistic exceeds this value. SLA is 500ms.",
+          currentState: "1.0",
+          correctState: "0.4",
+          states: ["0.2", "0.4", "0.5", "1.0"],
+          rationaleId: "r-latency-threshold",
+        },
+        {
+          id: "latency-eval-periods",
+          label: "Evaluation Periods",
+          detail: "Number of consecutive 60-second periods that must breach the threshold.",
+          currentState: "1",
+          correctState: "2",
+          states: ["1", "2", "3", "5"],
+          rationaleId: "r-latency-eval",
+        },
+        {
+          id: "missing-data",
+          label: "Missing Data Treatment",
+          detail: "How the alarm behaves when no data points are reported (e.g., zero traffic at night).",
+          currentState: "Treat as Breaching",
+          correctState: "Treat as Not Breaching",
+          states: ["Treat as Breaching", "Treat as Not Breaching", "Treat as Ignore", "Treat as Missing"],
+          rationaleId: "r-missing-data",
+        },
+      ],
+      rationales: [
+        {
+          id: "r-latency-statistic",
+          text: "P99 (99th percentile) is the correct statistic for SLA monitoring. Average latency hides tail latency problems — an Average of 100ms can coexist with a P99 of 2000ms, meaning 1% of users experience terrible performance that Average never reveals.",
+        },
+        {
+          id: "r-latency-threshold",
+          text: "Setting the alarm at 400ms (80% of the 500ms SLA) gives a 100ms buffer to investigate and respond before the SLA is technically breached. Alarming at 500ms means the SLA is already violated when the alert fires.",
+        },
+        {
+          id: "r-latency-eval",
+          text: "Two consecutive periods (2 minutes) filters single-minute spikes from cold starts or minor traffic bursts while catching genuine latency trends. One period is too sensitive for latency alarms which can spike briefly during deployments.",
+        },
+        {
+          id: "r-missing-data",
+          text: "Treating missing data as 'Not Breaching' prevents false alarms during low-traffic periods (overnight) when no requests are being made. Treating it as 'Breaching' would wake up on-call engineers when the service is simply idle.",
+        },
+      ],
+      feedback: {
+        perfect: "Excellent. P99 statistic with a pre-SLA threshold, two evaluation periods, and correct missing-data handling is the gold standard for latency alarm configuration.",
+        partial: "Most settings are correct but check your statistic choice. Using Average for an SLA based on percentile latency will allow the SLA to be breached silently.",
+        wrong: "This configuration will either fire false alarms or miss real SLA violations. The key insight is that percentile SLAs require percentile statistics — Average hides tail latency completely.",
+      },
+    },
+  ],
+  hints: [
+    "Evaluation periods × period length defines the minimum duration of a problem before an alarm fires — use this to filter transient spikes.",
+    "For resource exhaustion alarms (storage, connections), set thresholds at 70–80% of the limit to give response time.",
+    "Average statistics hide tail latency. Use p99 or p95 for SLA-based latency alarms.",
+  ],
+  scoring: {
+    maxScore: 100,
+    hintPenalty: 5,
+    penalties: { perfect: 0, partial: 10, wrong: 20 },
+    passingThresholds: { pass: 80, partial: 50 },
+  },
+  careerInsight:
+    "Monitoring configuration is a deceptively deep skill. Engineers who understand the difference between Average and p99 statistics, and who can reason about evaluation periods vs noise filtering, are invaluable during incident post-mortems when the team asks 'why didn't we get alerted earlier?'",
+  toolRelevance: ["AWS CloudWatch", "AWS SNS", "AWS Lambda", "Datadog", "PagerDuty"],
+  createdAt: "2026-03-28",
+  updatedAt: "2026-03-28",
+};

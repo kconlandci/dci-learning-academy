@@ -1,0 +1,162 @@
+import type { LabManifest } from "../../types/manifest";
+
+export const complianceFrameworkMappingLab: LabManifest = {
+  schemaVersion: "1.1",
+  id: "compliance-framework-mapping",
+  version: 1,
+  title: "Compliance Framework Mapping",
+  tier: "beginner",
+  track: "cloud-security",
+  difficulty: "easy",
+  accessLevel: "free",
+  tags: ["security", "compliance", "soc2", "pci-dss", "hipaa", "gdpr", "audit"],
+  description:
+    "Classify cloud security findings against major compliance frameworks and select appropriate remediations. Practice mapping misconfigurations to SOC 2, PCI-DSS, HIPAA, and GDPR controls in realistic audit scenarios.",
+  estimatedMinutes: 12,
+  learningObjectives: [
+    "Map cloud security findings to specific compliance framework controls",
+    "Distinguish between SOC 2, PCI-DSS, HIPAA, and GDPR requirements",
+    "Identify the most impactful remediation action for a given compliance gap",
+    "Understand which cloud misconfigurations constitute compliance violations",
+    "Prioritize remediation efforts based on regulatory severity",
+  ],
+  sortOrder: 503,
+  status: "published",
+  prerequisites: [],
+  rendererType: "triage-remediate",
+  scenarios: [
+    {
+      type: "triage-remediate",
+      id: "comp-s1-unencrypted-db",
+      title: "Unencrypted Customer Database",
+      description:
+        "During a pre-audit review, the security team discovers an RDS MySQL instance `customer-data-db` storing e-commerce order history is not encrypted at rest. The instance has been running in production for 8 months. Classify the compliance violation and select the correct remediation.",
+      evidence: [
+        { type: "finding", content: "RDS instance customer-data-db: StorageEncrypted = false" },
+        { type: "data-classification", content: "Data stored: customer names, email addresses, billing addresses, order amounts" },
+        { type: "business-context", content: "E-commerce platform processing ~50,000 orders/month across EU and US customers" },
+        { type: "audit-log", content: "Instance created 8 months ago; encryption was not selected at provisioning time" },
+      ],
+      classifications: [
+        { id: "c1", label: "SOC 2 Type II — CC6.1 Logical Access", description: "Logical and physical access controls to customer data." },
+        { id: "c2", label: "GDPR Article 32 — Technical Security Measures", description: "Appropriate technical measures including encryption to protect personal data." },
+        { id: "c3", label: "PCI-DSS 3.4 — Cardholder Data Encryption", description: "Render PAN unreadable anywhere it is stored." },
+        { id: "c4", label: "HIPAA 164.312(a)(2)(iv) — Encryption and Decryption", description: "Implement encryption mechanism for ePHI." },
+      ],
+      correctClassificationId: "c2",
+      remediations: [
+        { id: "rem1", label: "Enable encryption toggle on existing instance", description: "Use the RDS console to enable encryption on the running instance." },
+        { id: "rem2", label: "Snapshot → Encrypted Copy → Restore", description: "Take a snapshot of the unencrypted instance, copy the snapshot with KMS encryption enabled, then restore a new encrypted instance from that snapshot." },
+        { id: "rem3", label: "Delete the database and recreate with encryption", description: "Terminate the current instance and provision a new one with encryption enabled from scratch." },
+        { id: "rem4", label: "Add TLS in transit and defer at-rest encryption", description: "Enable SSL connections to the database as a temporary measure while planning at-rest encryption." },
+      ],
+      correctRemediationId: "rem2",
+      rationales: [
+        { id: "r1", text: "Storing EU customer personal data (names, addresses) without encryption violates GDPR Article 32, which mandates appropriate technical measures including encryption." },
+        { id: "r2", text: "AWS does not allow enabling encryption on an existing unencrypted RDS instance in-place. The only supported path is snapshot → encrypted copy → restore." },
+        { id: "r3", text: "This is not primarily a PCI-DSS issue because no cardholder data (PANs) are mentioned; it's a GDPR personal data protection issue." },
+        { id: "r4", text: "TLS addresses transit security but does not satisfy the at-rest encryption requirement — both protections are independently required." },
+      ],
+      correctRationaleId: "r1",
+      feedback: {
+        perfect: "Correct on both classification and remediation. GDPR Article 32 covers this scenario, and the snapshot-copy-restore is the only valid RDS encryption path.",
+        partial: "One of your choices is correct but the other needs refinement. Consider both which regulation governs personal data and AWS's technical constraints.",
+        wrong: "Review the difference between personal data regulations (GDPR) and payment card regulations (PCI-DSS), and check AWS documentation on enabling RDS encryption.",
+      },
+    },
+    {
+      type: "triage-remediate",
+      id: "comp-s2-mfa-finding",
+      title: "MFA Not Required for Console Access",
+      description:
+        "An automated compliance scan reports that 12 IAM users with console access do not have MFA enabled. The company handles payment card transactions and recently passed a PCI-DSS assessment, which is now at risk of invalidation.",
+      evidence: [
+        { type: "finding", content: "AWS Config Rule 'mfa-enabled-for-iam-console-access' — NON_COMPLIANT: 12 users" },
+        { type: "user-sample", content: "Affected users include: finance-analyst-01, finance-analyst-02, ops-engineer-03, and 9 others with billing and infrastructure access" },
+        { type: "business-context", content: "Company processes credit card payments; current PCI-DSS SAQ-D certification is active" },
+        { type: "risk-context", content: "One affected user's password was found in a public credential dump last week" },
+      ],
+      classifications: [
+        { id: "c1", label: "PCI-DSS 8.3 — Multi-Factor Authentication", description: "MFA required for all non-consumer access to the cardholder data environment." },
+        { id: "c2", label: "SOC 2 — CC6.3 User Access Management", description: "Controls to restrict user access based on authorized access rights." },
+        { id: "c3", label: "HIPAA 164.312(d) — Person or Entity Authentication", description: "Implement procedures to verify the identity of persons seeking access to ePHI." },
+        { id: "c4", label: "GDPR Article 25 — Data Protection by Design", description: "Implement appropriate technical measures at the time of processing design." },
+      ],
+      correctClassificationId: "c1",
+      remediations: [
+        { id: "rem1", label: "Send reminder emails and wait for users to self-enroll in MFA", description: "Notify affected users and give them 30 days to enable MFA voluntarily." },
+        { id: "rem2", label: "Attach an IAM policy denying all actions when MFA is not present, then force enrollment", description: "Use a DenyWithoutMFA policy and require enrollment before the next login allows any actions." },
+        { id: "rem3", label: "Enable AWS Organizations SCP to require MFA on all accounts", description: "Create a service control policy that denies API calls without MFA across the organization." },
+        { id: "rem4", label: "Disable the 12 accounts until users can be reached to enroll", description: "Immediately disable access to prevent account takeover while coordinating MFA enrollment." },
+      ],
+      correctRemediationId: "rem2",
+      rationales: [
+        { id: "r1", text: "PCI-DSS 8.3 explicitly requires MFA for all non-consumer access into the cardholder data environment, making this a direct compliance violation." },
+        { id: "r2", text: "A DenyWithoutMFA policy provides immediate enforcement while still allowing users to log in and complete MFA enrollment — balancing security and operational continuity." },
+        { id: "r3", text: "Voluntary enrollment with a 30-day window is not acceptable when credentials have already been compromised — immediate enforcement is required." },
+        { id: "r4", text: "Disabling accounts completely would block legitimate work; a forced enrollment flow is less disruptive and achieves the same security outcome." },
+      ],
+      correctRationaleId: "r1",
+      feedback: {
+        perfect: "Correct. PCI-DSS 8.3 governs this directly, and the DenyWithoutMFA policy approach enforces compliance without completely blocking user access.",
+        partial: "One choice is correct. For the other, consider which framework most directly governs MFA for payment card systems, and which remediation enforces compliance immediately.",
+        wrong: "Review PCI-DSS requirements for authentication controls and the AWS mechanisms available for enforcing MFA policy at scale.",
+      },
+    },
+    {
+      type: "triage-remediate",
+      id: "comp-s3-logging-gap",
+      title: "CloudTrail Logging Disabled in Production Region",
+      description:
+        "A security review reveals that AWS CloudTrail is not enabled in us-west-2, where three production workloads run. The organization is undergoing a SOC 2 Type II audit in six weeks. The auditor specifically requested evidence of user activity logging.",
+      evidence: [
+        { type: "finding", content: "CloudTrail: No trails configured in us-west-2 (production region)" },
+        { type: "finding", content: "CloudTrail: Multi-region trail exists but excludes us-west-2 from management events" },
+        { type: "audit-request", content: "Auditor evidence request #7: 'Provide 12-month user activity logs for all production environments'" },
+        { type: "timeline", content: "SOC 2 Type II observation period ends in 6 weeks; audit report due in 10 weeks" },
+      ],
+      classifications: [
+        { id: "c1", label: "SOC 2 — CC7.2 System Monitoring", description: "Monitor system components and detect anomalies; maintain activity logs for authorized personnel access." },
+        { id: "c2", label: "PCI-DSS 10.2 — Audit Log Implementation", description: "Implement audit trails to reconstruct events around cardholder data access." },
+        { id: "c3", label: "GDPR Article 30 — Records of Processing Activities", description: "Maintain a record of processing activities under controller's responsibility." },
+        { id: "c4", label: "HIPAA 164.312(b) — Audit Controls", description: "Implement hardware, software, and procedural mechanisms to record and examine ePHI system activity." },
+      ],
+      correctClassificationId: "c1",
+      remediations: [
+        { id: "rem1", label: "Create a new CloudTrail trail scoped to us-west-2 with S3 delivery", description: "Enable a region-specific trail immediately to start capturing future events." },
+        { id: "rem2", label: "Update the existing multi-region trail to include us-west-2", description: "Modify the current trail to remove the exclusion of us-west-2 management events." },
+        { id: "rem3", label: "Request a 30-day audit extension and enable logging after the audit", description: "Negotiate with the auditor for more time while planning the logging implementation." },
+        { id: "rem4", label: "Enable CloudTrail and explain the logging gap in the auditor's management letter", description: "Enable logging now, document the gap, and proactively disclose the control deficiency period to the auditor." },
+      ],
+      correctRemediationId: "rem4",
+      rationales: [
+        { id: "r1", text: "The absence of activity logging during the SOC 2 observation period is a CC7.2 control gap. The auditor needs complete evidence of monitoring, not just current state." },
+        { id: "r2", text: "Simply enabling CloudTrail now does not recover the missing historical logs. The correct approach is to enable it immediately AND proactively disclose the gap — auditors respond better to disclosed gaps than discovered ones." },
+        { id: "r3", text: "Requesting an extension without action is not an acceptable response when the gap is already known and a fix is straightforward to implement." },
+        { id: "r4", text: "Updating the multi-region trail is simpler than creating a new trail, but neither approach addresses the historical gap that already affects the audit period." },
+      ],
+      correctRationaleId: "r1",
+      feedback: {
+        perfect: "Correct. SOC 2 CC7.2 is the right mapping, and proactively disclosing the historical gap while enabling logging now is the professionally sound audit response.",
+        partial: "One of your choices is correct. Consider the audit context: it's not just about fixing the gap going forward, but also how to handle the historical period where logging was absent.",
+        wrong: "Review SOC 2 monitoring controls and audit best practices. Hiding gaps from auditors is always worse than proactive disclosure.",
+      },
+    },
+  ],
+  hints: [
+    "PCI-DSS primarily governs payment card data (PANs); GDPR governs any personal data of EU residents; HIPAA governs protected health information (PHI) — match the data type to the framework.",
+    "AWS does not support enabling encryption on an existing unencrypted RDS instance — the only path is to snapshot, copy with encryption enabled, then restore from the encrypted snapshot.",
+    "When a compliance gap is discovered during an active audit observation period, proactive disclosure is always preferable to letting the auditor discover it — auditors factor transparency into their conclusions.",
+  ],
+  scoring: {
+    maxScore: 100,
+    hintPenalty: 5,
+    penalties: { perfect: 0, partial: 10, wrong: 20 },
+    passingThresholds: { pass: 80, partial: 50 },
+  },
+  careerInsight:
+    "Compliance mapping is a critical skill for cloud security engineers, GRC analysts, and security architects. Companies pay significant premiums for engineers who understand how technical cloud controls map to audit frameworks like SOC 2, PCI-DSS, and GDPR.",
+  toolRelevance: ["AWS Config", "AWS Audit Manager", "AWS Security Hub", "AWS CloudTrail", "Vanta", "Drata", "Sprinto"],
+  createdAt: "2026-03-28",
+  updatedAt: "2026-03-28",
+};

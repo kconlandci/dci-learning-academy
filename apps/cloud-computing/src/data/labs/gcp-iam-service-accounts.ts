@@ -1,0 +1,313 @@
+import type { LabManifest } from "../../types/manifest";
+
+export const gcpIamServiceAccountsLab: LabManifest = {
+  schemaVersion: "1.1",
+  id: "gcp-iam-service-accounts",
+  version: 1,
+  title: "GCP IAM and Service Account Security",
+  tier: "beginner",
+  track: "gcp-essentials",
+  difficulty: "moderate",
+  accessLevel: "free",
+  tags: ["gcp", "iam", "service-accounts", "security", "least-privilege", "workload-identity"],
+  description:
+    "Audit and remediate IAM bindings and service account configurations to enforce least-privilege access. Identify over-permissioned accounts, key misuse, and impersonation anti-patterns.",
+  estimatedMinutes: 12,
+  learningObjectives: [
+    "Identify IAM bindings that violate the principle of least privilege",
+    "Replace service account key files with Workload Identity Federation",
+    "Configure service account impersonation correctly for cross-service access",
+    "Audit and remediate over-permissioned primitive roles (Owner, Editor, Viewer)",
+  ],
+  sortOrder: 304,
+  status: "published",
+  prerequisites: [],
+  rendererType: "toggle-config",
+  scenarios: [
+    {
+      type: "toggle-config",
+      id: "iam-scenario-1",
+      title: "Service Account Permission Audit",
+      description:
+        "A security audit has flagged four service accounts in your GCP project. Each account was provisioned with overly broad permissions during initial development. Toggle each account's role to the correct least-privilege role based on its stated purpose.",
+      targetSystem: "IAM Service Account Roles",
+      items: [
+        {
+          id: "sa-dataflow",
+          label: "dataflow-worker@prod.iam (Dataflow pipeline reads from GCS, writes to BigQuery)",
+          detail: "The Dataflow pipeline reads raw files from a specific GCS bucket and writes results to a BigQuery dataset. No other access required.",
+          currentState: "roles/editor",
+          correctState: "roles/dataflow.worker + roles/bigquery.dataEditor + roles/storage.objectViewer",
+          states: [
+            "roles/owner",
+            "roles/editor",
+            "roles/dataflow.worker + roles/bigquery.dataEditor + roles/storage.objectViewer",
+            "roles/dataflow.admin",
+            "roles/storage.admin",
+          ],
+          rationaleId: "r-dataflow-least-priv",
+        },
+        {
+          id: "sa-cloud-functions",
+          label: "thumbnail-func@prod.iam (Cloud Function generates GCS thumbnails)",
+          detail: "Function reads original images from 'uploads' bucket and writes thumbnails to 'thumbnails' bucket. No database or API access needed.",
+          currentState: "roles/storage.admin",
+          correctState: "roles/storage.objectViewer (uploads) + roles/storage.objectCreator (thumbnails)",
+          states: [
+            "roles/storage.admin",
+            "roles/storage.objectAdmin",
+            "roles/storage.objectViewer (uploads) + roles/storage.objectCreator (thumbnails)",
+            "roles/viewer",
+          ],
+          rationaleId: "r-storage-scoped",
+        },
+        {
+          id: "sa-monitoring",
+          label: "metrics-exporter@prod.iam (reads Cloud Monitoring metrics, sends to external SIEM)",
+          detail: "This service account only needs to read metric data from Cloud Monitoring. It should never write metrics or modify monitoring configuration.",
+          currentState: "roles/monitoring.admin",
+          correctState: "roles/monitoring.viewer",
+          states: [
+            "roles/monitoring.admin",
+            "roles/monitoring.editor",
+            "roles/monitoring.viewer",
+            "roles/viewer",
+          ],
+          rationaleId: "r-monitoring-viewer",
+        },
+        {
+          id: "sa-pubsub",
+          label: "order-processor@prod.iam (subscribes to Pub/Sub order topic, writes to Cloud SQL)",
+          detail: "Service subscribes to a single Pub/Sub subscription to receive order events and writes processed orders to Cloud SQL.",
+          currentState: "roles/editor",
+          correctState: "roles/pubsub.subscriber + roles/cloudsql.client",
+          states: [
+            "roles/editor",
+            "roles/owner",
+            "roles/pubsub.subscriber + roles/cloudsql.client",
+            "roles/pubsub.admin",
+            "roles/cloudsql.admin",
+          ],
+          rationaleId: "r-pubsub-scoped",
+        },
+      ],
+      rationales: [
+        {
+          id: "r-dataflow-least-priv",
+          text: "roles/editor grants write access to all GCP APIs — far beyond what Dataflow needs. The correct set: dataflow.worker (to run jobs), bigquery.dataEditor (to write results), storage.objectViewer (to read input files).",
+        },
+        {
+          id: "r-storage-scoped",
+          text: "roles/storage.admin grants full bucket and object administration across ALL buckets in the project. The correct approach is bucket-level IAM: objectViewer on uploads, objectCreator on thumbnails — limiting blast radius to just those two buckets.",
+        },
+        {
+          id: "r-monitoring-viewer",
+          text: "The service only reads metrics — roles/monitoring.viewer is the minimum necessary permission. roles/monitoring.admin grants the ability to create/delete alerting policies, notification channels, and dashboards — all unnecessary here.",
+        },
+        {
+          id: "r-pubsub-scoped",
+          text: "roles/editor on a service account that processes orders is a critical over-permission. If this account were compromised, an attacker could modify any GCP resource. roles/pubsub.subscriber and roles/cloudsql.client grant exactly what's needed.",
+        },
+      ],
+      feedback: {
+        perfect: "Excellent security remediation! You correctly applied least-privilege to all four service accounts, drastically reducing the blast radius of any potential compromise.",
+        partial: "Some accounts are correctly configured. Remember: match each role to the exact API operations the service needs to perform — nothing more.",
+        wrong: "Primitive roles (Owner, Editor, Viewer) should almost never be assigned to service accounts. Use predefined roles scoped to specific GCP services and limit to the operations actually needed.",
+      },
+    },
+    {
+      type: "toggle-config",
+      id: "iam-scenario-2",
+      title: "Service Account Key Hygiene",
+      description:
+        "A DevOps audit found that your team is using service account keys in several insecure ways. Toggle each configuration to the correct secure setting. The target is to eliminate all unnecessary key files.",
+      targetSystem: "Service Account Authentication Methods",
+      items: [
+        {
+          id: "gke-workload-auth",
+          label: "GKE Pod → Cloud Storage (pod reads ML model files)",
+          detail: "A GKE pod downloads ML model files from GCS at startup. Currently uses a mounted service account key JSON file stored in a Kubernetes Secret.",
+          currentState: "Service Account Key (JSON file in K8s Secret)",
+          correctState: "Workload Identity Federation (GKE Workload Identity)",
+          states: [
+            "Service Account Key (JSON file in K8s Secret)",
+            "Workload Identity Federation (GKE Workload Identity)",
+            "Default Compute Service Account",
+            "No authentication",
+          ],
+          rationaleId: "r-workload-identity",
+        },
+        {
+          id: "github-actions-auth",
+          label: "GitHub Actions CI → GCP Artifact Registry (push Docker images)",
+          detail: "CI pipeline pushes Docker images to Artifact Registry. Currently uses a long-lived service account key stored as a GitHub Actions secret.",
+          currentState: "Service Account Key (GitHub Actions Secret)",
+          correctState: "Workload Identity Federation (OIDC)",
+          states: [
+            "Service Account Key (GitHub Actions Secret)",
+            "Workload Identity Federation (OIDC)",
+            "Default Compute Metadata",
+            "Manual token refresh",
+          ],
+          rationaleId: "r-oidc-cicd",
+        },
+        {
+          id: "compute-engine-auth",
+          label: "Compute Engine VM → Pub/Sub (VM publishes events to Pub/Sub)",
+          detail: "A VM running on GCE publishes telemetry events to Pub/Sub. Currently uses a service account key file stored on the VM's disk at /etc/sa-key.json.",
+          currentState: "Service Account Key (file on disk)",
+          correctState: "Attached Service Account (instance metadata)",
+          states: [
+            "Service Account Key (file on disk)",
+            "Attached Service Account (instance metadata)",
+            "Workload Identity Federation",
+            "User credentials",
+          ],
+          rationaleId: "r-attached-sa",
+        },
+        {
+          id: "key-rotation",
+          label: "Remaining legacy service account keys rotation policy",
+          detail: "Some keys cannot be immediately migrated. For any remaining service account keys, what rotation policy should be enforced?",
+          currentState: "No rotation (keys are years old)",
+          correctState: "90-day rotation with automated alerts",
+          states: [
+            "No rotation (keys are years old)",
+            "Annual rotation",
+            "90-day rotation with automated alerts",
+            "180-day rotation",
+          ],
+          rationaleId: "r-key-rotation",
+        },
+      ],
+      rationales: [
+        {
+          id: "r-workload-identity",
+          text: "GKE Workload Identity binds a Kubernetes Service Account to a GCP Service Account using short-lived tokens from the GKE metadata server. No key files needed — tokens rotate automatically every hour.",
+        },
+        {
+          id: "r-oidc-cicd",
+          text: "GitHub Actions supports OIDC token exchange with GCP Workload Identity Federation. The CI pipeline gets a short-lived GCP access token per job run — no long-lived keys to store or rotate.",
+        },
+        {
+          id: "r-attached-sa",
+          text: "GCE VMs should use the Attached Service Account — the metadata server at 169.254.169.254 provides short-lived tokens automatically. Key files on disk are a severe security risk if the VM is compromised.",
+        },
+        {
+          id: "r-key-rotation",
+          text: "GCP recommends 90-day key rotation as a maximum. Older keys have a longer exposure window if leaked. Automated alerts (via Cloud Asset Inventory or a custom script) catch unrotated keys.",
+        },
+      ],
+      feedback: {
+        perfect: "Security best practices applied across the board! Eliminating key files with Workload Identity and metadata-based auth is the GCP-recommended approach.",
+        partial: "Most authentication methods are correct. The key principle: never use long-lived key files when the compute environment (GKE, GCE, GitHub Actions) supports token-based auth.",
+        wrong: "Service account key files are the riskiest credential type — they never expire by default and are frequently leaked in code repos or CI logs. Replace them with Workload Identity wherever possible.",
+      },
+    },
+    {
+      type: "toggle-config",
+      id: "iam-scenario-3",
+      title: "Organization-Level IAM Policy Review",
+      description:
+        "Your company's GCP organization has several IAM bindings set at the organization level that are overly permissive. Toggle each binding to the correct setting. Changes at the org level cascade to all projects.",
+      targetSystem: "GCP Organization IAM Bindings",
+      items: [
+        {
+          id: "org-viewer-all-devs",
+          label: "All developers (dev-group@company.com) bound to roles/viewer at org level",
+          detail: "Developers need read access to dev and staging projects but should have no access to production projects or billing data.",
+          currentState: "roles/viewer (org level)",
+          correctState: "roles/viewer (dev + staging projects only, via folder IAM)",
+          states: [
+            "roles/viewer (org level)",
+            "roles/viewer (dev + staging projects only, via folder IAM)",
+            "roles/browser (org level)",
+            "No access",
+          ],
+          rationaleId: "r-folder-scoped-iam",
+        },
+        {
+          id: "org-billing-admin",
+          label: "billing-admin@company.com bound to roles/billing.admin at org level",
+          detail: "Billing admins need to manage billing accounts and budgets but should not have the ability to create or delete projects.",
+          currentState: "roles/owner (org level)",
+          correctState: "roles/billing.admin (org level)",
+          states: [
+            "roles/owner (org level)",
+            "roles/billing.admin (org level)",
+            "roles/editor (org level)",
+            "roles/resourcemanager.organizationAdmin",
+          ],
+          rationaleId: "r-billing-admin-scoped",
+        },
+        {
+          id: "org-security-audit",
+          label: "security-scanner@company.iam bound to roles/editor for security scanning",
+          detail: "An automated security scanner checks IAM policies and Cloud Asset configurations. It only needs read access to all resources.",
+          currentState: "roles/editor (org level)",
+          correctState: "roles/securityReviewer (org level)",
+          states: [
+            "roles/editor (org level)",
+            "roles/viewer (org level)",
+            "roles/securityReviewer (org level)",
+            "roles/resourcemanager.organizationAdmin",
+          ],
+          rationaleId: "r-security-reviewer",
+        },
+        {
+          id: "domain-restricted-sharing",
+          label: "Organization Policy: Domain Restricted Sharing",
+          detail: "External contractors are being accidentally added to GCP projects with personal Gmail accounts.",
+          currentState: "Not enforced",
+          correctState: "Enforced (company domain only)",
+          states: [
+            "Not enforced",
+            "Enforced (company domain only)",
+            "Audit only",
+            "Enforced (all Google accounts)",
+          ],
+          rationaleId: "r-domain-restriction",
+        },
+      ],
+      rationales: [
+        {
+          id: "r-folder-scoped-iam",
+          text: "IAM inheritance means org-level bindings cascade to ALL projects including production. Use folder-level IAM to scope developer access to non-production folders only.",
+        },
+        {
+          id: "r-billing-admin-scoped",
+          text: "roles/owner at org level grants full control over every project, resource, and billing account — far beyond billing management. roles/billing.admin scopes the permission to billing operations only.",
+        },
+        {
+          id: "r-security-reviewer",
+          text: "roles/securityReviewer is a predefined role that grants read access to security-relevant configurations (IAM policies, audit logs, Cloud Asset). roles/editor allows the scanner to accidentally modify resources.",
+        },
+        {
+          id: "r-domain-restriction",
+          text: "The Domain Restricted Sharing org policy (constraints/iam.allowedPolicyMemberDomains) prevents adding members outside your organization's domain, blocking external Gmail accounts at the policy level.",
+        },
+      ],
+      feedback: {
+        perfect: "Organization-level IAM is the highest-impact security surface in GCP. Your correct configurations will protect every project in the organization.",
+        partial: "Some org-level bindings are still too permissive. Remember: permissions at the org level cascade to all child folders and projects — the blast radius is maximum.",
+        wrong: "Org-level IAM mistakes are the highest-severity security issues in GCP. Primitive roles like Owner/Editor at the org level grant access to every resource in every project in the organization.",
+      },
+    },
+  ],
+  hints: [
+    "Never assign primitive roles (Owner, Editor, Viewer) to service accounts. Always use predefined roles (e.g., roles/bigquery.dataEditor) — they follow the principle of least privilege and are easier to audit.",
+    "Workload Identity Federation eliminates the need for service account key files entirely for GKE pods, GCE VMs, and external CI systems. Key files are the #1 cause of GCP credential leaks.",
+    "IAM bindings cascade from parent to child in the GCP resource hierarchy: Organization → Folder → Project → Resource. Always set bindings at the lowest level that satisfies the access requirement.",
+  ],
+  scoring: {
+    maxScore: 100,
+    hintPenalty: 5,
+    penalties: { perfect: 0, partial: 10, wrong: 20 },
+    passingThresholds: { pass: 80, partial: 50 },
+  },
+  careerInsight:
+    "GCP IAM misconfiguration is the most common cause of cloud security incidents. Security engineers, cloud architects, and SREs who can audit and remediate IAM are in extremely high demand. The shift to Workload Identity Federation is a key skill that demonstrates modern GCP security knowledge beyond basic IAM role assignment.",
+  toolRelevance: ["GCP Console (IAM)", "gcloud iam CLI", "Cloud Asset Inventory", "Policy Analyzer", "Workload Identity Federation"],
+  createdAt: "2026-03-28",
+  updatedAt: "2026-03-28",
+};

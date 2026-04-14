@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "rebrandScriptVersion": "1.0.0",
+  "module": {
+    "slug": "cloud-computing",
+    "sourceRepoName": "CloudForge"
+  },
+  "source": {
+    "path": "C:\\Users\\conla\\OneDrive\\Desktop\\Forge Labs\\CloudForge",
+    "gitCommit": "edf5a99f322ca4e6c7d6a99692d71cd4367263f7",
+    "gitBranch": "main"
+  },
+  "rebrandedAt": "2026-04-14T17:23:40.221Z"
+}

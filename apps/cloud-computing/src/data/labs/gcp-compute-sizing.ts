@@ -1,0 +1,148 @@
+import type { LabManifest } from "../../types/manifest";
+
+export const gcpComputeSizingLab: LabManifest = {
+  schemaVersion: "1.1",
+  id: "gcp-compute-sizing",
+  version: 1,
+  title: "GCP Compute Engine Sizing",
+  tier: "beginner",
+  track: "gcp-essentials",
+  difficulty: "easy",
+  accessLevel: "free",
+  tags: ["gcp", "compute-engine", "vm", "sizing", "cost-optimization"],
+  description:
+    "Learn to right-size Compute Engine VM instances by analyzing CPU, memory, and disk utilization metrics from Cloud Monitoring to eliminate waste and reduce costs.",
+  estimatedMinutes: 10,
+  learningObjectives: [
+    "Identify over-provisioned VM instances using Cloud Monitoring metrics",
+    "Select the correct machine type family for a given workload profile",
+    "Understand the trade-offs between general-purpose, compute-optimized, and memory-optimized machine types",
+    "Apply sustained-use and committed-use discount strategies appropriately",
+  ],
+  sortOrder: 300,
+  status: "published",
+  prerequisites: [],
+  rendererType: "action-rationale",
+  scenarios: [
+    {
+      type: "action-rationale",
+      id: "cs-scenario-1",
+      title: "Over-provisioned Web Server",
+      context:
+        "A production web server running on an n2-standard-16 (16 vCPU, 64 GB RAM) has been flagged by the GCP Recommender. Cloud Monitoring shows the following 30-day averages. The application team says response times are acceptable and the workload is steady, not spiky.",
+      displayFields: [
+        { label: "Instance", value: "web-prod-01", emphasis: "normal" },
+        { label: "Current Machine Type", value: "n2-standard-16", emphasis: "warn" },
+        { label: "Avg CPU Utilization (30d)", value: "6.2%", emphasis: "critical" },
+        { label: "Avg Memory Utilization (30d)", value: "18.4%", emphasis: "warn" },
+        { label: "Network Egress (30d avg)", value: "120 Mbps", emphasis: "normal" },
+        { label: "Monthly Cost", value: "$389.14", emphasis: "warn" },
+      ],
+      actions: [
+        { id: "downsize-n2-standard-4", label: "Resize to n2-standard-4 (4 vCPU, 16 GB)", color: "green" },
+        { id: "downsize-n2-standard-8", label: "Resize to n2-standard-8 (8 vCPU, 32 GB)", color: "blue" },
+        { id: "switch-e2-medium", label: "Switch to e2-medium (2 vCPU shared, 4 GB)", color: "yellow" },
+        { id: "keep-current", label: "Keep n2-standard-16, no action needed", color: "red" },
+        { id: "switch-c2-standard-4", label: "Switch to c2-standard-4 (compute-optimized)", color: "orange" },
+      ],
+      correctActionId: "downsize-n2-standard-4",
+      rationales: [
+        { id: "r-peak-headroom", text: "6% average CPU means peak likely stays under 25%, so 4 vCPUs with headroom is correct." },
+        { id: "r-memory-fit", text: "18% of 64 GB ≈ 11.8 GB used — 16 GB on n2-standard-4 provides a safe buffer." },
+        { id: "r-no-compute-opt", text: "Compute-optimized (c2) is for sustained high-CPU workloads above 50% — not warranted here." },
+        { id: "r-e2-shared", text: "Shared-core e2-medium has too little RAM and CPU credits burst; unsuitable for production web traffic." },
+        { id: "r-cost-saving", text: "n2-standard-4 costs roughly $97/month — a 75% reduction with no performance risk." },
+      ],
+      correctRationaleId: "r-memory-fit",
+      feedback: {
+        perfect: "Excellent! You identified that both CPU and memory utilization are low, making n2-standard-4 the ideal right-size with adequate headroom.",
+        partial: "You reduced the instance size, but consider that memory usage (11.8 GB actual) determines the minimum RAM floor more than CPU does here.",
+        wrong: "With only 6% average CPU and 18% memory utilization, this instance is severely over-provisioned. Right-sizing saves cost without risking performance.",
+      },
+    },
+    {
+      type: "action-rationale",
+      id: "cs-scenario-2",
+      title: "In-Memory Analytics Workload",
+      context:
+        "A data science team runs nightly batch analytics jobs on a single Compute Engine VM. Jobs process large DataFrames entirely in RAM using pandas. The job fails with OOM errors on the current instance. gcloud output is shown below.",
+      displayFields: [
+        { label: "Instance", value: "analytics-batch-01", emphasis: "normal" },
+        { label: "Current Machine Type", value: "n2-standard-8 (8 vCPU, 32 GB)", emphasis: "warn" },
+        { label: "Job Peak Memory Usage", value: "28.6 GB", emphasis: "critical" },
+        { label: "Job Peak CPU Utilization", value: "22%", emphasis: "normal" },
+        { label: "OOM Kill Events (last 7d)", value: "4", emphasis: "critical" },
+        { label: "Job Duration (successful runs)", value: "~45 min", emphasis: "normal" },
+      ],
+      actions: [
+        { id: "m2-ultramem-208", label: "Upgrade to m2-ultramem-208 (208 vCPU, 5.9 TB)", color: "red" },
+        { id: "n2-highmem-8", label: "Switch to n2-highmem-8 (8 vCPU, 64 GB)", color: "green" },
+        { id: "n2-standard-16", label: "Upgrade to n2-standard-16 (16 vCPU, 64 GB)", color: "blue" },
+        { id: "add-swap-disk", label: "Keep n2-standard-8 and add a 200 GB swap disk", color: "yellow" },
+      ],
+      correctActionId: "n2-highmem-8",
+      rationales: [
+        { id: "r-highmem-purpose", text: "The n2-highmem family provides 8 GB RAM per vCPU, ideal for memory-intensive workloads with low CPU pressure." },
+        { id: "r-cpu-unchanged", text: "CPU utilization is only 22%, so doubling vCPUs to 16 wastes money without resolving the RAM bottleneck." },
+        { id: "r-swap-bad", text: "Swap on persistent disk causes catastrophic performance degradation for in-memory analytics — not a viable fix." },
+        { id: "r-ultramem-overkill", text: "m2-ultramem is designed for SAP HANA scale workloads; it would cost thousands per hour for a nightly 45-minute job." },
+      ],
+      correctRationaleId: "r-highmem-purpose",
+      feedback: {
+        perfect: "Perfect! The highmem machine family is purpose-built for this pattern: high RAM, moderate CPU. 64 GB gives 35 GB of headroom above the 28.6 GB peak.",
+        partial: "n2-standard-16 also provides 64 GB but at double the vCPU cost. Highmem gives the same RAM at lower price when CPU is not the bottleneck.",
+        wrong: "The workload is RAM-constrained (28.6 GB peak against 32 GB limit). Adding swap is destructive to analytics performance — choose a memory-optimized instance type.",
+      },
+    },
+    {
+      type: "action-rationale",
+      id: "cs-scenario-3",
+      title: "Choosing a Discount Strategy",
+      context:
+        "Your team runs a fleet of 20 n2-standard-4 instances as application servers. Historical data shows these VMs run 24/7 for production workloads with no planned decommission in the next 3 years. You want to minimize cost. The current billing model is on-demand.",
+      displayFields: [
+        { label: "Fleet Size", value: "20 × n2-standard-4", emphasis: "normal" },
+        { label: "Current Monthly Cost", value: "$1,940 (on-demand)", emphasis: "warn" },
+        { label: "Uptime Pattern", value: "24/7 continuous", emphasis: "normal" },
+        { label: "Sustained Use Discount (auto)", value: "~20% after 25% monthly uptime", emphasis: "normal" },
+        { label: "1-Year CUD (committed)", value: "~37% discount", emphasis: "normal" },
+        { label: "3-Year CUD (committed)", value: "~55% discount", emphasis: "normal" },
+      ],
+      actions: [
+        { id: "3yr-cud", label: "Purchase 3-year Committed Use Discounts for all 20 VMs", color: "green" },
+        { id: "1yr-cud", label: "Purchase 1-year Committed Use Discounts for all 20 VMs", color: "blue" },
+        { id: "rely-sud", label: "Rely on automatic Sustained Use Discounts only", color: "yellow" },
+        { id: "preemptible", label: "Convert production fleet to Spot (preemptible) VMs", color: "red" },
+      ],
+      correctActionId: "3yr-cud",
+      rationales: [
+        { id: "r-3yr-max-saving", text: "3-year CUDs offer ~55% off on-demand for resources you've committed to run continuously for 3 years." },
+        { id: "r-sud-suboptimal", text: "SUDs automatically apply at ~20% but are always less than CUDs for always-on workloads." },
+        { id: "r-spot-risk", text: "Spot VMs can be preempted with 30 seconds notice — unacceptable for production application servers." },
+        { id: "r-stability-known", text: "With a known 3-year horizon and 24/7 uptime, the commitment risk is minimal and the savings are maximized." },
+      ],
+      correctRationaleId: "r-3yr-max-saving",
+      feedback: {
+        perfect: "Correct! For a stable, 24/7 production fleet with a 3-year runway, CUDs provide the maximum deterministic savings of ~55% vs on-demand.",
+        partial: "1-year CUDs are a good middle ground, but if the 3-year commitment is feasible, you leave significant savings on the table.",
+        wrong: "Spot VMs are never appropriate for production workloads due to preemption risk. Sustained-use discounts are automatic but capped lower than CUDs.",
+      },
+    },
+  ],
+  hints: [
+    "Look at both CPU AND memory utilization together — the bottleneck resource determines the correct machine family (standard vs highmem vs highcpu).",
+    "Committed Use Discounts (CUDs) beat Sustained Use Discounts for always-on workloads — but require upfront commitment to a machine type and region.",
+    "The GCP Recommender in the console surfaces right-sizing suggestions automatically; always cross-check with actual peak metrics, not just averages.",
+  ],
+  scoring: {
+    maxScore: 100,
+    hintPenalty: 5,
+    penalties: { perfect: 0, partial: 10, wrong: 20 },
+    passingThresholds: { pass: 80, partial: 50 },
+  },
+  careerInsight:
+    "Cloud cost optimization is consistently listed as a top challenge by engineering teams. Demonstrating you can read utilization metrics and map them to the right GCP machine family is a valued skill in cloud engineering, SRE, and FinOps roles. Many teams overspend 30–40% on compute alone due to poor initial sizing.",
+  toolRelevance: ["GCP Console (Compute Engine)", "Cloud Monitoring", "gcloud CLI", "GCP Recommender", "Billing Cost Table"],
+  createdAt: "2026-03-28",
+  updatedAt: "2026-03-28",
+};

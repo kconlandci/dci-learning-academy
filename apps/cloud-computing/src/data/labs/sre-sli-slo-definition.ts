@@ -1,0 +1,281 @@
+import type { LabManifest } from "../../types/manifest";
+
+export const sreSliSloDefinitionLab: LabManifest = {
+  schemaVersion: "1.1",
+  id: "sre-sli-slo-definition",
+  version: 1,
+  title: "SRE SLI & SLO Definition",
+  tier: "intermediate",
+  track: "cloud-operations",
+  difficulty: "challenging",
+  accessLevel: "free",
+  tags: ["sre", "sli", "slo", "error-budget", "reliability"],
+  description:
+    "Define meaningful Service Level Indicators and Service Level Objectives for production services, configure error budget policies, and make burn-rate alerting decisions that balance reliability with engineering velocity.",
+  estimatedMinutes: 14,
+  learningObjectives: [
+    "Write precise SLI definitions that accurately measure user-perceived reliability",
+    "Set SLO targets calibrated to user expectations and business requirements",
+    "Calculate and interpret error budget consumption and burn rate",
+    "Design multi-window burn-rate alerts that provide actionable signals at the right urgency",
+  ],
+  sortOrder: 610,
+  status: "published",
+  prerequisites: [],
+  rendererType: "toggle-config",
+  scenarios: [
+    {
+      type: "toggle-config",
+      id: "slo-s1",
+      title: "Availability SLO Configuration",
+      description:
+        "Define the SLI and SLO for a payment processing API. The API receives 10 million requests per day. Business stakeholders say the service must be 'highly available'. The current measured error rate is 0.05%. The engineering team wants to maintain velocity for feature development.",
+      targetSystem: "Payment API — Availability SLO",
+      items: [
+        {
+          id: "sli-definition",
+          label: "SLI Definition",
+          detail: "The precise metric that measures whether the service is working correctly from the user's perspective.",
+          currentState: "Server uptime percentage (EC2 instance running)",
+          correctState: "Proportion of HTTP requests returning 2xx or 4xx (non-5xx) within 1000ms",
+          states: [
+            "Server uptime percentage (EC2 instance running)",
+            "Proportion of HTTP requests returning 2xx or 4xx (non-5xx) within 1000ms",
+            "Average response time across all requests",
+            "Percentage of time the load balancer health check is green",
+          ],
+          rationaleId: "r-sli",
+        },
+        {
+          id: "slo-target",
+          label: "SLO Target",
+          detail: "The availability percentage the team commits to over a 30-day rolling window.",
+          currentState: "100%",
+          correctState: "99.9%",
+          states: ["99%", "99.5%", "99.9%", "99.99%", "100%"],
+          rationaleId: "r-slo-target",
+        },
+        {
+          id: "slo-window",
+          label: "SLO Measurement Window",
+          detail: "The rolling time window over which the SLO is calculated.",
+          currentState: "Calendar year",
+          correctState: "30-day rolling window",
+          states: ["7-day rolling window", "30-day rolling window", "90-day rolling window", "Calendar year"],
+          rationaleId: "r-slo-window",
+        },
+        {
+          id: "error-budget-policy",
+          label: "Error Budget Policy at 50% Consumption",
+          detail: "What happens when 50% of the monthly error budget is consumed before the end of the month.",
+          currentState: "No action required",
+          correctState: "Engineering team pauses new feature deployments, focuses on reliability work",
+          states: [
+            "No action required",
+            "Engineering team pauses new feature deployments, focuses on reliability work",
+            "Immediately page the on-call engineer",
+            "Automatically roll back the last 3 deployments",
+          ],
+          rationaleId: "r-error-budget-policy",
+        },
+      ],
+      rationales: [
+        {
+          id: "r-sli",
+          text: "A good SLI measures user-perceived service health, not infrastructure health. Server uptime doesn't capture 500 errors, timeouts, or slow responses that users experience as failures. The correct SLI counts 'good' requests (non-5xx, under 1000ms) as a proportion of total requests — this directly measures what users care about.",
+        },
+        {
+          id: "r-slo-target",
+          text: "99.9% (three nines) allows 43.8 minutes of downtime per month. For a payment API at 10M requests/day, this is 10,000 failed requests/month — a business-acceptable level. 99.99% gives only 4.4 minutes/month — requiring near-perfect operations that constrains deployment velocity significantly. 100% is never achievable and creates no room for planned maintenance.",
+        },
+        {
+          id: "r-slo-window",
+          text: "A 30-day rolling window is the SRE standard. It reflects current system health, not historical performance from months ago. Calendar year SLOs allow January's outage to be 'forgiven' by December's perfect months — not useful for operational decision-making. 7-day windows are too short and amplify variance from brief incidents.",
+        },
+        {
+          id: "r-error-budget-policy",
+          text: "The error budget policy at 50% consumption creates a forcing function: burning half the monthly budget by mid-month signals the team is moving faster than reliability allows. Pausing deployments and focusing on reliability work is the SRE response — not paging (this isn't an emergency) and not auto-rollback (which is too aggressive and may itself cause issues).",
+        },
+      ],
+      feedback: {
+        perfect: "Excellent SLO design. User-centric SLI, calibrated target, rolling window, and error budget policy that creates the right engineering incentive structure.",
+        partial: "Most settings are correct but review your SLI definition. Infrastructure uptime is not the same as user-perceived reliability — users care about request success rates, not whether EC2 instances are running.",
+        wrong: "SLI/SLO design requires user-centric thinking. Define what 'good' looks like from the user's perspective first, then set a target that leaves engineering room to work without sacrificing business requirements.",
+      },
+    },
+    {
+      type: "toggle-config",
+      id: "slo-s2",
+      title: "Latency SLO Configuration",
+      description:
+        "Configure a latency SLO for a search API that powers product search on an e-commerce site. User research shows customers abandon searches that take more than 800ms. P50 latency is currently 120ms, P95 is 420ms, and P99 is 980ms. The team wants to monitor and improve tail latency.",
+      targetSystem: "Search API — Latency SLO",
+      items: [
+        {
+          id: "latency-sli",
+          label: "Latency SLI Definition",
+          detail: "How to measure latency from a user perspective for this SLO.",
+          currentState: "Average response time across all requests",
+          correctState: "Proportion of requests completing within 800ms (at P99 level)",
+          states: [
+            "Average response time across all requests",
+            "P50 (median) response time in milliseconds",
+            "Proportion of requests completing within 800ms (at P99 level)",
+            "Maximum response time in the measurement window",
+          ],
+          rationaleId: "r-latency-sli",
+        },
+        {
+          id: "latency-slo-target",
+          label: "Latency SLO Target",
+          detail: "The percentage of requests that must complete within the threshold.",
+          currentState: "95% of requests under 800ms",
+          correctState: "99% of requests under 800ms",
+          states: ["90% of requests under 800ms", "95% of requests under 800ms", "99% of requests under 800ms", "99.9% of requests under 800ms"],
+          rationaleId: "r-latency-slo-target",
+        },
+        {
+          id: "latency-tiered",
+          label: "Multi-Threshold Latency Monitoring",
+          detail: "Whether to configure additional latency tiers beyond the primary SLO.",
+          currentState: "Single threshold only (800ms)",
+          correctState: "Three tiers: 200ms (P50 target), 500ms (P95 target), 800ms (P99 SLO)",
+          states: [
+            "Single threshold only (800ms)",
+            "Two tiers: 500ms and 800ms",
+            "Three tiers: 200ms (P50 target), 500ms (P95 target), 800ms (P99 SLO)",
+            "Five tiers at every 200ms interval",
+          ],
+          rationaleId: "r-latency-tiered",
+        },
+        {
+          id: "latency-excluding",
+          label: "Requests to Exclude from Latency SLO",
+          detail: "Whether any request types should be excluded from SLO calculations.",
+          currentState: "Include all requests",
+          correctState: "Exclude health check requests and background job requests; include only user-initiated search requests",
+          states: [
+            "Include all requests",
+            "Exclude all requests from internal services",
+            "Exclude health check requests and background job requests; include only user-initiated search requests",
+            "Exclude requests from any source other than the production load balancer",
+          ],
+          rationaleId: "r-latency-excluding",
+        },
+      ],
+      rationales: [
+        {
+          id: "r-latency-sli",
+          text: "Measuring latency as a proportion (requests completing under 800ms / total requests) makes the SLI directly comparable to availability SLIs and enables clear error budget tracking. 'Average response time' hides tail latency — if P99 is 980ms and P50 is 120ms, the average of 150ms suggests everything is fine while 1% of users wait nearly a second.",
+        },
+        {
+          id: "r-latency-slo-target",
+          text: "The current P99 is 980ms — already over the 800ms user abandonment threshold. A 99% target means 1% of requests can exceed 800ms. Setting the SLO at 95% (existing P95 is 420ms, well under 800ms) would be too easy — the team already exceeds it. 99% creates the right pressure on tail latency improvement.",
+        },
+        {
+          id: "r-latency-tiered",
+          text: "Multi-tier latency monitoring provides early warning signals before the SLO is at risk. If P50 starts creeping from 120ms toward 200ms, it signals an upcoming P99 problem. Three tiers allow the team to see latency degradation trends before they breach the SLO — the same principle as monitoring at 70% capacity rather than 100%.",
+        },
+        {
+          id: "r-latency-excluding",
+          text: "Health check endpoints are designed to respond in <5ms and respond independently of the actual service logic. Including them in the latency SLO artificially improves the SLI percentage. Background jobs may take seconds by design. SLOs should measure the user experience path — user-initiated search requests only.",
+        },
+      ],
+      feedback: {
+        perfect: "Excellent latency SLO design. Proportional SLI, correctly calibrated target above current P99, multi-tier monitoring, and appropriate request exclusions.",
+        partial: "Review your SLI type. Average latency is not appropriate for user-experience SLOs — it hides tail latency. Use a proportion-based SLI with the user-perceived threshold.",
+        wrong: "Latency SLOs should be defined as proportions (X% of requests under Yms), not as average values. This makes them comparable to availability SLOs and enables error budget tracking.",
+      },
+    },
+    {
+      type: "toggle-config",
+      id: "slo-s3",
+      title: "Burn Rate Alert Configuration",
+      description:
+        "Configure multi-window burn rate alerts for a service with a 99.9% availability SLO (43.8 min/month error budget). The team wants alerts that wake people up for fast budget consumption and page during business hours for slow burn situations.",
+      targetSystem: "Error Budget Burn Rate Alerting",
+      items: [
+        {
+          id: "fast-burn-window",
+          label: "Fast Burn Alert — Short Window",
+          detail: "The short lookback window for detecting rapid error budget consumption (e.g., a major outage).",
+          currentState: "24 hours",
+          correctState: "1 hour",
+          states: ["5 minutes", "1 hour", "6 hours", "24 hours"],
+          rationaleId: "r-fast-burn-window",
+        },
+        {
+          id: "fast-burn-rate",
+          label: "Fast Burn Alert — Burn Rate Multiplier",
+          detail: "How many times faster than sustainable rate the budget must be burning to trigger the fast-burn page.",
+          currentState: "2x",
+          correctState: "14x",
+          states: ["2x", "5x", "14x", "100x"],
+          rationaleId: "r-fast-burn-rate",
+        },
+        {
+          id: "slow-burn-window",
+          label: "Slow Burn Alert — Long Window",
+          detail: "The longer lookback window for detecting gradual error budget degradation.",
+          currentState: "1 hour",
+          correctState: "6 hours",
+          states: ["1 hour", "3 hours", "6 hours", "24 hours"],
+          rationaleId: "r-slow-burn-window",
+        },
+        {
+          id: "slow-burn-action",
+          label: "Slow Burn Alert Action",
+          detail: "The response triggered by a slow burn rate alert (e.g., 5x burn rate over 6 hours).",
+          currentState: "Page on-call engineer immediately (PagerDuty critical)",
+          correctState: "Create a Jira ticket and notify team Slack channel (non-urgent)",
+          states: [
+            "Page on-call engineer immediately (PagerDuty critical)",
+            "Create a Jira ticket and notify team Slack channel (non-urgent)",
+            "Automatically pause all deployments",
+            "Ignore — slow burn is expected",
+          ],
+          rationaleId: "r-slow-burn-action",
+        },
+      ],
+      rationales: [
+        {
+          id: "r-fast-burn-window",
+          text: "A 1-hour window detects fast-moving incidents while they're still recoverable. A 24-hour window is too long — by the time a fast burn is detected, a major outage may have already consumed the entire monthly budget. Fast burn alerts need short windows to be actionable.",
+        },
+        {
+          id: "r-fast-burn-rate",
+          text: "14x burn rate at a 1-hour window means the service would consume its entire 30-day error budget in ~2 days. This is the Google SRE recommended threshold for fast-burn paging alerts. 2x is too sensitive (would fire on minor degradation); 100x would only catch near-total outages where the alert is almost redundant.",
+        },
+        {
+          id: "r-slow-burn-window",
+          text: "A 6-hour window catches gradual degradation patterns that a 1-hour window misses. If error rate is slightly elevated (e.g., 2x burn rate), the 1-hour window may not trigger but the 6-hour window accumulates enough signal. This is the 'slow burn' detector for the multi-window alerting strategy.",
+        },
+        {
+          id: "r-slow-burn-action",
+          text: "A slow burn (e.g., 5x over 6 hours) means the budget is being consumed gradually — concerning but not an emergency. Paging an engineer at 3 AM for a slow burn creates alert fatigue and wasted on-call time. A Slack notification and Jira ticket creates visibility and accountability during business hours without unnecessary urgency.",
+        },
+      ],
+      feedback: {
+        perfect: "Correct multi-window burn rate configuration. Fast-burn 1-hour/14x for urgent paging, slow-burn 6-hour for non-urgent notification — this is the Google SRE recommended alerting pattern.",
+        partial: "Your burn rate multipliers or windows need adjustment. Fast burn requires a short window (1h) and high multiplier (14x); slow burn uses a longer window (6h) with a lower multiplier and non-urgent response.",
+        wrong: "Multi-window burn rate alerting is a two-signal system: short window catches fast-moving outages (page immediately), long window catches gradual degradation (notify during business hours). Each needs different thresholds and response actions.",
+      },
+    },
+  ],
+  hints: [
+    "SLIs should measure user-perceived service quality, not infrastructure health. 'Requests completing successfully within threshold' is better than 'server uptime'.",
+    "The error budget policy is what makes SLOs actionable — without a policy that changes team behavior, an SLO is just a number.",
+    "Multi-window burn rate alerting: use a 1-hour window with 14x multiplier for fast-burn pages; use a 6-hour window with 5x multiplier for slow-burn notifications.",
+  ],
+  scoring: {
+    maxScore: 100,
+    hintPenalty: 5,
+    penalties: { perfect: 0, partial: 10, wrong: 20 },
+    passingThresholds: { pass: 80, partial: 50 },
+  },
+  careerInsight:
+    "SLO design is a cornerstone SRE competency that directly connects engineering reliability work to business outcomes. Engineers who can define meaningful SLIs, set calibrated SLO targets, and design burn-rate alerting are equipped to build the reliability culture that scales with organizational growth.",
+  toolRelevance: ["Google SRE Workbook", "Datadog SLOs", "AWS CloudWatch Synthetics", "Prometheus", "Nobl9"],
+  createdAt: "2026-03-28",
+  updatedAt: "2026-03-28",
+};

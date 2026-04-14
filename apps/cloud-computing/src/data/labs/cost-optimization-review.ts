@@ -1,0 +1,257 @@
+import type { LabManifest } from "../../types/manifest";
+
+export const costOptimizationReviewLab: LabManifest = {
+  schemaVersion: "1.1",
+  id: "cost-optimization-review",
+  version: 1,
+  title: "Cloud Cost Optimization Review",
+  tier: "intermediate",
+  track: "cloud-architecture",
+  difficulty: "easy",
+  accessLevel: "free",
+  tags: ["cost-optimization", "finops", "rightsizing", "reserved-capacity", "waste"],
+  description:
+    "Review a cloud environment's configuration settings and toggle each resource to its cost-optimal state, learning to identify over-provisioning, unused resources, and savings plan opportunities.",
+  estimatedMinutes: 15,
+  learningObjectives: [
+    "Identify over-provisioned compute and storage resources through utilization metrics",
+    "Distinguish between on-demand, reserved, and spot pricing models",
+    "Apply rightsizing principles to underutilized instances",
+    "Recognize cost waste from idle resources and unnecessary data transfer",
+  ],
+  sortOrder: 405,
+  status: "published",
+  prerequisites: [],
+  rendererType: "toggle-config",
+  scenarios: [
+    {
+      type: "toggle-config",
+      id: "cost-compute-rightsizing",
+      title: "Compute Fleet Rightsizing",
+      description:
+        "Your infrastructure team has pulled a utilization report for the production compute fleet. Each instance type setting needs to be reviewed and set to the cost-optimal configuration based on observed utilization data.",
+      targetSystem: "Production Compute Fleet",
+      items: [
+        {
+          id: "web-tier-size",
+          label: "Web Tier Instance Size",
+          detail: "8 x 32 vCPU / 128 GB RAM instances. Average CPU: 12%. Average memory: 18%. Peak CPU: 35% during business hours.",
+          currentState: "32vCPU-128GB",
+          correctState: "8vCPU-32GB",
+          states: ["32vCPU-128GB", "16vCPU-64GB", "8vCPU-32GB", "4vCPU-16GB"],
+          rationaleId: "rat-web-size",
+        },
+        {
+          id: "pricing-model",
+          label: "Compute Pricing Model",
+          detail: "All instances currently on on-demand pricing. The web tier has been running continuously for 14 months with predictable baseline load. Reserved 1-year pricing offers 40% discount vs on-demand.",
+          currentState: "on-demand",
+          correctState: "reserved-1yr",
+          states: ["on-demand", "reserved-1yr", "reserved-3yr", "spot"],
+          rationaleId: "rat-pricing",
+        },
+        {
+          id: "dev-env-schedule",
+          label: "Development Environment Schedule",
+          detail: "Dev and staging environments run 24/7. Developers work 09:00–19:00 local time (10 hours/day, weekdays only). Environments are idle 70% of the week.",
+          currentState: "always-on",
+          correctState: "scheduled-off",
+          states: ["always-on", "scheduled-off", "spot-only", "on-demand-reduced"],
+          rationaleId: "rat-dev-schedule",
+        },
+        {
+          id: "data-transfer",
+          label: "Cross-Region Data Transfer",
+          detail: "Application logs are shipped from the primary region to a secondary region for archiving. Log volume: 500 GB/day. Logs are accessed for troubleshooting less than twice per month.",
+          currentState: "real-time-cross-region",
+          correctState: "batch-same-region",
+          states: ["real-time-cross-region", "batch-same-region", "disabled", "compressed-cross-region"],
+          rationaleId: "rat-transfer",
+        },
+        {
+          id: "storage-tier",
+          label: "Object Storage Lifecycle Policy",
+          detail: "Application assets bucket: 12 TB total. Access pattern: objects older than 90 days are accessed less than once per year. Currently all objects in standard (hot) storage tier.",
+          currentState: "all-standard",
+          correctState: "lifecycle-tiering",
+          states: ["all-standard", "lifecycle-tiering", "all-archive", "delete-after-90d"],
+          rationaleId: "rat-storage",
+        },
+      ],
+      rationales: [
+        {
+          id: "rat-web-size",
+          text: "At 12% average CPU and 18% memory utilization, the 32 vCPU instances are heavily over-provisioned. Rightsizing to 8 vCPU / 32 GB provides 2x headroom above the 35% peak CPU, reducing cost by approximately 75% on the web tier without risking capacity.",
+        },
+        {
+          id: "rat-pricing",
+          text: "A workload running continuously for 14 months with predictable baseline load is the ideal candidate for 1-year reserved pricing. The 3-year term offers more savings but less flexibility; spot is inappropriate for always-on web-serving workloads that cannot tolerate interruption.",
+        },
+        {
+          id: "rat-dev-schedule",
+          text: "Scheduling dev/staging environments to stop outside working hours (nights and weekends) eliminates 70% of their compute cost with zero impact on developer productivity. This is one of the highest-ROI cost actions available for non-production environments.",
+        },
+        {
+          id: "rat-transfer",
+          text: "Real-time cross-region transfer for logs accessed twice per month generates high egress costs for negligible operational value. Batching transfers reduces the number of API calls and can use compressed bulk transfer, while same-region archiving eliminates cross-region egress entirely.",
+        },
+        {
+          id: "rat-storage",
+          text: "Objects accessed less than once per year should be in an infrequent access or archive storage class. Lifecycle policies automatically transition objects after a defined age threshold, reducing storage cost by 60–90% for cold data without changing the bucket structure.",
+        },
+      ],
+      feedback: {
+        perfect: "Excellent. You identified all five cost optimization opportunities and selected the configuration that best balances savings against operational risk.",
+        partial: "You found some cost savings but missed one or more significant optimization opportunities. Review the utilization data and pricing model trade-offs for each setting.",
+        wrong: "Several configurations are set to their most expensive option. Revisit the utilization metrics and consider the appropriate compute size, pricing model, and storage tier for each resource.",
+      },
+    },
+    {
+      type: "toggle-config",
+      id: "cost-database-optimization",
+      title: "Database Cost Configuration",
+      description:
+        "The database layer accounts for 38% of total cloud spend. Review each database configuration setting and toggle it to the cost-optimal state based on workload characteristics and access patterns.",
+      targetSystem: "Database Tier",
+      items: [
+        {
+          id: "read-replica-count",
+          label: "Read Replica Count",
+          detail: "Primary database with 5 read replicas. Read traffic: 3,200 req/s. Each replica handles up to 800 req/s at 60% CPU. Combined replica capacity: 4,000 req/s — 25% headroom over current peak.",
+          currentState: "5-replicas",
+          correctState: "4-replicas",
+          states: ["2-replicas", "3-replicas", "4-replicas", "5-replicas"],
+          rationaleId: "rat-replicas",
+        },
+        {
+          id: "multi-az",
+          label: "Multi-AZ Deployment for Dev Database",
+          detail: "Development database is deployed with Multi-AZ standby, doubling instance cost. Dev database does not need 99.99% uptime — developers can tolerate a 10-minute outage during maintenance.",
+          currentState: "multi-az-enabled",
+          correctState: "single-az",
+          states: ["multi-az-enabled", "single-az"],
+          rationaleId: "rat-multiaz",
+        },
+        {
+          id: "backup-retention",
+          label: "Backup Retention Period",
+          detail: "All databases retain automated backups for 35 days. Regulatory requirement: 7-day backup retention minimum. RTO/RPO SLA only requires point-in-time recovery to within 24 hours.",
+          currentState: "35-day-retention",
+          correctState: "7-day-retention",
+          states: ["7-day-retention", "14-day-retention", "35-day-retention"],
+          rationaleId: "rat-backup",
+        },
+        {
+          id: "aurora-capacity",
+          label: "Serverless Database Auto-Pause",
+          detail: "The reporting database uses a serverless database cluster. It runs scheduled reports at 06:00 UTC daily (30 min) and ad-hoc queries twice a week. Currently configured with auto-pause disabled — cluster runs continuously.",
+          currentState: "auto-pause-disabled",
+          correctState: "auto-pause-enabled",
+          states: ["auto-pause-disabled", "auto-pause-enabled"],
+          rationaleId: "rat-autopause",
+        },
+      ],
+      rationales: [
+        {
+          id: "rat-replicas",
+          text: "With 5 replicas providing 4,000 req/s capacity against 3,200 req/s demand (25% headroom), removing one replica still leaves 3,200 req/s capacity — exactly matching current peak. For cost optimization, 20% headroom on read replicas is adequate; 25% represents one billable over-provisioned replica.",
+        },
+        {
+          id: "rat-multiaz",
+          text: "Multi-AZ for production is essential. For development databases that can tolerate brief outages, Multi-AZ doubles instance cost with no business benefit. Disabling it for non-production saves approximately 50% on dev database instance cost.",
+        },
+        {
+          id: "rat-backup",
+          text: "Backup storage is billed by volume and duration. Retaining 35 days when the regulatory minimum is 7 days and the RPO only requires 24-hour recovery costs 5x more than necessary. Setting to 7 days meets all stated requirements at minimum cost.",
+        },
+        {
+          id: "rat-autopause",
+          text: "A serverless cluster with auto-pause enabled shuts down after a configurable idle period and resumes on the next query (with a brief cold start). For a cluster used 30 minutes daily plus twice weekly, auto-pause eliminates ~95% of compute cost with only a few seconds of resume latency.",
+        },
+      ],
+      feedback: {
+        perfect: "Well done. You correctly identified over-provisioned replicas, unnecessary HA for dev, excess backup retention, and the auto-pause opportunity.",
+        partial: "You found some database cost optimizations but missed one or more significant savings. Review each setting's utilization data and requirements carefully.",
+        wrong: "The database tier has multiple over-provisioned or misconfigured settings. Check replica capacity headroom, dev environment requirements, and the auto-pause opportunity.",
+      },
+    },
+    {
+      type: "toggle-config",
+      id: "cost-network-optimization",
+      title: "Network & Egress Cost Configuration",
+      description:
+        "Network costs are growing faster than traffic. Review each network configuration and toggle settings to reduce data transfer costs without degrading user experience.",
+      targetSystem: "Network & CDN Layer",
+      items: [
+        {
+          id: "cdn-caching",
+          label: "CDN Cache-Control TTL for Static Assets",
+          detail: "Static assets (JS bundles, CSS, images) have a Cache-Control TTL of 60 seconds. These assets are versioned with content hashes in filenames — a new filename is used with every build. CDN cache hit rate: 12%.",
+          currentState: "ttl-60s",
+          correctState: "ttl-1year",
+          states: ["ttl-60s", "ttl-1hr", "ttl-24hr", "ttl-1year"],
+          rationaleId: "rat-cdn-ttl",
+        },
+        {
+          id: "nat-gateway",
+          label: "NAT Gateway Usage for S3 Access",
+          detail: "Private subnet instances download 800 GB/day from S3 through a NAT Gateway, incurring per-GB NAT processing fees. S3 is in the same region. A VPC endpoint for S3 would route traffic within the cloud network at no data processing charge.",
+          currentState: "nat-gateway",
+          correctState: "vpc-endpoint",
+          states: ["nat-gateway", "vpc-endpoint"],
+          rationaleId: "rat-nat",
+        },
+        {
+          id: "log-compression",
+          label: "Application Log Shipping Compression",
+          detail: "Application logs are shipped to the logging service uncompressed. Log volume: 200 GB/day. Logs are plain text with high redundancy (estimated 85% compressibility). Compression CPU overhead: negligible on log-shipping agents.",
+          currentState: "uncompressed",
+          correctState: "compressed",
+          states: ["uncompressed", "compressed"],
+          rationaleId: "rat-compression",
+        },
+      ],
+      rationales: [
+        {
+          id: "rat-cdn-ttl",
+          text: "Content-hashed filenames make cache invalidation automatic — a new deployment generates new filenames, so old cached files are never stale. Setting TTL to 1 year allows CDN to cache aggressively, increasing hit rates from 12% to 90%+ and reducing origin egress and load by a similar factor.",
+        },
+        {
+          id: "rat-nat",
+          text: "NAT Gateway charges per GB of data processed in addition to hourly rates. A VPC endpoint for same-region S3 access routes traffic privately within the cloud backbone — there is no data processing fee. For 800 GB/day, this saves the full NAT data processing cost, which is typically $0.045–$0.09/GB depending on the provider.",
+        },
+        {
+          id: "rat-compression",
+          text: "Compressing logs with 85% compressibility before shipping reduces transfer volume by ~85%, directly reducing data transfer and storage ingestion costs. The CPU overhead on log-shipping agents is negligible compared to the savings on high-volume log pipelines.",
+        },
+      ],
+      feedback: {
+        perfect: "Correct on all network optimizations. CDN TTL, VPC endpoints, and compression are three of the most overlooked high-ROI network cost levers.",
+        partial: "You identified some network cost issues but missed one or more significant optimization. Review the CDN caching strategy and the NAT vs. VPC endpoint data path.",
+        wrong: "Network costs often hide in plain sight. Review how CDN TTLs interact with content hashing, what NAT Gateway charges per GB, and the impact of log compression on transfer costs.",
+      },
+    },
+  ],
+  hints: [
+    "Content-hashed filenames make long CDN TTLs safe — the filename itself is the cache key, so deploying new code automatically busts the cache.",
+    "NAT Gateways charge per GB processed. For same-region cloud service access (S3, databases), a VPC/private endpoint eliminates that per-GB fee.",
+    "Dev and staging environments running 24/7 are often the single easiest cost win — scheduling them off nights and weekends cuts their cost by 70%.",
+  ],
+  scoring: {
+    maxScore: 100,
+    hintPenalty: 5,
+    penalties: { perfect: 0, partial: 10, wrong: 20 },
+    passingThresholds: { pass: 80, partial: 50 },
+  },
+  careerInsight:
+    "FinOps and cost optimization skills are increasingly listed in cloud architect and platform engineer job descriptions. Demonstrating that you can audit an environment and identify concrete savings — not just theoretical best practices — is a skill that translates directly to reduced cloud bills and organizational trust.",
+  toolRelevance: [
+    "AWS Cost Explorer",
+    "Azure Cost Management",
+    "Google Cloud Cost Management",
+    "CloudHealth",
+    "Infracost",
+  ],
+  createdAt: "2026-03-28",
+  updatedAt: "2026-03-28",
+};

@@ -1,0 +1,252 @@
+import type { LabManifest } from "../../types/manifest";
+
+export const secretsManagerSetupLab: LabManifest = {
+  schemaVersion: "1.1",
+  id: "secrets-manager-setup",
+  version: 1,
+  title: "Secrets Manager Setup",
+  tier: "beginner",
+  track: "cloud-security",
+  difficulty: "moderate",
+  accessLevel: "free",
+  tags: ["security", "secrets", "kms", "rotation", "credentials", "aws-secrets-manager"],
+  description:
+    "Configure AWS Secrets Manager to securely store, rotate, and access application credentials. Eliminate hardcoded secrets from application code and infrastructure, and implement automatic rotation for database passwords.",
+  estimatedMinutes: 12,
+  learningObjectives: [
+    "Store database credentials and API keys in AWS Secrets Manager",
+    "Configure automatic secret rotation using Lambda rotation functions",
+    "Grant applications access to secrets using IAM roles with least-privilege policies",
+    "Identify and remediate hardcoded secrets in application configuration",
+    "Implement secret versioning and staging labels for zero-downtime rotation",
+  ],
+  sortOrder: 504,
+  status: "published",
+  prerequisites: [],
+  rendererType: "toggle-config",
+  scenarios: [
+    {
+      type: "toggle-config",
+      id: "sm-s1-secret-config",
+      title: "Initial Secrets Manager Configuration",
+      description:
+        "A new secret `prod/app/database` is being created to store the RDS master credentials for a production application. Configure the secret settings according to security best practices before storing the credentials.",
+      targetSystem: "AWS Secrets Manager: Secret Creation (prod/app/database)",
+      items: [
+        {
+          id: "i1",
+          label: "Encryption Key",
+          detail: "The KMS key used to encrypt the secret value at rest.",
+          currentState: "aws/secretsmanager (Default)",
+          correctState: "Customer Managed Key (CMK)",
+          states: ["aws/secretsmanager (Default)", "Customer Managed Key (CMK)"],
+          rationaleId: "r1",
+        },
+        {
+          id: "i2",
+          label: "Automatic Rotation",
+          detail: "Automatically rotates the secret on a schedule using a Lambda function.",
+          currentState: "Disabled",
+          correctState: "Enabled (30-day schedule)",
+          states: ["Disabled", "Enabled (30-day schedule)", "Enabled (90-day schedule)"],
+          rationaleId: "r2",
+        },
+        {
+          id: "i3",
+          label: "Resource-Based Policy",
+          detail: "Controls which IAM principals can access this specific secret.",
+          currentState: "No Policy",
+          correctState: "Allow Application Role Only",
+          states: ["No Policy", "Allow Application Role Only", "Allow All Authenticated Users"],
+          rationaleId: "r3",
+        },
+        {
+          id: "i4",
+          label: "Secret Replication",
+          detail: "Replicates the secret to a secondary region for disaster recovery.",
+          currentState: "Not Replicated",
+          correctState: "Replicated to us-west-2",
+          states: ["Not Replicated", "Replicated to us-west-2", "Replicated to all regions"],
+          rationaleId: "r4",
+        },
+      ],
+      rationales: [
+        {
+          id: "r1",
+          text: "A customer-managed KMS key gives you full control over key policies, enables CloudTrail audit of every secret decryption, and allows you to revoke access immediately by disabling the key.",
+        },
+        {
+          id: "r2",
+          text: "Automatic 30-day rotation limits the exposure window of compromised credentials. AWS provides managed rotation functions for all major RDS engines.",
+        },
+        {
+          id: "r3",
+          text: "A resource-based policy restricting access to only the application IAM role ensures no other principal can retrieve the secret, even if they have secretsmanager:GetSecretValue in their identity policy.",
+        },
+        {
+          id: "r4",
+          text: "Replicating to a secondary region ensures the application can retrieve credentials during a regional outage. Replicating to all regions is unnecessary overhead and expands the attack surface.",
+        },
+      ],
+      feedback: {
+        perfect: "All secret configuration options correctly set. This secret is encrypted with a CMK, auto-rotates, and is access-controlled to the application role only.",
+        partial: "Most settings are correct but at least one security control is missing. Review encryption key choice and access policy scope.",
+        wrong: "The secret is missing critical security controls. Without CMK encryption, rotation, and a scoped access policy, this secret is vulnerable to unauthorized access.",
+      },
+    },
+    {
+      type: "toggle-config",
+      id: "sm-s2-app-migration",
+      title: "Migrating Hardcoded Credentials",
+      description:
+        "A code review reveals a Node.js application with hardcoded database credentials in its configuration file, which has been committed to a Git repository. Harden the application's secret handling by toggling each setting to its secure state.",
+      targetSystem: "Application: payment-service (Node.js on ECS Fargate)",
+      items: [
+        {
+          id: "i1",
+          label: "Database Password Source",
+          detail: "How the application retrieves the database password at runtime.",
+          currentState: "Hardcoded in config.js",
+          correctState: "Fetched from Secrets Manager at startup",
+          states: ["Hardcoded in config.js", "Environment Variable (ECS Task Definition)", "Fetched from Secrets Manager at startup"],
+          rationaleId: "r1",
+        },
+        {
+          id: "i2",
+          label: "Git Repository Secret Scanning",
+          detail: "Scans commits for accidental secret exposure before they are pushed.",
+          currentState: "Disabled",
+          correctState: "Enabled (pre-commit hook + CI scan)",
+          states: ["Disabled", "Enabled (CI scan only)", "Enabled (pre-commit hook + CI scan)"],
+          rationaleId: "r2",
+        },
+        {
+          id: "i3",
+          label: "ECS Task Role Secret Permission",
+          detail: "The IAM permission granted to the ECS task role for secret retrieval.",
+          currentState: "secretsmanager:* on *",
+          correctState: "secretsmanager:GetSecretValue on specific secret ARN",
+          states: ["secretsmanager:* on *", "secretsmanager:GetSecretValue on specific secret ARN", "No permission (use VPC endpoint)"],
+          rationaleId: "r3",
+        },
+        {
+          id: "i4",
+          label: "Secret Value Caching in Application",
+          detail: "How the application caches the retrieved secret to avoid repeated API calls.",
+          currentState: "No caching (fetches on every request)",
+          correctState: "Cache in memory with TTL less than rotation period",
+          states: ["No caching (fetches on every request)", "Cache in memory with TTL less than rotation period", "Cache to local disk indefinitely"],
+          rationaleId: "r4",
+        },
+      ],
+      rationales: [
+        {
+          id: "r1",
+          text: "Fetching secrets from Secrets Manager at startup is more secure than environment variables (visible in task definitions and logs) and eliminates hardcoded credentials entirely.",
+        },
+        {
+          id: "r2",
+          text: "Pre-commit hooks catch secrets before they reach the repository; CI scanning catches anything that slips through. Both layers are needed for defense-in-depth.",
+        },
+        {
+          id: "r3",
+          text: "Least privilege requires specifying the exact secret ARN and only the GetSecretValue action — wildcard permissions on all secrets are as dangerous as no access control.",
+        },
+        {
+          id: "r4",
+          text: "Caching with a TTL shorter than the rotation period prevents service disruption during rotation while dramatically reducing API call volume and latency.",
+        },
+      ],
+      feedback: {
+        perfect: "All application secret handling controls are correctly configured. The app now uses Secrets Manager securely with proper caching and least-privilege access.",
+        partial: "Some controls are correct but check secret access patterns. Environment variables are more secure than hardcoding but still expose secrets in ECS task definitions.",
+        wrong: "Hardcoded secrets and broad IAM permissions are serious vulnerabilities. Review the AWS Secrets Manager integration best practices for containerized applications.",
+      },
+    },
+    {
+      type: "toggle-config",
+      id: "sm-s3-rotation-config",
+      title: "Secret Rotation Lambda Configuration",
+      description:
+        "You are configuring the Lambda function that performs automatic rotation for the `prod/app/database` secret. The rotation function must correctly handle the four rotation steps: createSecret, setSecret, testSecret, finishSecret.",
+      targetSystem: "Secrets Manager Rotation Lambda: prod-db-rotation-fn",
+      items: [
+        {
+          id: "i1",
+          label: "Lambda VPC Configuration",
+          detail: "The network context in which the rotation Lambda runs.",
+          currentState: "No VPC (public internet)",
+          correctState: "VPC with access to RDS and Secrets Manager endpoint",
+          states: ["No VPC (public internet)", "VPC with access to RDS and Secrets Manager endpoint", "VPC with only RDS access"],
+          rationaleId: "r1",
+        },
+        {
+          id: "i2",
+          label: "Rotation Strategy",
+          detail: "How the rotation Lambda handles the transition between old and new credentials.",
+          currentState: "Single-user rotation",
+          correctState: "Multi-user rotation",
+          states: ["Single-user rotation", "Multi-user rotation", "In-place rotation"],
+          rationaleId: "r2",
+        },
+        {
+          id: "i3",
+          label: "Lambda Execution Role",
+          detail: "IAM permissions granted to the rotation Lambda function.",
+          currentState: "AdministratorAccess",
+          correctState: "Scoped to secretsmanager rotation actions and RDS password update only",
+          states: ["AdministratorAccess", "Scoped to secretsmanager rotation actions and RDS password update only", "ReadOnly"],
+          rationaleId: "r3",
+        },
+        {
+          id: "i4",
+          label: "Rotation Window Duration",
+          detail: "How long Secrets Manager allows between AWSPENDING and AWSCURRENT stages.",
+          currentState: "Unlimited",
+          correctState: "4-hour window",
+          states: ["Unlimited", "4-hour window", "24-hour window"],
+          rationaleId: "r4",
+        },
+      ],
+      rationales: [
+        {
+          id: "r1",
+          text: "The rotation Lambda must be in the same VPC as the RDS instance to set the new password, and must reach the Secrets Manager VPC endpoint to update the secret value.",
+        },
+        {
+          id: "r2",
+          text: "Multi-user rotation creates a cloned user, tests it, then switches — ensuring zero-downtime rotation without a window where the old and new passwords are both invalid.",
+        },
+        {
+          id: "r3",
+          text: "The rotation Lambda must have least-privilege access. AdministratorAccess on a rotation Lambda is a privilege escalation vector if the function is compromised.",
+        },
+        {
+          id: "r4",
+          text: "A bounded rotation window ensures the AWSPENDING stage does not persist indefinitely. A 4-hour window is long enough for the rotation to complete while limiting exposure of the pending secret.",
+        },
+      ],
+      feedback: {
+        perfect: "All rotation Lambda settings are correctly configured. This setup enables zero-downtime secret rotation with proper network access and least-privilege execution.",
+        partial: "Some rotation settings are correct but check the VPC configuration and rotation strategy. The Lambda needs network paths to both RDS and Secrets Manager.",
+        wrong: "The rotation function has critical configuration issues. Without VPC placement, correct rotation strategy, and scoped IAM permissions, rotation will either fail or create security vulnerabilities.",
+      },
+    },
+  ],
+  hints: [
+    "AWS Secrets Manager rotation uses four lifecycle steps: createSecret (create new version), setSecret (update the resource), testSecret (verify new credentials work), and finishSecret (promote AWSPENDING to AWSCURRENT).",
+    "Environment variables in ECS task definitions are visible in the AWS console and CloudTrail logs — use Secrets Manager or Parameter Store with SecureString for sensitive values instead.",
+    "Multi-user rotation creates a second database user, tests it, then switches the secret — this approach achieves zero downtime compared to single-user rotation which has a brief window of invalidity.",
+  ],
+  scoring: {
+    maxScore: 100,
+    hintPenalty: 5,
+    penalties: { perfect: 0, partial: 10, wrong: 20 },
+    passingThresholds: { pass: 80, partial: 50 },
+  },
+  careerInsight:
+    "Secrets management is a foundational DevSecOps skill. Engineers who can design and implement secrets rotation pipelines — eliminating hardcoded credentials from codebases — are in high demand at companies scaling secure cloud infrastructure. This is frequently tested in cloud security interviews.",
+  toolRelevance: ["AWS Secrets Manager", "AWS KMS", "AWS Lambda", "AWS IAM", "AWS Systems Manager Parameter Store", "HashiCorp Vault", "git-secrets", "truffleHog"],
+  createdAt: "2026-03-28",
+  updatedAt: "2026-03-28",
+};

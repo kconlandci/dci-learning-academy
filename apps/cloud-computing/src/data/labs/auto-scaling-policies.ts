@@ -1,0 +1,251 @@
+import type { LabManifest } from "../../types/manifest";
+
+export const autoScalingPoliciesLab: LabManifest = {
+  schemaVersion: "1.1",
+  id: "auto-scaling-policies",
+  version: 1,
+  title: "Auto Scaling Policies",
+  tier: "beginner",
+  track: "cloud-operations",
+  difficulty: "easy",
+  accessLevel: "free",
+  tags: ["aws", "auto-scaling", "ec2", "cloudwatch", "cost-optimization"],
+  description:
+    "Configure EC2 Auto Scaling groups with the right scaling policies, cooldown periods, and capacity bounds to handle variable traffic without over-provisioning.",
+  estimatedMinutes: 9,
+  learningObjectives: [
+    "Choose between target tracking, step scaling, and scheduled scaling policies",
+    "Set appropriate cooldown periods to prevent scaling thrash",
+    "Define minimum, desired, and maximum capacity for different workloads",
+    "Select the right CloudWatch metric as a scaling trigger",
+  ],
+  sortOrder: 603,
+  status: "published",
+  prerequisites: [],
+  rendererType: "toggle-config",
+  scenarios: [
+    {
+      type: "toggle-config",
+      id: "asg-s1",
+      title: "Web Tier Auto Scaling Configuration",
+      description:
+        "Configure the Auto Scaling Group for a web application tier that serves variable traffic throughout the day. Traffic is lowest at 2am (20 req/s) and peaks at noon (400 req/s). Each instance handles 50 req/s at 70% CPU. The team wants to stay under $800/month on compute.",
+      targetSystem: "EC2 Auto Scaling Group — Web Tier",
+      items: [
+        {
+          id: "policy-type",
+          label: "Scaling Policy Type",
+          detail: "The policy that determines when and how the ASG scales.",
+          currentState: "Simple Scaling",
+          correctState: "Target Tracking",
+          states: ["Simple Scaling", "Step Scaling", "Target Tracking", "Scheduled Only"],
+          rationaleId: "r-policy-type",
+        },
+        {
+          id: "target-metric",
+          label: "Target Tracking Metric",
+          detail: "The CloudWatch metric used as the scaling signal.",
+          currentState: "NetworkIn",
+          correctState: "ASGAverageCPUUtilization",
+          states: ["NetworkIn", "ASGAverageCPUUtilization", "ALBRequestCountPerTarget", "MemoryUtilization"],
+          rationaleId: "r-target-metric",
+        },
+        {
+          id: "min-capacity",
+          label: "Minimum Capacity",
+          detail: "The floor — instances that always run regardless of load.",
+          currentState: "1",
+          correctState: "2",
+          states: ["1", "2", "3", "4"],
+          rationaleId: "r-min-capacity",
+        },
+        {
+          id: "max-capacity",
+          label: "Maximum Capacity",
+          detail: "The ceiling — maximum instances allowed to prevent runaway costs.",
+          currentState: "20",
+          correctState: "10",
+          states: ["5", "8", "10", "20"],
+          rationaleId: "r-max-capacity",
+        },
+      ],
+      rationales: [
+        {
+          id: "r-policy-type",
+          text: "Target Tracking is the simplest and most effective policy for web tiers with variable load. You specify a target metric value and AWS automatically adjusts capacity to maintain it, handling both scale-out and scale-in without step threshold configuration.",
+        },
+        {
+          id: "r-target-metric",
+          text: "ASGAverageCPUUtilization directly reflects how hard instances are working. Since each instance handles 50 req/s at 70% CPU, targeting 70% CPU gives you a direct relationship to capacity needs. NetworkIn doesn't correlate with compute load for API workloads.",
+        },
+        {
+          id: "r-min-capacity",
+          text: "Minimum 2 instances ensures high availability — if one instance fails, the other continues serving traffic while replacement launches. A minimum of 1 creates a single point of failure during the scale-in valley at 2am.",
+        },
+        {
+          id: "r-max-capacity",
+          text: "At 50 req/s per instance, handling 400 req/s peak requires 8 instances. A maximum of 10 provides 25% headroom above peak load. A maximum of 20 could allow runaway scaling during a traffic anomaly, blowing the $800/month budget.",
+        },
+      ],
+      feedback: {
+        perfect: "Correctly configured. Target Tracking at 70% CPU with 2 minimum and 10 maximum instances provides high availability, efficient cost control, and automatic scaling for variable traffic.",
+        partial: "The policy type or metric needs adjustment. Target Tracking on CPU is the most reliable approach for web tiers — it handles both scale-out and scale-in without complex step threshold tuning.",
+        wrong: "Revisit your capacity bounds and policy type. The minimum must ensure availability (2+ instances), and the maximum must reflect your budget and peak load, not an arbitrary large number.",
+      },
+    },
+    {
+      type: "toggle-config",
+      id: "asg-s2",
+      title: "Batch Processing Tier — Scheduled Scaling",
+      description:
+        "An ASG runs data processing workers for a nightly ETL job. The job starts at 11pm and finishes by 3am every night. Outside these hours, no instances should be running. During the job, 8 workers are needed. The team wants to minimize costs with zero idle capacity outside the job window.",
+      targetSystem: "EC2 Auto Scaling Group — ETL Worker Tier",
+      items: [
+        {
+          id: "primary-policy",
+          label: "Primary Scaling Policy",
+          detail: "The main scaling strategy for this predictable, time-based workload.",
+          currentState: "Target Tracking (CPU 70%)",
+          correctState: "Scheduled Scaling",
+          states: ["Target Tracking (CPU 70%)", "Step Scaling", "Scheduled Scaling", "Manual Scaling"],
+          rationaleId: "r-batch-policy",
+        },
+        {
+          id: "scale-out-time",
+          label: "Scale-Out Schedule",
+          detail: "When to provision workers before the job starts.",
+          currentState: "11:00 PM (job start time)",
+          correctState: "10:45 PM (15 min before job start)",
+          states: ["10:30 PM (30 min early)", "10:45 PM (15 min before job start)", "11:00 PM (job start time)", "11:15 PM (15 min after job start)"],
+          rationaleId: "r-scale-out-time",
+        },
+        {
+          id: "scale-in-min",
+          label: "Minimum Capacity Outside Job Window",
+          detail: "Instances that should run when no job is active.",
+          currentState: "2",
+          correctState: "0",
+          states: ["0", "1", "2", "4"],
+          rationaleId: "r-batch-min",
+        },
+        {
+          id: "cooldown-period",
+          label: "Default Cooldown Period",
+          detail: "Time (seconds) to wait after a scaling activity before allowing another.",
+          currentState: "300",
+          correctState: "60",
+          states: ["30", "60", "300", "600"],
+          rationaleId: "r-batch-cooldown",
+        },
+      ],
+      rationales: [
+        {
+          id: "r-batch-policy",
+          text: "Scheduled Scaling is purpose-built for predictable, time-based workloads. When you know exactly when capacity is needed, scheduled actions are more reliable and faster to respond than metric-based policies that must wait to observe load before scaling.",
+        },
+        {
+          id: "r-scale-out-time",
+          text: "Scaling out 15 minutes before the job starts accounts for EC2 instance launch time (~3–5 minutes) and any application warm-up. If scaling starts exactly at 11pm, workers won't be ready until 11:05–11:10, causing the job to start late.",
+        },
+        {
+          id: "r-batch-min",
+          text: "For batch-only workloads with no user-facing traffic, minimum capacity of 0 outside job windows is correct. Keeping 2 idle instances running 20 hours/day wastes ~60% of the monthly compute budget on standby workers.",
+        },
+        {
+          id: "r-batch-cooldown",
+          text: "A 60-second cooldown is appropriate for scheduled batch workloads. Since scaling is time-triggered (not metric-triggered), there is no risk of rapid scale-in/out thrash. A 300-second cooldown just delays the scale-in after the job finishes, keeping instances running longer than needed.",
+        },
+      ],
+      feedback: {
+        perfect: "Correct. Scheduled scaling with pre-warmed capacity, zero minimum outside hours, and a short cooldown minimizes cost while ensuring job readiness.",
+        partial: "You have the right policy but check your schedule timing and minimum capacity. Pre-warming and zero-minimum are key to both reliability and cost efficiency.",
+        wrong: "Metric-based scaling is wrong for predictable batch workloads — it reacts to load that has already arrived. Scheduled scaling proactively provisions capacity based on known schedules.",
+      },
+    },
+    {
+      type: "toggle-config",
+      id: "asg-s3",
+      title: "Scaling Cooldown and Warmup Configuration",
+      description:
+        "A SaaS application's ASG is exhibiting scaling thrash — it scales out to 6 instances, then back to 2, then out to 5, within a 10-minute window. CloudWatch shows CPU alternating between 75% and 45% in rapid cycles. The default cooldown is 30 seconds and the instance warmup is 0 seconds.",
+      targetSystem: "EC2 Auto Scaling Group — Thrashing Remediation",
+      items: [
+        {
+          id: "default-cooldown",
+          label: "Default Cooldown Period (seconds)",
+          detail: "Minimum time between scaling activities to prevent rapid oscillation.",
+          currentState: "30",
+          correctState: "300",
+          states: ["30", "60", "180", "300"],
+          rationaleId: "r-thrash-cooldown",
+        },
+        {
+          id: "warmup-period",
+          label: "Instance Warmup Period (seconds)",
+          detail: "Time after a new instance launches before it contributes to scaling metrics.",
+          currentState: "0",
+          correctState: "120",
+          states: ["0", "60", "120", "300"],
+          rationaleId: "r-warmup",
+        },
+        {
+          id: "scale-in-protection",
+          label: "Scale-In Protection During Warmup",
+          detail: "Whether newly launched instances are protected from scale-in while warming up.",
+          currentState: "Disabled",
+          correctState: "Enabled",
+          states: ["Disabled", "Enabled"],
+          rationaleId: "r-scale-in-protection",
+        },
+        {
+          id: "scale-in-policy",
+          label: "Scale-In Evaluation Periods",
+          detail: "Number of consecutive below-threshold periods required before scaling in.",
+          currentState: "1",
+          correctState: "3",
+          states: ["1", "2", "3", "5"],
+          rationaleId: "r-scale-in-eval",
+        },
+      ],
+      rationales: [
+        {
+          id: "r-thrash-cooldown",
+          text: "A 300-second (5-minute) cooldown ensures that after a scale-out, the ASG waits long enough for the new instances to absorb load and for metrics to stabilize before deciding whether more scaling is needed. 30 seconds is shorter than EC2 instance launch time.",
+        },
+        {
+          id: "r-warmup",
+          text: "A 120-second warmup period tells Auto Scaling not to count new instances in scaling metrics until they are fully initialized. Without this, the ASG sees CPU drop as soon as instances launch (even before they serve traffic), triggering premature scale-in.",
+        },
+        {
+          id: "r-scale-in-protection",
+          text: "Enabling scale-in protection during warmup prevents the Auto Scaling group from terminating a newly launched instance before it has finished warming up — which would immediately trigger another scale-out, perpetuating the thrash.",
+        },
+        {
+          id: "r-scale-in-eval",
+          text: "Requiring 3 consecutive below-threshold periods (3 × 60s = 3 minutes) before scaling in prevents scale-in based on a brief CPU dip. A single evaluation period means one minute of low CPU triggers instance termination, even during traffic lulls within sustained load.",
+        },
+      ],
+      feedback: {
+        perfect: "Perfect. Cooldown, warmup, scale-in protection, and evaluation period work together as a system. Each setting addresses a different cause of scaling thrash.",
+        partial: "You addressed some thrash causes but not all. Both the cooldown AND the warmup period must be long enough to let new instances absorb load before the next scaling decision.",
+        wrong: "Scaling thrash is caused by the ASG making scaling decisions before new instances are ready to serve traffic. Cooldown, warmup, and evaluation period settings must all be tuned to reflect actual instance startup time.",
+      },
+    },
+  ],
+  hints: [
+    "Target Tracking is the easiest policy for variable web traffic — set the target value and let AWS handle the math.",
+    "Scheduled scaling is better than metric-based scaling for predictable, time-boxed workloads like nightly batch jobs.",
+    "Scaling thrash happens when the ASG reacts to metrics before new instances are warm — configure warmup periods to match your actual startup time.",
+  ],
+  scoring: {
+    maxScore: 100,
+    hintPenalty: 5,
+    penalties: { perfect: 0, partial: 10, wrong: 20 },
+    passingThresholds: { pass: 80, partial: 50 },
+  },
+  careerInsight:
+    "Auto Scaling configuration is one of the most impactful cloud cost levers available. Engineers who understand the interplay between cooldown, warmup, and scaling policies can eliminate both over-provisioning waste and under-capacity incidents — a rare combination that directly impacts business metrics.",
+  toolRelevance: ["AWS Auto Scaling", "AWS CloudWatch", "AWS EC2", "AWS Cost Explorer", "Terraform"],
+  createdAt: "2026-03-28",
+  updatedAt: "2026-03-28",
+};

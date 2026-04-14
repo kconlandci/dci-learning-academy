@@ -1,0 +1,257 @@
+import type { LabManifest } from "../../types/manifest";
+
+export const cloudWafConfigurationLab: LabManifest = {
+  schemaVersion: "1.1",
+  id: "cloud-waf-configuration",
+  version: 1,
+  title: "Cloud WAF Configuration",
+  tier: "beginner",
+  track: "cloud-security",
+  difficulty: "moderate",
+  accessLevel: "free",
+  tags: ["security", "waf", "owasp", "ddos", "web-application", "aws-waf"],
+  description:
+    "Configure AWS WAF rules to protect web applications against OWASP Top 10 attacks, DDoS, and bot abuse. Practice enabling managed rule groups, tuning rate limiting, and responding to WAF findings in realistic production scenarios.",
+  estimatedMinutes: 12,
+  learningObjectives: [
+    "Enable and configure AWS Managed Rule groups for OWASP Top 10 protection",
+    "Set appropriate rate-based rules to mitigate volumetric DDoS and credential stuffing",
+    "Configure WAF logging and integrate with CloudWatch for alerting",
+    "Understand the difference between COUNT and BLOCK modes for rule tuning",
+    "Apply geo-blocking rules to restrict application access by country",
+  ],
+  sortOrder: 506,
+  status: "published",
+  prerequisites: [],
+  rendererType: "toggle-config",
+  scenarios: [
+    {
+      type: "toggle-config",
+      id: "waf-s1-rule-groups",
+      title: "WAF Web ACL Managed Rule Configuration",
+      description:
+        "An e-commerce application load balancer has an AWS WAF Web ACL attached but with minimal rules enabled. A security assessment found the application is vulnerable to SQL injection and XSS. Configure the Web ACL to provide comprehensive protection.",
+      targetSystem: "AWS WAF Web ACL: prod-ecommerce-webacl (ALB: ecommerce-alb-prod)",
+      items: [
+        {
+          id: "i1",
+          label: "AWSManagedRulesCommonRuleSet",
+          detail: "Core rule set providing protection against common web exploits including OWASP Top 10.",
+          currentState: "Disabled",
+          correctState: "Enabled (BLOCK mode)",
+          states: ["Disabled", "Enabled (COUNT mode)", "Enabled (BLOCK mode)"],
+          rationaleId: "r1",
+        },
+        {
+          id: "i2",
+          label: "AWSManagedRulesSQLiRuleSet",
+          detail: "Specifically targets SQL injection patterns in request body, headers, and query strings.",
+          currentState: "Disabled",
+          correctState: "Enabled (BLOCK mode)",
+          states: ["Disabled", "Enabled (COUNT mode)", "Enabled (BLOCK mode)"],
+          rationaleId: "r2",
+        },
+        {
+          id: "i3",
+          label: "Rate-Based Rule (Login Endpoint)",
+          detail: "Limits requests from a single IP to the /auth/login endpoint.",
+          currentState: "Disabled",
+          correctState: "Enabled (100 req/5min per IP)",
+          states: ["Disabled", "Enabled (1000 req/5min per IP)", "Enabled (100 req/5min per IP)", "Enabled (10 req/5min per IP)"],
+          rationaleId: "r3",
+        },
+        {
+          id: "i4",
+          label: "WAF Logging",
+          detail: "Sends WAF allow/block decisions to a Kinesis Firehose for storage and analysis.",
+          currentState: "Disabled",
+          correctState: "Enabled (full logging to S3)",
+          states: ["Disabled", "Enabled (sampled logging)", "Enabled (full logging to S3)"],
+          rationaleId: "r4",
+        },
+        {
+          id: "i5",
+          label: "AWSManagedRulesBotControlRuleSet",
+          detail: "Identifies and controls bot traffic including scrapers, credential stuffers, and scanners.",
+          currentState: "Disabled",
+          correctState: "Enabled (COUNT mode)",
+          states: ["Disabled", "Enabled (COUNT mode)", "Enabled (BLOCK mode)"],
+          rationaleId: "r5",
+        },
+      ],
+      rationales: [
+        {
+          id: "r1",
+          text: "The Common Rule Set is the baseline OWASP protection layer. BLOCK mode should be enabled after initial tuning to prevent real attacks rather than just count them.",
+        },
+        {
+          id: "r2",
+          text: "SQL injection is consistently in the OWASP Top 10. With a known vulnerability in the e-commerce application, this rule set should be in BLOCK mode immediately.",
+        },
+        {
+          id: "r3",
+          text: "100 requests per 5 minutes per IP on the login endpoint throttles credential stuffing attacks while allowing legitimate users to attempt login without impact.",
+        },
+        {
+          id: "r4",
+          text: "Full WAF logging enables forensic investigation of attacks, tuning of false positives, and evidence collection for compliance and incident response.",
+        },
+        {
+          id: "r5",
+          text: "Bot Control should start in COUNT mode to understand the bot traffic profile before blocking — some legitimate bots (SEO crawlers, monitoring tools) may be inadvertently blocked.",
+        },
+      ],
+      feedback: {
+        perfect: "WAF Web ACL correctly configured with core protections in BLOCK mode, rate limiting on sensitive endpoints, and full logging enabled.",
+        partial: "Some rules are correctly configured but review the mode (COUNT vs BLOCK) for OWASP rules — counting attacks on a vulnerable application doesn't prevent them.",
+        wrong: "The WAF is significantly under-configured. Core OWASP rules must be in BLOCK mode, and sensitive endpoints need rate limiting to prevent credential attacks.",
+      },
+    },
+    {
+      type: "toggle-config",
+      id: "waf-s2-geo-blocking",
+      title: "Geographic Restriction and IP Reputation",
+      description:
+        "A US-only financial services application is receiving high volumes of malicious traffic from regions where it has no customers. Configure geographic restrictions and IP reputation-based blocking to reduce attack surface.",
+      targetSystem: "AWS WAF Web ACL: prod-finserv-webacl (CloudFront Distribution)",
+      items: [
+        {
+          id: "i1",
+          label: "Geographic Match Rule",
+          detail: "Blocks requests originating from countries outside the US where the service operates.",
+          currentState: "Not Configured",
+          correctState: "Block all countries except US",
+          states: ["Not Configured", "Block all countries except US", "Block only known high-risk countries"],
+          rationaleId: "r1",
+        },
+        {
+          id: "i2",
+          label: "AWSManagedRulesAmazonIpReputationList",
+          detail: "Blocks IPs identified by AWS threat intelligence as malicious (botnets, scanners, etc.).",
+          currentState: "Disabled",
+          correctState: "Enabled (BLOCK mode)",
+          states: ["Disabled", "Enabled (COUNT mode)", "Enabled (BLOCK mode)"],
+          rationaleId: "r2",
+        },
+        {
+          id: "i3",
+          label: "IP Allowlist for Internal Testing",
+          detail: "Ensures the internal security team's IPs are never blocked by WAF rules.",
+          currentState: "Not Configured",
+          correctState: "Configured (priority 0 — evaluate before other rules)",
+          states: ["Not Configured", "Configured (priority 0 — evaluate before other rules)", "Configured (priority 100 — after managed rules)"],
+          rationaleId: "r3",
+        },
+        {
+          id: "i4",
+          label: "Request Body Size Limit",
+          detail: "Limits the maximum request body size inspected by WAF rules.",
+          currentState: "16 KB (default)",
+          correctState: "8 KB (tighter limit for API endpoints)",
+          states: ["16 KB (default)", "8 KB (tighter limit for API endpoints)", "Unlimited"],
+          rationaleId: "r4",
+        },
+      ],
+      rationales: [
+        {
+          id: "r1",
+          text: "For a US-only service, blocking all non-US traffic eliminates the majority of international scanning and attack traffic with no legitimate business impact.",
+        },
+        {
+          id: "r2",
+          text: "AWS's IP reputation list is continuously updated with threat intelligence and is one of the highest-signal, lowest-false-positive WAF rules available.",
+        },
+        {
+          id: "r3",
+          text: "Internal IP allowlists must have the highest priority (lowest number) to prevent the security team's penetration testing and scanning tools from being blocked by the WAF.",
+        },
+        {
+          id: "r4",
+          text: "Limiting inspected body size for API endpoints reduces WAF processing cost and forces clients to comply with expected request sizes, reducing some attack vectors.",
+        },
+      ],
+      feedback: {
+        perfect: "Geographic restrictions and IP reputation blocking correctly configured. The application is now protected from the majority of international attack traffic.",
+        partial: "Some restrictions are in place but check the priority ordering. IP allowlists must be evaluated before managed rules to avoid blocking the security team.",
+        wrong: "Without geographic restrictions and IP reputation blocking, the financial application remains exposed to international attack traffic with no business justification for that exposure.",
+      },
+    },
+    {
+      type: "toggle-config",
+      id: "waf-s3-false-positive-tuning",
+      title: "WAF False Positive Remediation",
+      description:
+        "After enabling WAF rules in BLOCK mode, the customer support team reports that their Zendesk integration is returning 403 errors. WAF logs show the AWSManagedRulesCommonRuleSet is blocking Zendesk's webhook requests. Tune the WAF without disabling the protection.",
+      targetSystem: "AWS WAF Web ACL: prod-support-webacl (Rule: AWSManagedRulesCommonRuleSet)",
+      items: [
+        {
+          id: "i1",
+          label: "Response to False Positive",
+          detail: "How to handle the Zendesk webhook being blocked by the Common Rule Set.",
+          currentState: "Common Rule Set in BLOCK mode (blocking Zendesk)",
+          correctState: "Rule group override: exclude specific Zendesk-triggering rules only",
+          states: [
+            "Common Rule Set in BLOCK mode (blocking Zendesk)",
+            "Disable Common Rule Set entirely",
+            "Rule group override: exclude specific Zendesk-triggering rules only",
+            "Put entire Web ACL in COUNT mode",
+          ],
+          rationaleId: "r1",
+        },
+        {
+          id: "i2",
+          label: "Zendesk Webhook IP Handling",
+          detail: "How to handle traffic specifically from Zendesk's published IP ranges.",
+          currentState: "No special handling",
+          correctState: "Add Zendesk IP ranges to an IP allowlist rule evaluated before the managed rule group",
+          states: ["No special handling", "Add Zendesk IP ranges to an IP allowlist rule evaluated before the managed rule group", "Disable rate limiting for all IPs"],
+          rationaleId: "r2",
+        },
+        {
+          id: "i3",
+          label: "WAF Logging Filter for Investigation",
+          detail: "Filtering WAF logs to identify which specific rule is causing the false positive.",
+          currentState: "No filter (all traffic logged)",
+          correctState: "Filter on BLOCK action + rule group AWSManagedRulesCommonRuleSet",
+          states: ["No filter (all traffic logged)", "Filter on BLOCK action + rule group AWSManagedRulesCommonRuleSet", "Disable logging during investigation"],
+          rationaleId: "r3",
+        },
+      ],
+      rationales: [
+        {
+          id: "r1",
+          text: "Overriding only the specific rule that triggers on Zendesk's webhook format preserves all other Common Rule Set protections while resolving the false positive.",
+        },
+        {
+          id: "r2",
+          text: "Allowlisting Zendesk's published IP ranges with a higher-priority rule bypasses WAF inspection for trusted webhook sources while blocking the same patterns from untrusted IPs.",
+        },
+        {
+          id: "r3",
+          text: "Filtering WAF logs to BLOCK actions from the specific rule group isolates the exact rule ID causing false positives, enabling targeted override rather than broad changes.",
+        },
+      ],
+      feedback: {
+        perfect: "Correct approach to WAF tuning. Using rule-level overrides and IP allowlists resolves false positives while preserving protection — never disable a rule group entirely for a single integration.",
+        partial: "Your tuning approach is partially correct. Consider both a targeted rule override AND an IP allowlist for the most surgical fix.",
+        wrong: "Disabling the entire Common Rule Set or putting the Web ACL in COUNT mode removes protection from all attacks to fix one false positive — always tune at the rule level instead.",
+      },
+    },
+  ],
+  hints: [
+    "Start new WAF rules in COUNT mode to observe what they would block before switching to BLOCK mode — this prevents false positives from disrupting production traffic.",
+    "IP allowlist rules should always have the lowest priority number (highest priority) in the Web ACL to ensure your security team's testing IPs are never blocked by subsequent rules.",
+    "AWS WAF logs include the terminating rule ID in every blocked request — use CloudWatch Logs Insights to query `filter action = 'BLOCK'` to find which rule is causing false positives.",
+  ],
+  scoring: {
+    maxScore: 100,
+    hintPenalty: 5,
+    penalties: { perfect: 0, partial: 10, wrong: 20 },
+    passingThresholds: { pass: 80, partial: 50 },
+  },
+  careerInsight:
+    "WAF configuration and tuning is a core skill for application security engineers and cloud security architects. The ability to enable strong protections while managing false positives is a practical skill that directly impacts both security posture and developer experience.",
+  toolRelevance: ["AWS WAF", "AWS Shield", "AWS CloudFront", "AWS Application Load Balancer", "AWS Kinesis Firehose", "CloudWatch Logs Insights"],
+  createdAt: "2026-03-28",
+  updatedAt: "2026-03-28",
+};

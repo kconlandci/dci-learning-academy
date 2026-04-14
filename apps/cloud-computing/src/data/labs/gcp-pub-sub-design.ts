@@ -1,0 +1,145 @@
+import type { LabManifest } from "../../types/manifest";
+
+export const gcpPubSubDesignLab: LabManifest = {
+  schemaVersion: "1.1",
+  id: "gcp-pub-sub-design",
+  version: 1,
+  title: "Pub/Sub Messaging Design Patterns",
+  tier: "beginner",
+  track: "gcp-essentials",
+  difficulty: "moderate",
+  accessLevel: "free",
+  tags: ["gcp", "pub-sub", "messaging", "event-driven", "dead-letter", "ordering", "fan-out"],
+  description:
+    "Design correct Pub/Sub topologies for fan-out, competing consumers, and ordered delivery. Configure dead-letter topics, acknowledgement deadlines, and message retention for production reliability.",
+  estimatedMinutes: 11,
+  learningObjectives: [
+    "Choose between fan-out (multiple subscriptions) and competing consumers (one subscription, multiple consumers) patterns",
+    "Configure dead-letter topics to handle poison messages without blocking queues",
+    "Apply message ordering keys when sequencing guarantees are required",
+    "Set acknowledgement deadlines based on message processing time to avoid duplicate delivery",
+  ],
+  sortOrder: 309,
+  status: "published",
+  prerequisites: [],
+  rendererType: "action-rationale",
+  scenarios: [
+    {
+      type: "action-rationale",
+      id: "ps-scenario-1",
+      title: "Fan-out vs Competing Consumers",
+      context:
+        "Your order processing system publishes an order-placed event when a customer completes checkout. Three downstream services need to act on every order: the inventory service (decrement stock), the email service (send confirmation), and the analytics service (record for reporting). A junior engineer created one subscription with three consumer groups all reading from it.",
+      displayFields: [
+        { label: "Publisher", value: "checkout-service → orders-topic", emphasis: "normal" },
+        { label: "Current Topology", value: "1 subscription, 3 consumer groups competing", emphasis: "critical" },
+        { label: "Required Behavior", value: "ALL 3 services must receive EVERY order event", emphasis: "warn" },
+        { label: "Current Behavior", value: "Each event delivered to only ONE consumer (load-balanced)", emphasis: "critical" },
+        { label: "Missing Orders", value: "~67% of orders not reaching email or analytics", emphasis: "critical" },
+      ],
+      actions: [
+        { id: "three-subscriptions", label: "Create 3 separate subscriptions: one per downstream service", color: "green" },
+        { id: "one-subscription-push", label: "Switch to push subscription that calls all 3 services via HTTP", color: "yellow" },
+        { id: "ordered-delivery", label: "Enable message ordering on the single subscription", color: "orange" },
+        { id: "increase-consumers", label: "Keep 1 subscription but ensure consumers coordinate via Cloud Firestore", color: "red" },
+      ],
+      correctActionId: "three-subscriptions",
+      rationales: [
+        { id: "r-fan-out-correct", text: "Pub/Sub fan-out works at the subscription level — each subscription receives every message independently. Creating one subscription per service ensures all three services receive every order event." },
+        { id: "r-competing-consumers", text: "A single subscription with multiple consumers is the competing consumers pattern — messages are load-balanced across consumers, so each message goes to EXACTLY ONE consumer. Wrong for this use case." },
+        { id: "r-push-coupling", text: "A push subscription that calls multiple HTTP endpoints is a valid approach but tightly couples Pub/Sub to the downstream service endpoints and requires all services to have HTTP endpoints." },
+        { id: "r-ordering-irrelevant", text: "Message ordering ensures sequential delivery within an ordering key — it has no effect on which consumers receive messages. The topology mismatch is the problem, not ordering." },
+      ],
+      correctRationaleId: "r-fan-out-correct",
+      feedback: {
+        perfect: "Correct! Fan-out in Pub/Sub means multiple subscriptions on the same topic. Each subscription gets every message independently. One subscription per consumer service is the canonical pattern.",
+        partial: "Your approach works, but 3 separate subscriptions is the cleanest solution. It decouples services, allows independent scaling, and each service manages its own acknowledgement and retry policy.",
+        wrong: "One subscription = one stream of messages where each message goes to one consumer. To have 3 services each receive every message, you need 3 subscriptions — one per service. This is fan-out.",
+      },
+    },
+    {
+      type: "action-rationale",
+      id: "ps-scenario-2",
+      title: "Poison Message Blocking the Queue",
+      context:
+        "A Cloud Functions consumer processes payment webhook events from Pub/Sub. One malformed message (invalid JSON payload) is causing the function to throw an exception on every attempt. Because it never acknowledges the message, Pub/Sub keeps redelivering it, and no new messages are being processed. The subscription is 12 hours behind.",
+      displayFields: [
+        { label: "Subscription Backlog", value: "12 hours of unprocessed payments", emphasis: "critical" },
+        { label: "Oldest Unacked Message Age", value: "4 hours (the poison message)", emphasis: "critical" },
+        { label: "Function Error", value: "JSON parse error on payment_webhook_events-sub", emphasis: "warn" },
+        { label: "Delivery Attempts on Poison Message", value: "1,440 attempts", emphasis: "critical" },
+        { label: "Dead Letter Topic Configured", value: "No", emphasis: "warn" },
+        { label: "Max Delivery Attempts Setting", value: "Unlimited (default)", emphasis: "warn" },
+      ],
+      actions: [
+        { id: "configure-dead-letter", label: "Configure a dead-letter topic with max delivery attempts = 5", color: "green" },
+        { id: "manually-seek-forward", label: "Use gcloud pubsub subscriptions seek to skip the poison message", color: "blue" },
+        { id: "increase-ack-deadline", label: "Increase acknowledgement deadline to give the function more time to parse", color: "orange" },
+        { id: "delete-subscription", label: "Delete and recreate the subscription to clear the backlog", color: "red" },
+      ],
+      correctActionId: "configure-dead-letter",
+      rationales: [
+        { id: "r-dead-letter-permanent", text: "A dead-letter topic (DLT) is the permanent architectural fix. Messages that fail max-delivery-attempts are moved to the DLT automatically. The queue unblocks and normal messages continue processing. Failed messages in the DLT can be inspected and replayed." },
+        { id: "r-seek-immediate", text: "gcloud pubsub subscriptions seek to a timestamp is a valid immediate triage action to skip the current poison message, but without a DLT, the next malformed message will cause the same outage." },
+        { id: "r-ack-deadline-wrong", text: "The error is a JSON parse exception, not a timeout — the function fails instantly. A longer ack deadline doesn't help with parsing errors; it just delays redelivery." },
+        { id: "r-delete-subscription-bad", text: "Deleting the subscription destroys all unprocessed messages in the backlog — including 12 hours of payment events. This would cause massive data loss." },
+      ],
+      correctRationaleId: "r-dead-letter-permanent",
+      feedback: {
+        perfect: "Correct! The dead-letter topic is the proper solution for poison messages. Set max-delivery-attempts to 5, attach a DLT, and the queue automatically unblocks when a bad message exhausts its retries.",
+        partial: "You found a way to unblock the queue, but without a dead-letter topic, the next malformed message causes the same outage. The DLT is the permanent architectural fix.",
+        wrong: "The root cause is unlimited delivery attempts on a poison message with no dead-letter topic. Configure a DLT with max-delivery-attempts=5 — after 5 failed attempts, the message moves to the DLT and the queue unblocks.",
+      },
+    },
+    {
+      type: "action-rationale",
+      id: "ps-scenario-3",
+      title: "Message Ordering for Financial Transactions",
+      context:
+        "A banking application publishes account balance update events to Pub/Sub. The consumer updates balances in Cloud SQL. Events are occasionally arriving out of order at the consumer — a debit arriving before the corresponding credit — causing incorrect balance calculations. The current subscription has ordering disabled.",
+      displayFields: [
+        { label: "Topic", value: "account-events", emphasis: "normal" },
+        { label: "Publisher", value: "banking-core-service", emphasis: "normal" },
+        { label: "Message Ordering", value: "Disabled", emphasis: "critical" },
+        { label: "Out-of-Order Events Detected (last 24h)", value: "342", emphasis: "critical" },
+        { label: "Ordering Key Available", value: "account_id field in message attributes", emphasis: "normal" },
+        { label: "Consumer Count", value: "3 subscriber instances", emphasis: "normal" },
+      ],
+      actions: [
+        { id: "enable-ordering-key", label: "Enable message ordering and set ordering key to account_id", color: "green" },
+        { id: "add-sequence-number", label: "Add a sequence_number to each message, sort in-memory before processing", color: "yellow" },
+        { id: "increase-consumers", label: "Reduce to 1 consumer instance for strict ordering across all messages", color: "orange" },
+        { id: "use-cloud-tasks", label: "Replace Pub/Sub with Cloud Tasks for ordered delivery", color: "blue" },
+      ],
+      correctActionId: "enable-ordering-key",
+      rationales: [
+        { id: "r-ordering-key-correct", text: "Pub/Sub message ordering guarantees that messages with the same ordering key are delivered in the order they were published, when both the topic and subscription have ordering enabled. Using account_id as the key ensures all events for a given account are in order." },
+        { id: "r-sequence-fragile", text: "In-memory sequence sorting is fragile — it requires knowing when a 'gap' in sequence numbers is a delay vs a lost message. Pub/Sub ordering is a built-in platform guarantee, not an application-layer workaround." },
+        { id: "r-one-consumer-wrong", text: "Single consumer ordering would serialize all account events through one instance — eliminating parallelism. Pub/Sub ordering keys allow parallelism across different account_ids while maintaining order within each account." },
+        { id: "r-cloud-tasks-wrong", text: "Cloud Tasks is for task queuing with explicit scheduling and targeting — not for event streaming with per-key ordering. Pub/Sub message ordering is the correct GCP-native solution." },
+      ],
+      correctRationaleId: "r-ordering-key-correct",
+      feedback: {
+        perfect: "Exactly right! Pub/Sub ordering keys ensure per-key FIFO delivery. Events for account_id=12345 will always arrive in publish order, while events for different accounts process in parallel.",
+        partial: "Your approach handles ordering in some cases, but Pub/Sub's built-in ordering key feature is more reliable and doesn't require application-level sorting logic.",
+        wrong: "Pub/Sub supports message ordering via ordering keys — when enabled, all messages with the same ordering key are delivered in publish order. Set account_id as the ordering key and enable ordering on the subscription.",
+      },
+    },
+  ],
+  hints: [
+    "Fan-out in Pub/Sub is achieved at the subscription level — create one subscription per consuming service. A single subscription with multiple consumers is the competing consumers pattern (load-balanced delivery).",
+    "Always configure a dead-letter topic (DLT) for subscriptions that process business-critical messages. Set max-delivery-attempts to 3–5. Without a DLT, one malformed message can permanently block your queue.",
+    "Pub/Sub message ordering guarantees FIFO delivery per ordering key, not globally. Use a business entity ID (account_id, order_id) as the ordering key to maintain per-entity ordering while preserving parallel processing for different entities.",
+  ],
+  scoring: {
+    maxScore: 100,
+    hintPenalty: 5,
+    penalties: { perfect: 0, partial: 10, wrong: 20 },
+    passingThresholds: { pass: 80, partial: 50 },
+  },
+  careerInsight:
+    "Pub/Sub is GCP's backbone for event-driven architectures. Understanding fan-out vs competing consumer patterns, dead-letter handling, and ordering keys separates junior engineers from senior ones in system design interviews. These patterns appear repeatedly in microservices, data pipelines, and real-time processing architectures.",
+  toolRelevance: ["GCP Console (Pub/Sub)", "gcloud pubsub CLI", "Cloud Monitoring (Pub/Sub metrics)", "Cloud Functions", "Cloud Run"],
+  createdAt: "2026-03-28",
+  updatedAt: "2026-03-28",
+};

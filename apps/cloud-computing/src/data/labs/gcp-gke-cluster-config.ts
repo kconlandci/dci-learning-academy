@@ -1,0 +1,266 @@
+import type { LabManifest } from "../../types/manifest";
+
+export const gcpGkeClusterConfigLab: LabManifest = {
+  schemaVersion: "1.1",
+  id: "gcp-gke-cluster-config",
+  version: 1,
+  title: "GKE Cluster Configuration Best Practices",
+  tier: "beginner",
+  track: "gcp-essentials",
+  difficulty: "moderate",
+  accessLevel: "free",
+  tags: ["gcp", "gke", "kubernetes", "cluster-autoscaler", "node-pools", "autopilot"],
+  description:
+    "Configure GKE cluster settings for production readiness including node pool autoscaling, release channels, Workload Identity, and the choice between Autopilot and Standard mode.",
+  estimatedMinutes: 13,
+  learningObjectives: [
+    "Choose between GKE Autopilot and Standard mode based on operational requirements",
+    "Configure node pool autoscaling with appropriate min/max node counts",
+    "Enable and configure release channels for automated Kubernetes version management",
+    "Apply GKE security hardening settings including Workload Identity and Binary Authorization",
+  ],
+  sortOrder: 307,
+  status: "published",
+  prerequisites: [],
+  rendererType: "toggle-config",
+  scenarios: [
+    {
+      type: "toggle-config",
+      id: "gke-scenario-1",
+      title: "New Production Cluster Settings",
+      description:
+        "Your team is provisioning a new GKE cluster for a production microservices application. The cluster will run 15 microservices with varied resource requirements. A junior engineer has set several incorrect defaults. Toggle each setting to the correct production-ready value.",
+      targetSystem: "GKE Cluster Configuration",
+      items: [
+        {
+          id: "cluster-mode",
+          label: "Cluster Mode",
+          detail: "Team of 5 engineers, no Kubernetes node management expertise. Want to focus on application deployment, not node maintenance.",
+          currentState: "Standard (self-managed nodes)",
+          correctState: "Autopilot",
+          states: ["Standard (self-managed nodes)", "Autopilot"],
+          rationaleId: "r-autopilot-teams",
+        },
+        {
+          id: "release-channel",
+          label: "Release Channel",
+          detail: "Production cluster — needs security patches automatically but must avoid bleeding-edge experimental features.",
+          currentState: "None (no auto-upgrade)",
+          correctState: "Regular",
+          states: ["None (no auto-upgrade)", "Rapid", "Regular", "Stable"],
+          rationaleId: "r-regular-channel",
+        },
+        {
+          id: "workload-identity",
+          label: "Workload Identity",
+          detail: "Pods need to access Cloud Storage and Pub/Sub. Currently using service account key files mounted as Kubernetes Secrets.",
+          currentState: "Disabled",
+          correctState: "Enabled",
+          states: ["Enabled", "Disabled"],
+          rationaleId: "r-workload-identity-gke",
+        },
+        {
+          id: "private-cluster",
+          label: "Cluster Visibility",
+          detail: "Cluster nodes should not have public IP addresses. Only the control plane should be accessible from the VPN.",
+          currentState: "Public cluster (nodes have public IPs)",
+          correctState: "Private cluster (no public IPs on nodes)",
+          states: ["Public cluster (nodes have public IPs)", "Private cluster (no public IPs on nodes)"],
+          rationaleId: "r-private-cluster",
+        },
+        {
+          id: "vertical-pod-autoscaling",
+          label: "Vertical Pod Autoscaler (VPA)",
+          detail: "Resource requests/limits for pods are set manually and frequently cause either OOM kills or over-provisioning.",
+          currentState: "Disabled",
+          correctState: "Enabled (recommendation mode)",
+          states: ["Disabled", "Enabled (recommendation mode)", "Enabled (auto mode)", "Enabled (initial mode)"],
+          rationaleId: "r-vpa-recommend",
+        },
+      ],
+      rationales: [
+        {
+          id: "r-autopilot-teams",
+          text: "GKE Autopilot manages node provisioning, scaling, and upgrades automatically. For teams without deep Kubernetes node expertise, Autopilot reduces operational burden while providing SLA-backed infrastructure. Standard mode requires managing node pools, instance types, and upgrade windows.",
+        },
+        {
+          id: "r-regular-channel",
+          text: "The Regular release channel delivers Kubernetes versions after they've been validated in Rapid for approximately 2–3 months. It provides automatic security patches without bleeding-edge instability. 'None' means manual upgrades — a common source of security vulnerabilities.",
+        },
+        {
+          id: "r-workload-identity-gke",
+          text: "Workload Identity binds a Kubernetes Service Account to a GCP Service Account, allowing pods to authenticate to GCP APIs without key files. Key files in Kubernetes Secrets are base64-encoded and readable by anyone with Secret access in the namespace.",
+        },
+        {
+          id: "r-private-cluster",
+          text: "Private clusters assign only internal IP addresses to nodes. This eliminates direct internet exposure of node VMs. The control plane can be restricted to specific CIDR ranges (e.g., corporate VPN). This is the GKE security baseline for production.",
+        },
+        {
+          id: "r-vpa-recommend",
+          text: "VPA recommendation mode suggests optimal CPU/memory requests without automatically changing them — ideal for teams learning the right values. Auto mode changes live pod resources, which can cause pod restarts; use with caution in production initially.",
+        },
+      ],
+      feedback: {
+        perfect: "All five settings correctly configured for production! Autopilot, Regular channel, Workload Identity, private networking, and VPA recommendations form a solid GKE production baseline.",
+        partial: "Most settings are correct. Review the misconfigured items — each represents either a security risk or operational burden that will cause problems in production.",
+        wrong: "Production GKE clusters need: Autopilot for operational simplicity, Regular channel for auto-patching, Workload Identity to eliminate key files, private nodes for security, and VPA for resource right-sizing.",
+      },
+    },
+    {
+      type: "toggle-config",
+      id: "gke-scenario-2",
+      title: "Node Pool Autoscaling Configuration",
+      description:
+        "Your GKE Standard cluster has three node pools with incorrect autoscaling settings. The cluster runs a mix of stateless web services, batch ML training jobs, and a stateful Redis cache. Toggle each node pool to the correct configuration.",
+      targetSystem: "GKE Node Pool Autoscaling",
+      items: [
+        {
+          id: "web-pool",
+          label: "web-pool (n2-standard-4, stateless HTTP services, scales with traffic)",
+          detail: "Serves live user traffic. Must have at least 2 nodes at all times for HA. Should scale up to 50 during peak. Currently: min=0, max=100.",
+          currentState: "min=0, max=100, autoscaling=enabled",
+          correctState: "min=2, max=50, autoscaling=enabled",
+          states: [
+            "min=0, max=100, autoscaling=enabled",
+            "min=2, max=50, autoscaling=enabled",
+            "min=1, max=50, autoscaling=enabled",
+            "min=2, max=100, autoscaling=disabled",
+          ],
+          rationaleId: "r-web-pool-min2",
+        },
+        {
+          id: "ml-pool",
+          label: "ml-pool (a2-highgpu-1g, ML training jobs, runs overnight only)",
+          detail: "GPU node pool for ML training. Jobs run 10pm–6am. GPUs are expensive; zero nodes during day is acceptable. Max 10 GPU nodes. Currently: min=3, max=10.",
+          currentState: "min=3, max=10, autoscaling=enabled",
+          correctState: "min=0, max=10, autoscaling=enabled",
+          states: [
+            "min=3, max=10, autoscaling=enabled",
+            "min=0, max=10, autoscaling=enabled",
+            "min=1, max=10, autoscaling=enabled",
+            "min=0, max=5, autoscaling=enabled",
+          ],
+          rationaleId: "r-ml-pool-min0",
+        },
+        {
+          id: "redis-pool",
+          label: "redis-pool (n2-highmem-4, stateful Redis StatefulSet, 3 replicas)",
+          detail: "Redis cluster runs as a StatefulSet with 3 replicas, one per node. Requires exactly 3 nodes. Data stored on persistent disks.",
+          currentState: "min=1, max=10, autoscaling=enabled",
+          correctState: "min=3, max=3, autoscaling=disabled",
+          states: [
+            "min=1, max=10, autoscaling=enabled",
+            "min=3, max=10, autoscaling=enabled",
+            "min=3, max=3, autoscaling=disabled",
+            "min=0, max=3, autoscaling=enabled",
+          ],
+          rationaleId: "r-redis-pool-fixed",
+        },
+      ],
+      rationales: [
+        {
+          id: "r-web-pool-min2",
+          text: "Stateless web services need at least 2 nodes for high availability (spread across zones). min=0 risks a cold start delay when traffic arrives. max=50 is a realistic cap based on actual peak; max=100 risks over-scaling costs.",
+        },
+        {
+          id: "r-ml-pool-min0",
+          text: "GPU nodes are expensive ($2.50+/hour for A2). min=3 means you pay for 3 idle GPU nodes 16+ hours/day when no ML jobs are running. min=0 allows complete scale-down during the day. GKE Cluster Autoscaler will provision GPU nodes when ML jobs are scheduled.",
+        },
+        {
+          id: "r-redis-pool-fixed",
+          text: "Stateful applications like Redis should have autoscaling disabled with a fixed min=max=3. Autoscaling can evict Redis pods during scale-down, causing data loss. The StatefulSet requires exactly 3 nodes — no more, no less.",
+        },
+      ],
+      feedback: {
+        perfect: "Perfect node pool configuration! You correctly identified that stateless services need HA minimums, GPU pools should scale to zero, and stateful services need fixed-size pools.",
+        partial: "Some node pools are correctly configured. The key insight: autoscaling behavior must match the workload type — stateless (HA floor), batchable (zero floor), stateful (fixed size).",
+        wrong: "Different workload types need different autoscaling policies. Stateless web = min≥2 for HA. GPU batch = min=0 for cost. Stateful Redis = fixed size, autoscaling disabled to prevent eviction.",
+      },
+    },
+    {
+      type: "toggle-config",
+      id: "gke-scenario-3",
+      title: "GKE Security Hardening Settings",
+      description:
+        "A GKE security audit has flagged several cluster-level security settings. Toggle each setting to meet the CIS GKE Benchmark baseline.",
+      targetSystem: "GKE Security Configuration",
+      items: [
+        {
+          id: "shielded-nodes",
+          label: "Shielded GKE Nodes",
+          detail: "Protects against rootkit and bootkit attacks by verifying the integrity of GKE node boot sequences.",
+          currentState: "Disabled",
+          correctState: "Enabled",
+          states: ["Enabled", "Disabled"],
+          rationaleId: "r-shielded-nodes",
+        },
+        {
+          id: "legacy-metadata",
+          label: "Legacy Metadata API (v0.1)",
+          detail: "The legacy metadata server allows pods to access node-level metadata without restriction.",
+          currentState: "Enabled",
+          correctState: "Disabled",
+          states: ["Enabled", "Disabled"],
+          rationaleId: "r-legacy-metadata",
+        },
+        {
+          id: "network-policy",
+          label: "Network Policy (Calico)",
+          detail: "By default, all pods in a GKE cluster can communicate with all other pods. Network Policy enforces pod-to-pod traffic restrictions.",
+          currentState: "Disabled",
+          correctState: "Enabled",
+          states: ["Enabled", "Disabled"],
+          rationaleId: "r-network-policy",
+        },
+        {
+          id: "binary-authorization",
+          label: "Binary Authorization",
+          detail: "Ensures only container images that have been signed by a trusted authority can run in the cluster.",
+          currentState: "Disabled",
+          correctState: "Enabled (dry-run mode initially)",
+          states: ["Disabled", "Enabled (dry-run mode initially)", "Enabled (enforcement mode)", "Enabled (audit mode)"],
+          rationaleId: "r-binary-auth",
+        },
+      ],
+      rationales: [
+        {
+          id: "r-shielded-nodes",
+          text: "Shielded GKE Nodes use Secure Boot, vTPM, and Integrity Monitoring to verify node boot integrity. This prevents an attacker who compromises a node from installing persistent rootkits that survive reboots.",
+        },
+        {
+          id: "r-legacy-metadata",
+          text: "The legacy metadata API (v0.1) allows any pod to query node-level metadata including service account tokens. The v1 metadata API with metadata concealment should be used instead, which restricts pod access to only their own metadata.",
+        },
+        {
+          id: "r-network-policy",
+          text: "Without Network Policy, a compromised pod can reach any other pod in the cluster. Network Policy implements microsegmentation at the pod level — only allow traffic that's explicitly permitted between services.",
+        },
+        {
+          id: "r-binary-auth",
+          text: "Binary Authorization prevents unsigned or unverified container images from running. Start with dry-run mode to identify which images would be blocked before switching to enforcement, avoiding accidental cluster breakage.",
+        },
+      ],
+      feedback: {
+        perfect: "Excellent security hardening! These four settings together form a strong defense-in-depth posture for GKE — node integrity, metadata isolation, network segmentation, and image trust.",
+        partial: "Most security settings are correct. Each unconfigured item leaves a specific attack vector open — review the rationale for any you missed.",
+        wrong: "GKE security hardening requires enabling Shielded Nodes, disabling legacy metadata, enforcing Network Policy, and using Binary Authorization — these are the CIS GKE Benchmark baseline controls.",
+      },
+    },
+  ],
+  hints: [
+    "GKE Autopilot manages nodes for you — it's the recommended mode for teams without dedicated Kubernetes infrastructure engineers. Standard mode gives more control but requires managing node pools, upgrades, and sizing manually.",
+    "For stateful workloads (Redis, Kafka, databases), disable Cluster Autoscaler on that node pool. Autoscaler can evict pods during scale-down, which destroys in-memory state unless carefully handled.",
+    "Release channels automate Kubernetes version upgrades with security patches. 'None' means you must manually upgrade — this is how most clusters fall behind on security patches. Use 'Regular' for production.",
+  ],
+  scoring: {
+    maxScore: 100,
+    hintPenalty: 5,
+    penalties: { perfect: 0, partial: 10, wrong: 20 },
+    passingThresholds: { pass: 80, partial: 50 },
+  },
+  careerInsight:
+    "GKE is the most widely deployed managed Kubernetes service on GCP and Kubernetes expertise is one of the most sought-after cloud skills globally. Engineers who can configure GKE clusters with production best practices — security hardening, autoscaling strategies, and Workload Identity — command premium salaries in cloud-native and platform engineering roles.",
+  toolRelevance: ["GCP Console (GKE)", "gcloud container CLI", "kubectl", "GKE Security Posture", "CIS GKE Benchmark"],
+  createdAt: "2026-03-28",
+  updatedAt: "2026-03-28",
+};

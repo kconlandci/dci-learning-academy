@@ -1,0 +1,145 @@
+import type { LabManifest } from "../../types/manifest";
+
+export const awsKinesisStreamingLab: LabManifest = {
+  schemaVersion: "1.1",
+  id: "aws-kinesis-streaming",
+  version: 1,
+  title: "AWS Kinesis Data Streaming",
+  tier: "advanced",
+  track: "aws-core",
+  difficulty: "challenging",
+  accessLevel: "free",
+  tags: ["aws", "kinesis", "streaming", "real-time", "data-pipeline", "shards"],
+  description:
+    "Design Kinesis Data Streams configurations with proper shard counts, partition key strategies, and consumer scaling to handle high-throughput real-time data ingestion without hot shards or consumer lag.",
+  estimatedMinutes: 12,
+  learningObjectives: [
+    "Calculate shard counts based on ingestion and consumption throughput requirements",
+    "Design partition key strategies that prevent hot shards",
+    "Configure enhanced fan-out consumers for low-latency parallel processing",
+    "Troubleshoot consumer lag caused by uneven shard distribution",
+    "Understand the trade-offs between Kinesis Data Streams and Kinesis Data Firehose",
+  ],
+  sortOrder: 115,
+  status: "published",
+  prerequisites: [],
+  rendererType: "action-rationale",
+  scenarios: [
+    {
+      type: "action-rationale",
+      id: "kinesis-s1",
+      title: "Shard Count Planning for IoT Telemetry",
+      context:
+        "You are designing a Kinesis Data Stream to ingest IoT sensor telemetry from 10,000 devices. Each device sends a 1 KB message every second (10 MB/s total ingestion). You need two consumer applications: one writing to S3 via Lambda, another feeding a real-time dashboard via Kinesis Analytics. Each shard supports 1 MB/s write and 2 MB/s read throughput.",
+      displayFields: [
+        { label: "Ingestion Rate", value: "10 MB/s (10,000 devices x 1 KB/s)", emphasis: "critical" },
+        { label: "Write Capacity per Shard", value: "1 MB/s", emphasis: "normal" },
+        { label: "Read Capacity per Shard", value: "2 MB/s (shared across consumers)", emphasis: "warn" },
+        { label: "Consumer Applications", value: "2 (S3 writer + real-time dashboard)", emphasis: "normal" },
+        { label: "Record Size", value: "1 KB per message", emphasis: "normal" },
+      ],
+      actions: [
+        { id: "12-shards-fan-out", label: "Provision 12 shards with enhanced fan-out for both consumers", color: "green" },
+        { id: "10-shards-shared", label: "Provision exactly 10 shards with standard shared throughput consumers", color: "orange" },
+        { id: "5-shards-batch", label: "Provision 5 shards and batch records to reduce write volume", color: "red" },
+        { id: "20-shards-overprovision", label: "Provision 20 shards to avoid any potential throughput issues", color: "yellow" },
+      ],
+      correctActionId: "12-shards-fan-out",
+      rationales: [
+        { id: "r-12-shards-fan-out", text: "10 MB/s write needs at least 10 shards (10 MB / 1 MB per shard). Adding 20% headroom gives 12 shards, which handles traffic spikes without throttling. Enhanced fan-out gives each consumer a dedicated 2 MB/s per shard read pipe, so the two consumers do not compete for the shared 2 MB/s read limit." },
+        { id: "r-10-shards-tight", text: "Exactly 10 shards runs at 100% write capacity with zero headroom. Any traffic spike causes WriteProvisionedThroughputExceeded errors. Additionally, with shared throughput, two consumers splitting 2 MB/s per shard creates read contention and increased latency for the real-time dashboard." },
+        { id: "r-5-shards-insufficient", text: "5 shards provide only 5 MB/s write capacity — half of what is needed. Batching records does not reduce the byte throughput; it only reduces the number of API calls. The 10 MB/s of data still must flow through the shards." },
+        { id: "r-20-shards-wasteful", text: "20 shards provide 20 MB/s write capacity — double the requirement. While this works, the cost is nearly double what is needed. Kinesis charges per shard-hour, so over-provisioning by 100% is a significant ongoing expense with no operational benefit over 12 shards." },
+      ],
+      correctRationaleId: "r-12-shards-fan-out",
+      feedback: {
+        perfect: "Correct. 12 shards provides the right capacity with headroom, and enhanced fan-out eliminates read contention between the two consumers. This is the cost-effective, operationally sound configuration.",
+        partial: "Over-provisioning works but wastes budget. Under-provisioning with shared consumers creates throttling and contention. The key is calculating shards from throughput requirements plus headroom, and using enhanced fan-out for multiple consumers.",
+        wrong: "Batching does not reduce byte throughput — only API call counts. Under-provisioning will cause persistent throttling errors that cascade into data loss or increased producer retry latency.",
+      },
+    },
+    {
+      type: "action-rationale",
+      id: "kinesis-s2",
+      title: "Partition Key Strategy for Order Processing",
+      context:
+        "Your Kinesis stream processes e-commerce orders. The current partition key is the customer region (us-east, us-west, eu-west, ap-southeast — 4 values). The stream has 8 shards but CloudWatch shows that 2 shards handle 80% of the traffic while 6 shards are nearly idle. The 2 hot shards correspond to 'us-east' and 'eu-west' regions where most customers are located.",
+      displayFields: [
+        { label: "Current Partition Key", value: "Customer region (4 values for 8 shards)", emphasis: "critical" },
+        { label: "Shard Count", value: "8 shards", emphasis: "normal" },
+        { label: "Hot Shards", value: "2 out of 8 (handling 80% of traffic)", emphasis: "critical" },
+        { label: "Ordering Requirement", value: "Orders from the same customer must be processed in order", emphasis: "warn" },
+        { label: "CloudWatch IncomingBytes", value: "Hot shards at 95% capacity, others at 10%", emphasis: "critical" },
+      ],
+      actions: [
+        { id: "partition-by-customer-id", label: "Change partition key to customer ID for even distribution while preserving per-customer ordering", color: "green" },
+        { id: "partition-by-order-id", label: "Change partition key to order ID for maximum randomness across shards", color: "yellow" },
+        { id: "add-more-shards", label: "Double shards to 16 to absorb the hot shard traffic", color: "orange" },
+        { id: "partition-by-region-subkey", label: "Append a random suffix to the region key (us-east-1, us-east-2, etc.)", color: "yellow" },
+      ],
+      correctActionId: "partition-by-customer-id",
+      rationales: [
+        { id: "r-customer-id-balanced", text: "Customer ID provides high cardinality (thousands or millions of unique values) ensuring even distribution across all 8 shards via consistent hashing. It also preserves per-customer ordering — all orders from the same customer hash to the same shard and are processed in sequence. This satisfies both requirements." },
+        { id: "r-order-id-no-ordering", text: "Order ID gives excellent distribution but breaks per-customer ordering. Two orders from the same customer could land on different shards and be processed out of order, which violates the ordering requirement for operations like refunds that depend on original order state." },
+        { id: "r-more-shards-doesnt-fix", text: "Adding shards does not fix partition key skew. The same 4 region values still hash to a subset of shards. Splitting a hot shard may help temporarily, but the fundamental problem — low cardinality partition keys — creates perpetual imbalance regardless of shard count." },
+        { id: "r-random-suffix-breaks-ordering", text: "Appending a random suffix to the region key (us-east-1, us-east-2) distributes traffic better but breaks ordering within a region. A customer whose orders alternate between us-east-1 and us-east-2 suffixes will have orders processed on different shards out of order." },
+      ],
+      correctRationaleId: "r-customer-id-balanced",
+      feedback: {
+        perfect: "Correct. Customer ID is the ideal partition key — high cardinality for even shard distribution and natural per-customer ordering preservation. This eliminates hot shards without breaking ordering guarantees.",
+        partial: "Order ID distributes well but breaks ordering. Random suffixes also break ordering. The partition key must align with the ordering requirement while providing enough cardinality for even distribution.",
+        wrong: "Adding shards does not fix low-cardinality partition key skew. The same 4 region values will continue to create hot shards regardless of how many shards exist.",
+      },
+    },
+    {
+      type: "action-rationale",
+      id: "kinesis-s3",
+      title: "Consumer Lag Investigation and Scaling",
+      context:
+        "Your Kinesis stream processes clickstream data with 16 shards. A Lambda consumer processes events and writes to DynamoDB. CloudWatch shows GetRecords.IteratorAgeMilliseconds climbing steadily — it was 30 seconds an hour ago and is now at 8 minutes. The Lambda function takes 200ms per invocation and processes 500 records per batch. The stream ingestion rate has not changed.",
+      displayFields: [
+        { label: "Iterator Age", value: "8 minutes and climbing (was 30s one hour ago)", emphasis: "critical" },
+        { label: "Shard Count", value: "16 shards", emphasis: "normal" },
+        { label: "Lambda Duration", value: "200ms per invocation", emphasis: "normal" },
+        { label: "Batch Size", value: "500 records per batch", emphasis: "normal" },
+        { label: "DynamoDB Writes", value: "BatchWriteItem — intermittent throttling errors in logs", emphasis: "critical" },
+        { label: "Lambda Concurrency", value: "16 (one per shard, Kinesis event source mapping)", emphasis: "warn" },
+      ],
+      actions: [
+        { id: "fix-dynamodb-throttling", label: "Increase DynamoDB write capacity and add retry with exponential backoff in the Lambda function", color: "green" },
+        { id: "add-more-shards", label: "Double shards to 32 to increase parallelism and reduce per-shard volume", color: "orange" },
+        { id: "increase-batch-size", label: "Increase Lambda batch size to 1000 records to process more data per invocation", color: "yellow" },
+        { id: "add-lambda-concurrency", label: "Increase Lambda reserved concurrency to 32 to allow more parallel processing", color: "red" },
+      ],
+      correctActionId: "fix-dynamodb-throttling",
+      rationales: [
+        { id: "r-dynamodb-root-cause", text: "The intermittent DynamoDB throttling is the root cause. When BatchWriteItem is throttled, the Lambda function retries or fails, increasing processing time per batch. This cascading delay causes the iterator age to climb. Fixing DynamoDB capacity (switching to on-demand or increasing provisioned WCU) and adding proper retry logic eliminates the bottleneck without changing the stream architecture." },
+        { id: "r-more-shards-wrong-bottleneck", text: "Adding shards increases parallelism, but the bottleneck is DynamoDB throttling, not shard throughput. Doubling shards would double the Lambda concurrency hitting DynamoDB, potentially making throttling worse — not better." },
+        { id: "r-batch-size-marginal", text: "Larger batches process more records per invocation, which slightly improves throughput. But if DynamoDB throttles a larger BatchWriteItem, the entire batch fails and must be retried — potentially making the problem worse by increasing the blast radius of each throttle event." },
+        { id: "r-lambda-concurrency-wrong", text: "Kinesis event source mappings use one Lambda invocation per shard. Increasing reserved concurrency does not change this — the parallelism is bounded by shard count, not Lambda concurrency settings. The 16 concurrent invocations match the 16 shards." },
+      ],
+      correctRationaleId: "r-dynamodb-root-cause",
+      feedback: {
+        perfect: "Correct root cause analysis. DynamoDB throttling is causing cascading Lambda delays, which manifests as climbing iterator age. Fix the downstream bottleneck first — the stream and Lambda configuration are fine.",
+        partial: "Larger batches or more shards address symptoms but not the root cause. The DynamoDB throttling in the logs is the key signal — when the downstream write target throttles, all upstream processing backs up.",
+        wrong: "Lambda concurrency for Kinesis is one invocation per shard — you cannot increase it independently. The investigation data clearly shows DynamoDB throttling, which is the actual bottleneck.",
+      },
+    },
+  ],
+  hints: [
+    "Shard count = max(ingestion MB/s / 1, consumption MB/s / 2). Always add 10-20% headroom above the calculated minimum to handle traffic spikes.",
+    "Partition keys should have high cardinality (thousands of unique values) to distribute evenly across shards. Low-cardinality keys like region or status create hot shards.",
+    "When iterator age climbs but ingestion rate is stable, the bottleneck is usually downstream — check the consumer's write targets (DynamoDB, S3, etc.) for throttling or errors before adding shards.",
+  ],
+  scoring: {
+    maxScore: 100,
+    hintPenalty: 5,
+    penalties: { perfect: 0, partial: 10, wrong: 20 },
+    passingThresholds: { pass: 80, partial: 50 },
+  },
+  careerInsight:
+    "Real-time streaming architectures are increasingly central to modern data platforms. Engineers who can right-size Kinesis streams, design partition key strategies that prevent hot shards, and diagnose consumer lag by tracing bottlenecks through the entire pipeline are essential for companies building event-driven architectures at scale.",
+  toolRelevance: ["AWS Kinesis Console", "CloudWatch Metrics", "AWS Lambda Console", "AWS CLI", "DynamoDB Console"],
+  createdAt: "2026-03-28",
+  updatedAt: "2026-03-28",
+};

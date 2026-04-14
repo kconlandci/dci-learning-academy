@@ -1,0 +1,257 @@
+import type { LabManifest } from "../../types/manifest";
+
+export const apiGatewayDesignLab: LabManifest = {
+  schemaVersion: "1.1",
+  id: "api-gateway-design",
+  version: 1,
+  title: "API Gateway Design",
+  tier: "intermediate",
+  track: "cloud-architecture",
+  difficulty: "moderate",
+  accessLevel: "free",
+  tags: ["api-gateway", "rate-limiting", "authentication", "routing", "backend-for-frontend"],
+  description:
+    "Configure an API gateway layer for a microservices platform by enabling the correct routing, authentication, rate limiting, and protocol transformation settings.",
+  estimatedMinutes: 18,
+  learningObjectives: [
+    "Apply rate limiting and throttling policies to protect backend services",
+    "Configure authentication and authorization at the gateway layer",
+    "Design backend-for-frontend (BFF) patterns for different client types",
+    "Select appropriate protocol transformation settings for legacy and modern backends",
+  ],
+  sortOrder: 408,
+  status: "published",
+  prerequisites: [],
+  rendererType: "toggle-config",
+  scenarios: [
+    {
+      type: "toggle-config",
+      id: "apigw-security-config",
+      title: "API Gateway Security Configuration",
+      description:
+        "Your API gateway fronts 12 microservices for a B2B SaaS platform. Review each security-related configuration setting and toggle it to the correct state to harden the gateway against common threats.",
+      targetSystem: "B2B SaaS API Gateway",
+      items: [
+        {
+          id: "auth-enforcement",
+          label: "Authentication Enforcement",
+          detail: "Currently: some endpoints allow unauthenticated access for 'ease of testing.' Three internal health-check endpoints and two legacy webhook endpoints pass through without JWT validation. The platform has had two unauthorized data access incidents in 90 days.",
+          currentState: "selective-auth",
+          correctState: "enforce-all-with-exemption-list",
+          states: ["no-auth", "selective-auth", "enforce-all-with-exemption-list", "mTLS-only"],
+          rationaleId: "rat-auth",
+        },
+        {
+          id: "rate-limiting",
+          label: "API Rate Limiting Policy",
+          detail: "Currently: no rate limits configured. Last month a misconfigured client script sent 50,000 requests in 2 minutes, exhausting the backend connection pool and causing a 12-minute outage. Different API consumers have different tiers (free: 100/min, pro: 1000/min, enterprise: unlimited).",
+          currentState: "disabled",
+          correctState: "per-consumer-tier",
+          states: ["disabled", "global-flat-limit", "per-consumer-tier", "adaptive-throttling"],
+          rationaleId: "rat-rate",
+        },
+        {
+          id: "cors-policy",
+          label: "CORS Allowed Origins Policy",
+          detail: "Current CORS configuration: Access-Control-Allow-Origin: * (wildcard). The API handles authenticated requests that include session cookies. A security audit flagged that wildcard CORS with credentialed requests is a misconfiguration that enables cross-site request forgery.",
+          currentState: "wildcard-cors",
+          correctState: "explicit-allowlist",
+          states: ["wildcard-cors", "explicit-allowlist", "cors-disabled", "origin-reflect"],
+          rationaleId: "rat-cors",
+        },
+        {
+          id: "request-size",
+          label: "Maximum Request Body Size",
+          detail: "Currently: no request size limit. The /api/upload endpoint has received 4 GB payloads that caused out-of-memory crashes on backend services. Legitimate uploads are under 10 MB. File upload is handled by a separate dedicated service.",
+          currentState: "unlimited",
+          correctState: "10mb-limit",
+          states: ["unlimited", "1mb-limit", "10mb-limit", "100mb-limit"],
+          rationaleId: "rat-size",
+        },
+        {
+          id: "tls-version",
+          label: "Minimum TLS Version",
+          detail: "Currently accepting TLS 1.0, 1.1, and 1.2 for backwards compatibility with older API clients. A recent PCI-DSS audit requires TLS 1.2 or higher. Telemetry shows 0.3% of requests use TLS 1.0/1.1 — all from a single legacy integration partner.",
+          currentState: "tls-1.0-minimum",
+          correctState: "tls-1.2-minimum",
+          states: ["tls-1.0-minimum", "tls-1.1-minimum", "tls-1.2-minimum", "tls-1.3-minimum"],
+          rationaleId: "rat-tls",
+        },
+      ],
+      rationales: [
+        {
+          id: "rat-auth",
+          text: "All endpoints should require authentication by default with a small, explicitly managed exemption list (e.g., public health checks). Selective auth based on developer judgment creates gaps — as evidenced by two data access incidents. An explicit exemption list enforces the principle of least privilege while remaining operational.",
+        },
+        {
+          id: "rat-rate",
+          text: "Per-consumer tier rate limiting aligns limits with contract terms, protects backends from runaway clients, and allows enterprise customers their premium capacity. A global flat limit would throttle enterprise customers unfairly. Adaptive throttling adds complexity without a clear benefit at this stage.",
+        },
+        {
+          id: "rat-cors",
+          text: "Wildcard CORS with credentialed requests (cookies, Authorization headers) is a security misconfiguration. Browsers block credentialed requests to wildcard origins per the CORS spec, but reflecting the Origin header dynamically is even worse. An explicit allowlist of trusted frontend domains is the correct fix.",
+        },
+        {
+          id: "rat-size",
+          text: "Setting the limit to 10 MB covers all legitimate payloads (under 10 MB per the data) while preventing denial-of-service via large request bodies. 1 MB is too restrictive for some legitimate payloads; 100 MB is unnecessarily generous given the 10 MB legitimate maximum.",
+        },
+        {
+          id: "rat-tls",
+          text: "PCI-DSS requires TLS 1.2 minimum. The 0.3% of TLS 1.0/1.1 traffic from a single legacy partner should be addressed by contacting that partner to upgrade — not by maintaining a compliance violation for all other customers. TLS 1.3 minimum could be considered for new deployments but risks breaking valid TLS 1.2 clients unnecessarily.",
+        },
+      ],
+      feedback: {
+        perfect: "All security configurations are correctly set. You've enforced authentication, rate limiting, CORS, request size, and TLS version policies appropriately.",
+        partial: "Most security settings are correct but one or more configurations either over-restricts legitimate traffic or leaves a known vulnerability unaddressed.",
+        wrong: "Several gateway security settings are incorrectly configured. Review the auth enforcement, rate limiting, and CORS policies — these are the most critical gaps.",
+      },
+    },
+    {
+      type: "toggle-config",
+      id: "apigw-routing-config",
+      title: "API Gateway Routing & Transformation Configuration",
+      description:
+        "Configure routing, protocol transformation, and backend-for-frontend settings for a platform serving three client types: a mobile app, a web SPA, and third-party API consumers.",
+      targetSystem: "Multi-Client API Gateway",
+      items: [
+        {
+          id: "bff-mobile",
+          label: "Mobile App API Aggregation",
+          detail: "The mobile app's home screen requires data from 6 microservices. Currently the mobile client makes 6 separate API calls on app open, consuming 800ms total. Network conditions on mobile are variable. A BFF (Backend for Frontend) endpoint that aggregates all 6 calls server-side would reduce home screen load time to one request.",
+          currentState: "direct-to-services",
+          correctState: "bff-aggregation",
+          states: ["direct-to-services", "bff-aggregation", "graphql-gateway", "client-side-join"],
+          rationaleId: "rat-bff",
+        },
+        {
+          id: "grpc-transcoding",
+          label: "gRPC-to-REST Transcoding for Legacy Clients",
+          detail: "Backend inventory and pricing services were rebuilt using gRPC for performance. Third-party API consumers use REST/JSON and cannot use gRPC. Currently these consumers get HTTP 415 errors because transcoding is disabled.",
+          currentState: "transcoding-disabled",
+          correctState: "transcoding-enabled",
+          states: ["transcoding-disabled", "transcoding-enabled"],
+          rationaleId: "rat-transcoding",
+        },
+        {
+          id: "response-caching",
+          label: "Gateway-Level Response Caching",
+          detail: "The /api/v1/countries, /api/v1/currencies, and /api/v1/categories reference endpoints return data that changes less than once per week. Currently no gateway-level caching — all requests hit backend services. These endpoints receive 12,000 requests/hour.",
+          currentState: "no-gateway-cache",
+          correctState: "cache-reference-endpoints",
+          states: ["no-gateway-cache", "cache-reference-endpoints", "cache-all-get", "cache-disabled"],
+          rationaleId: "rat-gw-cache",
+        },
+        {
+          id: "api-versioning",
+          label: "API Version Routing Strategy",
+          detail: "Currently: v1 and v2 of the API exist. Version is indicated by a custom header (X-API-Version). Older API consumers that don't send the header get routed to v2 by default, breaking their integrations. The industry standard for REST versioning is URL path versioning (/v1/, /v2/).",
+          currentState: "header-versioning",
+          correctState: "path-versioning",
+          states: ["header-versioning", "path-versioning", "query-param-versioning", "no-versioning"],
+          rationaleId: "rat-versioning",
+        },
+      ],
+      rationales: [
+        {
+          id: "rat-bff",
+          text: "BFF aggregation moves the 6-service fan-out to a server-side connection (low latency, stable network) and returns one response to the mobile client. On variable mobile networks, one round-trip is dramatically more reliable than six. This is the defining use case for the BFF pattern.",
+        },
+        {
+          id: "rat-transcoding",
+          text: "gRPC-to-REST transcoding at the gateway allows backend services to use gRPC natively while external consumers continue using REST/JSON. This decouples internal protocol optimization from external API compatibility — without transcoding, the gRPC migration breaks third-party integrations.",
+        },
+        {
+          id: "rat-gw-cache",
+          text: "Reference data (countries, currencies, categories) that changes weekly is an ideal candidate for gateway-level caching with a long TTL. Caching at the gateway layer serves 12,000 requests/hour without hitting backend services, reducing load and response latency. Caching all GET responses would risk stale data on user-specific endpoints.",
+        },
+        {
+          id: "rat-versioning",
+          text: "URL path versioning (/v1/, /v2/) is self-documenting, cacheable, and visible in logs and metrics. Header versioning is invisible in URLs, harder to cache, and — as evidenced by the breaking change for consumers who omit the header — more error-prone. Path versioning is the REST industry standard.",
+        },
+      ],
+      feedback: {
+        perfect: "All routing and transformation settings are correctly configured for the three client types and backend protocol requirements.",
+        partial: "Most settings are correct but one configuration either breaks a client type or misses a significant performance optimization.",
+        wrong: "Review the BFF pattern, protocol transcoding, and versioning strategy settings — these address distinct client compatibility and performance requirements.",
+      },
+    },
+    {
+      type: "toggle-config",
+      id: "apigw-observability-config",
+      title: "API Gateway Observability Configuration",
+      description:
+        "The gateway currently has minimal observability. Configure logging, tracing, and alerting settings to enable effective incident response and capacity planning.",
+      targetSystem: "API Gateway Observability",
+      items: [
+        {
+          id: "access-logging",
+          label: "Access Log Detail Level",
+          detail: "Currently: access logs contain only HTTP method and status code. During the last incident, the on-call engineer could not determine which consumer was responsible for the traffic spike. Full access logs (method, path, consumer ID, response time, status, request size) are required for incident response.",
+          currentState: "minimal-logs",
+          correctState: "full-access-logs",
+          states: ["no-logs", "minimal-logs", "full-access-logs", "debug-logs"],
+          rationaleId: "rat-logging",
+        },
+        {
+          id: "tracing",
+          label: "Distributed Tracing Propagation",
+          detail: "Distributed tracing is enabled on all backend microservices but the gateway does not inject trace context headers (e.g., traceparent/W3C, X-B3-TraceId). Cross-service traces are broken — each service shows isolated spans with no request lineage from the gateway.",
+          currentState: "tracing-disabled",
+          correctState: "tracing-enabled-propagate",
+          states: ["tracing-disabled", "tracing-enabled-propagate", "sampling-only"],
+          rationaleId: "rat-tracing",
+        },
+        {
+          id: "error-alerting",
+          label: "4xx/5xx Error Rate Alerting",
+          detail: "Currently: no automated alerts on gateway error rates. The last two incidents were discovered by customer support tickets, not engineering monitoring. P99 error rate thresholds: alert at 1% 5xx sustained for 5 minutes; page at 5% 5xx sustained for 2 minutes.",
+          currentState: "no-alerting",
+          correctState: "tiered-alerting",
+          states: ["no-alerting", "flat-threshold-alerting", "tiered-alerting", "alert-on-every-error"],
+          rationaleId: "rat-alerting",
+        },
+      ],
+      rationales: [
+        {
+          id: "rat-logging",
+          text: "Full access logs capturing consumer ID, endpoint, response time, and status code are the minimum required to identify the source of traffic spikes, debug slow endpoints, and attribute errors to specific consumers. Debug-level logs capture too much volume and increase storage cost significantly.",
+        },
+        {
+          id: "rat-tracing",
+          text: "The gateway is the entry point of every request. If it doesn't inject trace context headers, all downstream service spans appear as independent traces with no lineage. Enabling propagation at the gateway stitches all service spans into a single trace, enabling end-to-end latency attribution.",
+        },
+        {
+          id: "rat-alerting",
+          text: "Tiered alerting (notify at 1%, page at 5%) reduces alert fatigue from transient spikes while ensuring high-severity incidents trigger immediate response. Flat thresholds either over-alert on transient errors or under-alert on sustained incidents. Alert-on-every-error would generate noise for expected client errors (400s from invalid input).",
+        },
+      ],
+      feedback: {
+        perfect: "All observability settings are correctly configured. Full access logging, distributed trace propagation, and tiered alerting give the team the visibility needed for rapid incident response.",
+        partial: "Most observability settings are correct but one gap will make incident investigation harder — either trace lineage is broken, alerts are missing, or log detail is insufficient.",
+        wrong: "The gateway currently has minimal observability. Review access log detail level, trace context propagation, and error rate alerting — all three are required for effective operations.",
+      },
+    },
+  ],
+  hints: [
+    "The BFF pattern exists specifically to reduce the number of round-trips for mobile clients — aggregate server-side, not client-side.",
+    "gRPC-to-REST transcoding lets you evolve internal protocols without breaking external consumers — the gateway is the right place for this translation.",
+    "If distributed traces are broken, check whether the gateway is injecting trace context headers — it's the most common reason spans appear unlinked.",
+  ],
+  scoring: {
+    maxScore: 100,
+    hintPenalty: 5,
+    penalties: { perfect: 0, partial: 10, wrong: 20 },
+    passingThresholds: { pass: 80, partial: 50 },
+  },
+  careerInsight:
+    "API gateways have become the de facto entry point for microservices platforms, and their correct configuration is a force multiplier for security, performance, and observability. Platform engineers who can design and audit a gateway configuration — not just deploy one — are highly effective in teams operating at scale.",
+  toolRelevance: [
+    "Kong Gateway",
+    "AWS API Gateway",
+    "Azure API Management",
+    "Google Cloud Apigee",
+    "Traefik",
+  ],
+  createdAt: "2026-03-28",
+  updatedAt: "2026-03-28",
+};

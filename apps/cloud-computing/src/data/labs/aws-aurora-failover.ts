@@ -1,0 +1,146 @@
+import type { LabManifest } from "../../types/manifest";
+
+export const awsAuroraFailoverLab: LabManifest = {
+  schemaVersion: "1.1",
+  id: "aws-aurora-failover",
+  version: 1,
+  title: "AWS Aurora Failover & Replication",
+  tier: "advanced",
+  track: "aws-core",
+  difficulty: "challenging",
+  accessLevel: "free",
+  tags: ["aws", "aurora", "rds", "failover", "replication", "global-database", "high-availability"],
+  description:
+    "Design Aurora cluster failover strategies, configure read replica promotion priorities, and architect global databases for cross-region disaster recovery with minimal data loss.",
+  estimatedMinutes: 14,
+  learningObjectives: [
+    "Configure Aurora failover priority tiers to control which replica becomes the new writer",
+    "Diagnose prolonged failover times caused by application connection handling",
+    "Design Aurora Global Database architectures for cross-region disaster recovery",
+    "Understand the RPO and RTO trade-offs between Aurora replication methods",
+    "Troubleshoot split-brain scenarios and stale read replica connections",
+  ],
+  sortOrder: 119,
+  status: "published",
+  prerequisites: [],
+  rendererType: "action-rationale",
+  scenarios: [
+    {
+      type: "action-rationale",
+      id: "aurora-failover-s1",
+      title: "Failover Priority Configuration for Mixed Workloads",
+      context:
+        "Your Aurora MySQL cluster has one writer and three read replicas. Replica-1 (db.r6g.2xlarge) serves real-time analytics queries and is heavily loaded. Replica-2 (db.r6g.xlarge) serves the main application read traffic. Replica-3 (db.r6g.2xlarge) is a standby with no application connections. During a failover, the new writer must immediately handle production write traffic without performance degradation.",
+      displayFields: [
+        { label: "Replica-1", value: "r6g.2xlarge — heavy analytics queries, high CPU", emphasis: "warn" },
+        { label: "Replica-2", value: "r6g.xlarge — app read traffic, smaller instance", emphasis: "normal" },
+        { label: "Replica-3", value: "r6g.2xlarge — standby, no connections, idle", emphasis: "normal" },
+        { label: "Failover Need", value: "New writer must handle production writes immediately", emphasis: "critical" },
+        { label: "Current Priority", value: "All replicas at default priority tier 1 (equal)", emphasis: "warn" },
+      ],
+      actions: [
+        { id: "priority-standby-first", label: "Set Replica-3 (standby) to priority tier 0, Replica-1 and Replica-2 to tier 2", color: "green" },
+        { id: "priority-largest-first", label: "Set Replica-1 (analytics, 2xlarge) to priority tier 0 as it has the most capacity", color: "orange" },
+        { id: "priority-app-replica", label: "Set Replica-2 (app reads) to priority tier 0 since it already serves the application", color: "red" },
+        { id: "keep-default", label: "Keep all replicas at tier 1 — Aurora will pick the best candidate automatically", color: "yellow" },
+      ],
+      correctActionId: "priority-standby-first",
+      rationales: [
+        { id: "r-standby-correct", text: "Replica-3 is the ideal failover target: it has the same large instance type (r6g.2xlarge) for write capacity, and zero existing connections or workload. When promoted to writer, it immediately handles production writes without competing with analytics or read queries. The standby pattern ensures predictable failover performance." },
+        { id: "r-analytics-loaded", text: "Replica-1 has the capacity on paper but is running heavy analytics queries. Promoting it to writer means write operations compete with existing analytics workload for CPU and memory. The analytics queries would need to be killed or migrated, adding failover recovery time." },
+        { id: "r-app-replica-small", text: "Replica-2 is an r6g.xlarge — half the capacity of the writer. Promoting a smaller instance to writer risks immediate CPU and memory saturation under write load, potentially causing a cascading failure worse than the original outage." },
+        { id: "r-default-unpredictable", text: "With all replicas at tier 1, Aurora selects the replica with the smallest replication lag. This could be any of the three, including the undersized Replica-2 or the heavily loaded Replica-1. Unpredictable failover targets mean unpredictable post-failover performance." },
+      ],
+      correctRationaleId: "r-standby-correct",
+      feedback: {
+        perfect: "Correct. A dedicated standby replica with no workload and matched instance size provides the most predictable and performant failover. This is the gold standard for Aurora HA configuration.",
+        partial: "Selecting the largest instance makes sense in theory, but a heavily loaded replica is a poor failover target. The ideal writer candidate should be idle and right-sized.",
+        wrong: "Promoting an undersized replica or a heavily loaded one creates post-failover performance problems. Always designate a right-sized, idle standby as the highest failover priority.",
+      },
+    },
+    {
+      type: "action-rationale",
+      id: "aurora-failover-s2",
+      title: "Application Connection Handling During Failover",
+      context:
+        "After an Aurora failover, the new writer is healthy within 30 seconds, but your application takes 8 minutes to fully recover. Application logs show 'connection refused' and 'read-only connection' errors for several minutes after failover. The application uses a custom connection pool with 200 persistent connections to the Aurora cluster endpoint. DNS TTL for the cluster endpoint is 5 seconds.",
+      displayFields: [
+        { label: "Aurora Failover", value: "Completed in 30 seconds", emphasis: "normal" },
+        { label: "Application Recovery", value: "8 minutes — connection errors persist", emphasis: "critical" },
+        { label: "Error Types", value: "'connection refused' and 'read-only connection'", emphasis: "critical" },
+        { label: "Connection Pool", value: "200 persistent connections, custom pool", emphasis: "warn" },
+        { label: "DNS TTL", value: "5 seconds (Aurora cluster endpoint)", emphasis: "normal" },
+        { label: "Connection Max Age", value: "None configured — connections live until closed", emphasis: "critical" },
+      ],
+      actions: [
+        { id: "configure-connection-validation", label: "Configure connection pool max lifetime, idle timeout, and validation queries to recycle stale connections after failover", color: "green" },
+        { id: "reduce-dns-ttl", label: "Reduce DNS TTL to 1 second for faster endpoint resolution", color: "red" },
+        { id: "add-more-replicas", label: "Add more read replicas to absorb connections during failover", color: "red" },
+        { id: "restart-application", label: "Add a CloudWatch alarm that triggers an application restart on failover detection", color: "yellow" },
+      ],
+      correctActionId: "configure-connection-validation",
+      rationales: [
+        { id: "r-connection-pool-fix", text: "The persistent connections in the pool are still pointing to the old writer IP (now a read replica or terminated instance). Without max lifetime or validation, the pool keeps serving stale connections that return 'read-only' or 'connection refused' errors. Configuring max connection lifetime (e.g., 15 minutes), idle timeout, and a validation query (SELECT 1) ensures connections are recycled and re-resolved through the cluster endpoint DNS." },
+        { id: "r-dns-already-fast", text: "DNS TTL is already 5 seconds — the Aurora cluster endpoint updates quickly. The problem is not DNS resolution speed. The problem is that the connection pool holds 200 TCP connections that were established before the failover. These connections bypass DNS because they are already connected to a specific IP address." },
+        { id: "r-replicas-irrelevant", text: "Adding read replicas does not fix application connection handling. The issue is that the application's writer connections are stale and pointing to the old primary. More replicas do not change how the connection pool manages writer connections." },
+        { id: "r-restart-heavy-handed", text: "Restarting the application forces all connections to re-establish, which works but causes full application downtime (cold start, dependency initialization, cache warming). Proper connection pool configuration achieves the same result without any downtime by transparently recycling stale connections." },
+      ],
+      correctRationaleId: "r-connection-pool-fix",
+      feedback: {
+        perfect: "Correct. Connection pool configuration is the root cause of prolonged application recovery. Max lifetime and validation queries ensure stale connections are recycled transparently, reducing effective application failover time from 8 minutes to under 1 minute.",
+        partial: "Application restart works but causes unnecessary downtime. Connection pool lifecycle management achieves graceful recovery without restarting the application.",
+        wrong: "DNS TTL is not the problem — established TCP connections bypass DNS. The connection pool is holding stale connections to the old writer IP. This is an application-layer issue, not a DNS issue.",
+      },
+    },
+    {
+      type: "action-rationale",
+      id: "aurora-failover-s3",
+      title: "Cross-Region Disaster Recovery Architecture",
+      context:
+        "Your company requires a cross-region DR strategy for an Aurora PostgreSQL database. The RPO requirement is under 1 second of data loss, and RTO is under 1 minute. The primary cluster is in us-east-1 with 500 GB of data and 5,000 write transactions per second. You need to choose the correct cross-region replication architecture.",
+      displayFields: [
+        { label: "RPO Requirement", value: "< 1 second data loss", emphasis: "critical" },
+        { label: "RTO Requirement", value: "< 1 minute recovery time", emphasis: "critical" },
+        { label: "Database Size", value: "500 GB", emphasis: "normal" },
+        { label: "Write Volume", value: "5,000 TPS", emphasis: "normal" },
+        { label: "Primary Region", value: "us-east-1", emphasis: "normal" },
+        { label: "DR Region", value: "us-west-2", emphasis: "normal" },
+      ],
+      actions: [
+        { id: "aurora-global-database", label: "Deploy Aurora Global Database with a secondary cluster in us-west-2", color: "green" },
+        { id: "cross-region-read-replica", label: "Create a cross-region Aurora read replica in us-west-2 using MySQL binlog replication", color: "orange" },
+        { id: "automated-snapshots", label: "Copy automated snapshots to us-west-2 every 5 minutes using Lambda", color: "red" },
+        { id: "dms-replication", label: "Set up AWS DMS continuous replication from us-east-1 to a standalone Aurora cluster in us-west-2", color: "yellow" },
+      ],
+      correctActionId: "aurora-global-database",
+      rationales: [
+        { id: "r-global-db-correct", text: "Aurora Global Database uses dedicated storage-level replication with typical lag under 1 second across regions — meeting the RPO requirement. Managed failover promotes the secondary cluster to a standalone read-write cluster in under 1 minute — meeting the RTO requirement. The replication is handled at the storage layer, not the database engine, so it has minimal impact on primary cluster performance." },
+        { id: "r-cross-region-replica-lag", text: "Cross-region read replicas use logical (binlog) replication, which has higher lag than Aurora Global Database's storage-level replication — typically 5-30 seconds under load. This does not meet the sub-1-second RPO requirement, and promotion is manual with no managed failover." },
+        { id: "r-snapshots-high-rpo", text: "Snapshot-based DR has an RPO equal to the time since the last snapshot. Even at 5-minute intervals, the RPO is 0-5 minutes — far exceeding the 1-second requirement. Restoring from a snapshot also takes 15-30 minutes for a 500 GB database, violating the RTO." },
+        { id: "r-dms-overhead", text: "DMS continuous replication adds an intermediate service with its own lag and failure modes. DMS change data capture typically has 3-10 seconds of lag and requires ongoing monitoring and management. Aurora Global Database provides this capability natively without the operational overhead of managing DMS tasks." },
+      ],
+      correctRationaleId: "r-global-db-correct",
+      feedback: {
+        perfect: "Correct. Aurora Global Database is purpose-built for cross-region DR with sub-second RPO and sub-minute RTO. Storage-level replication is faster and more efficient than any logical replication method.",
+        partial: "DMS works for heterogeneous database migration but adds unnecessary complexity for Aurora-to-Aurora replication. Aurora Global Database provides this capability natively with better performance guarantees.",
+        wrong: "Snapshot-based DR cannot meet sub-second RPO requirements. Cross-region read replicas use logical replication with higher lag. Aurora Global Database's storage-level replication is the only option that meets both RPO and RTO targets.",
+      },
+    },
+  ],
+  hints: [
+    "Aurora failover priority tiers (0-15) determine which replica is promoted. Lower numbers have higher priority. Designate an idle, right-sized standby at tier 0 for predictable failover.",
+    "Connection pool configuration is the most common cause of prolonged application recovery after Aurora failover. Set max connection lifetime, idle timeout, and validation queries to recycle stale connections.",
+    "Aurora Global Database replicates at the storage layer with sub-second lag. Cross-region read replicas use logical replication with higher lag. Choose based on RPO requirements.",
+  ],
+  scoring: {
+    maxScore: 100,
+    hintPenalty: 5,
+    penalties: { perfect: 0, partial: 10, wrong: 20 },
+    passingThresholds: { pass: 80, partial: 50 },
+  },
+  careerInsight:
+    "Aurora is the most widely adopted managed relational database on AWS. Engineers who understand failover mechanics — from storage-level replication to application connection pool behavior — are essential during database incidents. The ability to distinguish between a database failover completing in 30 seconds and an application taking 8 minutes to recover is a skill that separates senior database engineers from generalists.",
+  toolRelevance: ["AWS RDS Console", "Aurora Cluster Management", "CloudWatch Metrics", "AWS CLI", "Performance Insights"],
+  createdAt: "2026-03-28",
+  updatedAt: "2026-03-28",
+};

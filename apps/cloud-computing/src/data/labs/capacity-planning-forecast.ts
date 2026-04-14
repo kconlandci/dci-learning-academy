@@ -1,0 +1,148 @@
+import type { LabManifest } from "../../types/manifest";
+
+export const capacityPlanningForecastLab: LabManifest = {
+  schemaVersion: "1.1",
+  id: "capacity-planning-forecast",
+  version: 1,
+  title: "Capacity Planning & Forecasting",
+  tier: "advanced",
+  track: "cloud-operations",
+  difficulty: "challenging",
+  accessLevel: "free",
+  tags: ["capacity-planning", "load-testing", "scaling", "forecasting", "performance"],
+  description:
+    "Forecast infrastructure capacity needs based on growth trends and load testing data, configure scaling triggers with appropriate headroom, and interpret load test results to identify bottlenecks before they impact production.",
+  estimatedMinutes: 13,
+  learningObjectives: [
+    "Interpret load testing results to identify system bottlenecks and saturation points",
+    "Calculate capacity headroom requirements based on traffic growth projections",
+    "Design auto-scaling policies with appropriate thresholds and cooldown periods",
+    "Distinguish between vertical and horizontal scaling strategies based on workload characteristics",
+    "Create capacity forecasts that account for seasonal traffic patterns and organic growth",
+  ],
+  sortOrder: 614,
+  status: "published",
+  prerequisites: [],
+  rendererType: "action-rationale",
+  scenarios: [
+    {
+      type: "action-rationale",
+      id: "cp-s1",
+      title: "Interpreting Load Test Results",
+      context:
+        "The team ran a load test against the product catalog API before Black Friday. The test gradually increased concurrent users from 100 to 5,000 over 30 minutes. The API runs on 4 ECS Fargate tasks (2 vCPU, 4 GB each) behind an Application Load Balancer, backed by an RDS Aurora PostgreSQL cluster (1 writer, 2 readers). Current peak production traffic is 1,200 concurrent users. Expected Black Friday peak is 3,500 concurrent users.",
+      displayFields: [
+        { label: "Current Peak", value: "1,200 concurrent users", emphasis: "normal" },
+        { label: "Black Friday Target", value: "3,500 concurrent users", emphasis: "critical" },
+        { label: "At 2,000 Users", value: "P99 latency: 180ms, error rate: 0.1%, CPU: 55%", emphasis: "normal" },
+        { label: "At 3,000 Users", value: "P99 latency: 620ms, error rate: 0.8%, CPU: 82%", emphasis: "warn" },
+        { label: "At 3,500 Users", value: "P99 latency: 2,100ms, error rate: 4.2%, CPU: 94%", emphasis: "critical" },
+        { label: "At 4,000 Users", value: "P99 latency: 8,500ms, error rate: 23%, CPU: 99%", emphasis: "critical" },
+        { label: "RDS Reader CPU at 3,500", value: "78%", emphasis: "warn" },
+      ],
+      actions: [
+        { id: "scale-ecs-and-headroom", label: "Scale ECS tasks from 4 to 8 (doubling compute), add a third Aurora reader, and retest to confirm the system handles 4,500 users (3,500 target + 30% headroom) with P99 under 300ms", color: "green" },
+        { id: "scale-ecs-only", label: "Scale ECS tasks from 4 to 6 to handle 3,500 users — the load test shows the current 4 tasks almost handle it", color: "yellow" },
+        { id: "optimize-code-first", label: "Focus on code optimization to reduce per-request CPU usage, then retest — do not add infrastructure before optimizing", color: "orange" },
+        { id: "vertical-scale-tasks", label: "Increase each ECS task to 4 vCPU / 8 GB instead of adding more tasks — fewer larger instances are simpler to manage", color: "blue" },
+      ],
+      correctActionId: "scale-ecs-and-headroom",
+      rationales: [
+        { id: "r-cp-s1-correct", text: "The load test shows a clear inflection point: between 2,000 and 3,500 users, P99 latency increases 12x (180ms → 2,100ms) and error rate jumps 42x (0.1% → 4.2%). At 3,500 users (the Black Friday target), the system is already degraded. Doubling ECS tasks shifts the saturation point right, and adding an Aurora reader distributes read load. The 30% headroom (testing to 4,500) is critical because Black Friday traffic is unpredictable and may exceed the 3,500 estimate. Retesting validates the scaling decision." },
+        { id: "r-cp-s1-ecs-only", text: "Adding only 2 ECS tasks (50% increase) may not be enough. The latency curve is non-linear — going from 4.2% errors at 3,500 to acceptable levels requires more than a 50% capacity increase because the system hits a CPU saturation cliff. Additionally, the Aurora reader at 78% CPU is a secondary bottleneck that 2 more ECS tasks will not address." },
+        { id: "r-cp-s1-optimize", text: "Code optimization is valuable long-term but risky as the sole pre-Black Friday strategy. Optimization may yield 10-20% improvement but the system needs to handle nearly 3x the current capacity. With a fixed deadline (Black Friday), scaling horizontally is the lower-risk approach. Optimize after surviving the traffic peak." },
+        { id: "r-cp-s1-vertical", text: "Vertical scaling (larger tasks) has diminishing returns and hard ceilings. Doubling vCPU per task does not double throughput due to contention, GC overhead, and connection limits. Horizontal scaling (more tasks) provides linear capacity increase and better fault tolerance — if one of 8 tasks fails, 87.5% capacity remains versus 75% with 4 larger tasks." },
+      ],
+      correctRationaleId: "r-cp-s1-correct",
+      feedback: {
+        perfect: "Correct. The non-linear latency curve demands scaling well past the target, and the 30% headroom protects against traffic exceeding estimates. Retesting validates the scaling decision before Black Friday.",
+        partial: "You identified the need to scale but without sufficient headroom. Black Friday traffic is unpredictable — always plan for 25-30% above your peak estimate and validate with a retest.",
+        wrong: "The load test clearly shows system degradation at the target load. Code optimization alone cannot close the gap before a fixed deadline, and vertical scaling has diminishing returns. Horizontal scaling with headroom and retesting is the correct approach.",
+      },
+    },
+    {
+      type: "action-rationale",
+      id: "cp-s2",
+      title: "Auto-Scaling Policy Design",
+      context:
+        "After scaling the ECS tasks and retesting, the team needs to configure auto-scaling policies for ongoing operations. The product catalog API has a predictable daily traffic pattern: low overnight (200 users), ramp-up 8-10 AM (200 → 1,200), steady peak 10 AM-6 PM (1,200), gradual decline 6-10 PM (1,200 → 400). Occasionally, marketing email campaigns cause 20-minute traffic spikes of 2x normal peak. The team wants to balance cost efficiency with performance.",
+      displayFields: [
+        { label: "Overnight Traffic", value: "200 concurrent users", emphasis: "normal" },
+        { label: "Morning Ramp", value: "200 → 1,200 users over 2 hours", emphasis: "normal" },
+        { label: "Steady Peak", value: "1,200 users (10 AM - 6 PM)", emphasis: "normal" },
+        { label: "Marketing Spike", value: "2x peak for 20 minutes (unpredictable)", emphasis: "warn" },
+        { label: "Scale-Up Time", value: "ECS task startup: 45 seconds", emphasis: "warn" },
+        { label: "Cost Target", value: "Minimize overnight/weekend waste", emphasis: "normal" },
+      ],
+      actions: [
+        { id: "scheduled-plus-target-tracking", label: "Use scheduled scaling to pre-provision for the morning ramp (scale up at 7:45 AM, scale down at 10 PM), combined with target-tracking auto-scaling on CPU at 60% to handle marketing spikes — set scale-out cooldown to 60 seconds and scale-in cooldown to 300 seconds", color: "green" },
+        { id: "target-tracking-only", label: "Use target-tracking auto-scaling on CPU at 70% with 120-second cooldowns for both scale-out and scale-in", color: "yellow" },
+        { id: "step-scaling-aggressive", label: "Use step scaling: add 2 tasks when CPU > 50%, add 4 tasks when CPU > 70%, remove 2 tasks when CPU < 30%", color: "orange" },
+        { id: "fixed-capacity", label: "Run a fixed 8 tasks 24/7 to handle any traffic pattern including marketing spikes without scaling complexity", color: "red" },
+      ],
+      correctActionId: "scheduled-plus-target-tracking",
+      rationales: [
+        { id: "r-cp-s2-correct", text: "The predictable daily pattern is ideal for scheduled scaling: pre-provisioning at 7:45 AM (15 minutes before ramp) ensures tasks are warm before traffic arrives, avoiding the 45-second startup lag under load. Target-tracking at 60% CPU handles unpredictable marketing spikes reactively. The asymmetric cooldowns are critical: 60-second scale-out (respond quickly to spikes) versus 300-second scale-in (avoid flapping during variable traffic). This combination provides cost efficiency overnight while maintaining headroom during peaks." },
+        { id: "r-cp-s2-target-only", text: "Target-tracking alone means the morning ramp triggers reactive scaling — with 45-second task startup, users experience degraded latency during the initial scale-out. The system is always chasing traffic rather than anticipating it. For predictable patterns, scheduled scaling eliminates this lag. A 70% CPU target also leaves less headroom for sudden marketing spikes." },
+        { id: "r-cp-s2-step", text: "Step scaling is more complex to configure correctly and can overshoot or undershoot during transitions. Adding 4 tasks when CPU exceeds 70% may overprovision for a brief spike, and the step boundaries require ongoing tuning as traffic patterns evolve. Target-tracking auto-adjusts to maintain the target metric without step configuration." },
+        { id: "r-cp-s2-fixed", text: "Running 8 tasks 24/7 wastes 60-75% of compute cost overnight and on weekends when traffic drops to 200 users. At estimated $0.12/hour per task, that is roughly $430/month in waste. The predictable traffic pattern makes this the easiest workload to optimize with scheduled scaling." },
+      ],
+      correctRationaleId: "r-cp-s2-correct",
+      feedback: {
+        perfect: "Excellent scaling policy design. Scheduled scaling for predictable patterns plus target-tracking for unpredictable spikes, with asymmetric cooldowns, is the optimal cost-performance balance.",
+        partial: "Target-tracking alone works but misses the opportunity to pre-provision for predictable ramps. Combine scheduled scaling for known patterns with reactive scaling for unknowns.",
+        wrong: "Fixed capacity wastes significant cost overnight, and step scaling requires complex tuning. Use scheduled scaling for predictable patterns and target-tracking for reactive adjustments.",
+      },
+    },
+    {
+      type: "action-rationale",
+      id: "cp-s3",
+      title: "Growth Forecasting and Budget Planning",
+      context:
+        "The VP of Engineering asks for a 12-month infrastructure capacity forecast and budget projection. The platform has grown 15% month-over-month for the past 6 months. The current monthly infrastructure bill is $42,000. The team uses a mix of on-demand EC2, Fargate, RDS, and S3. Reserved Instances and Savings Plans have not been purchased. A major product launch in Q3 is expected to add 40% incremental traffic.",
+      displayFields: [
+        { label: "Current Monthly Cost", value: "$42,000", emphasis: "normal" },
+        { label: "Growth Rate", value: "15% month-over-month (6-month trend)", emphasis: "warn" },
+        { label: "Q3 Product Launch", value: "+40% incremental traffic expected", emphasis: "critical" },
+        { label: "Reserved Instances", value: "None purchased", emphasis: "warn" },
+        { label: "Savings Plans", value: "None purchased", emphasis: "warn" },
+        { label: "Compute Mix", value: "On-demand EC2, Fargate, RDS, S3", emphasis: "normal" },
+      ],
+      actions: [
+        { id: "tiered-forecast-with-commitments", label: "Build a three-scenario forecast (conservative 10%, expected 15%, aggressive 20% growth) with the Q3 launch modeled as a step function, purchase 1-year Compute Savings Plans covering 60-70% of baseline compute, and present quarterly review checkpoints", color: "green" },
+        { id: "linear-extrapolation", label: "Project 15% monthly growth for 12 months, multiply current cost, and present a single-line forecast to the VP", color: "yellow" },
+        { id: "all-in-reserved", label: "Purchase 3-year Reserved Instances covering 100% of projected month-12 capacity to maximize discount", color: "red" },
+        { id: "wait-and-see", label: "Do not forecast — cloud infrastructure scales on demand, so capacity planning is unnecessary. Monitor monthly bills and react when costs spike", color: "orange" },
+      ],
+      correctActionId: "tiered-forecast-with-commitments",
+      rationales: [
+        { id: "r-cp-s3-correct", text: "A three-scenario forecast communicates uncertainty honestly — growth may accelerate or decelerate. The Q3 product launch is a discrete event (step function) that should be modeled separately from organic growth, not blended into the monthly rate. Compute Savings Plans at 60-70% of baseline cover the predictable portion of spend (saving 20-30%) while leaving 30-40% on-demand for flexibility. Quarterly review checkpoints allow the team to adjust the forecast as actual data arrives, avoiding a 12-month plan that becomes stale in month 3." },
+        { id: "r-cp-s3-linear", text: "A single-line 15% projection masks uncertainty and creates false precision. If growth accelerates to 20%, the team is underprepared; if it slows to 10%, they overprovision. The Q3 launch is not captured by a smooth growth curve — it is a step change that needs separate modeling. Leadership decisions should be based on ranges, not single numbers." },
+        { id: "r-cp-s3-reserved", text: "Purchasing 3-year RIs at 100% of projected month-12 capacity locks in maximum commitment based on a forecast that may be wrong. If growth slows, the team pays for unused capacity for 3 years. If the architecture changes (e.g., migrating from EC2 to Fargate), the RIs become stranded. Savings Plans are more flexible than RIs, and 60-70% coverage is safer than 100%." },
+        { id: "r-cp-s3-wait", text: "At 15% monthly growth, the infrastructure bill doubles every 5 months. Without forecasting, the team will go from $42K to $85K in 5 months with no budget approval process. The VP is asking for this forecast precisely because reactive cost management does not work at this growth rate. Cloud elasticity handles minutes-to-hours scaling, not months-to-quarters financial planning." },
+      ],
+      correctRationaleId: "r-cp-s3-correct",
+      feedback: {
+        perfect: "Excellent capacity forecast. Three scenarios communicate uncertainty, the Q3 launch is modeled as a step function, Savings Plans cover the predictable baseline, and quarterly reviews keep the forecast honest.",
+        partial: "A single-line forecast or overly aggressive commitments both carry risk. Use scenario-based forecasting with moderate commitment coverage and regular review checkpoints.",
+        wrong: "Capacity forecasting is essential at 15% monthly growth. Cloud elasticity handles real-time scaling but not budget planning. Three-scenario forecasts with partial commitments and review checkpoints are the industry standard.",
+      },
+    },
+  ],
+  hints: [
+    "Load test results with non-linear latency increases indicate a saturation point. Always plan capacity with 25-30% headroom above your peak target and retest after scaling to validate.",
+    "Combine scheduled scaling for predictable traffic patterns with target-tracking auto-scaling for unpredictable spikes. Use asymmetric cooldowns: fast scale-out, slow scale-in.",
+    "Capacity forecasts should use multiple scenarios (conservative, expected, aggressive) with discrete events modeled separately. Purchase commitments covering 60-70% of baseline, not 100% of projected peak.",
+  ],
+  scoring: {
+    maxScore: 100,
+    hintPenalty: 5,
+    penalties: { perfect: 0, partial: 10, wrong: 20 },
+    passingThresholds: { pass: 80, partial: 50 },
+  },
+  careerInsight:
+    "Capacity planning bridges engineering and finance — a rare skill set that makes engineers invaluable to leadership. Engineers who can translate load test data into scaling decisions and present three-scenario financial forecasts earn trust from both technical and business stakeholders, accelerating career growth into staff engineer and engineering manager roles.",
+  toolRelevance: ["AWS Auto Scaling", "AWS Cost Explorer", "Locust", "k6", "Grafana", "AWS Savings Plans", "AWS Compute Optimizer"],
+  createdAt: "2026-03-28",
+  updatedAt: "2026-03-28",
+};

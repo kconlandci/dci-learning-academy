@@ -1,0 +1,281 @@
+import type { LabManifest } from "../../types/manifest";
+
+export const logAggregationStrategyLab: LabManifest = {
+  schemaVersion: "1.1",
+  id: "log-aggregation-strategy",
+  version: 1,
+  title: "Log Aggregation Strategy",
+  tier: "beginner",
+  track: "cloud-operations",
+  difficulty: "moderate",
+  accessLevel: "free",
+  tags: ["logging", "observability", "cloudwatch", "opensearch", "log-management"],
+  description:
+    "Design and configure effective log aggregation pipelines by selecting retention policies, structuring log formats, choosing the right log destinations, and implementing efficient querying strategies.",
+  estimatedMinutes: 10,
+  learningObjectives: [
+    "Configure appropriate CloudWatch Logs retention periods by log category",
+    "Choose between log storage tiers based on access patterns and cost",
+    "Structure application logs for efficient querying and alerting",
+    "Design a centralized log aggregation pipeline for multi-account environments",
+  ],
+  sortOrder: 608,
+  status: "published",
+  prerequisites: [],
+  rendererType: "toggle-config",
+  scenarios: [
+    {
+      type: "toggle-config",
+      id: "log-s1",
+      title: "CloudWatch Logs Retention Configuration",
+      description:
+        "A multi-service application generates logs across several CloudWatch Log Groups. The company has a compliance requirement to retain security and audit logs for 1 year, operational logs for 30 days, and debug logs for 7 days. Currently all log groups have no retention policy set (infinite retention), costing $340/month in CloudWatch storage.",
+      targetSystem: "CloudWatch Log Groups — Retention Policies",
+      items: [
+        {
+          id: "application-logs",
+          label: "Application Logs (/aws/app/api) Retention",
+          detail: "Standard request/response logs, error messages. Used for incident investigation. Compliance: operational.",
+          currentState: "Never Expire",
+          correctState: "30 days",
+          states: ["7 days", "14 days", "30 days", "90 days", "Never Expire"],
+          rationaleId: "r-app-logs",
+        },
+        {
+          id: "audit-logs",
+          label: "Security Audit Logs (/aws/app/audit) Retention",
+          detail: "IAM changes, authentication events, admin actions. Required for compliance SOC 2.",
+          currentState: "Never Expire",
+          correctState: "365 days",
+          states: ["30 days", "90 days", "180 days", "365 days", "Never Expire"],
+          rationaleId: "r-audit-logs",
+        },
+        {
+          id: "debug-logs",
+          label: "Debug Logs (/aws/app/debug) Retention",
+          detail: "Verbose trace-level output, used only during active development and debugging sessions.",
+          currentState: "Never Expire",
+          correctState: "7 days",
+          states: ["1 day", "3 days", "7 days", "14 days", "Never Expire"],
+          rationaleId: "r-debug-logs",
+        },
+        {
+          id: "lambda-logs",
+          label: "Lambda Function Logs (/aws/lambda/*) Retention",
+          detail: "Function execution logs, cold start info. Primarily used for performance debugging within 2 weeks.",
+          currentState: "Never Expire",
+          correctState: "14 days",
+          states: ["3 days", "7 days", "14 days", "30 days", "Never Expire"],
+          rationaleId: "r-lambda-logs",
+        },
+      ],
+      rationales: [
+        {
+          id: "r-app-logs",
+          text: "30 days covers the typical incident investigation window (most P1 post-mortems reference logs from the last 2–4 weeks). Beyond 30 days, application logs are rarely accessed and the storage cost isn't justified. Critical events in application logs are typically captured by audit logs with longer retention.",
+        },
+        {
+          id: "r-audit-logs",
+          text: "SOC 2 and most security compliance frameworks require security and audit log retention for 12 months (1 year). These logs are the evidentiary trail for security investigations, compliance audits, and insider threat detection. Never-expire incurs unnecessary cost; 1 year meets the requirement.",
+        },
+        {
+          id: "r-debug-logs",
+          text: "Debug logs are extremely verbose and generated at high volume. They are only useful during active debugging sessions (hours to days). Retaining debug logs beyond 7 days is almost never useful and creates significant unnecessary storage cost — debug logs often account for 40–60% of total log volume.",
+        },
+        {
+          id: "r-lambda-logs",
+          text: "Lambda logs are most valuable in the 0–14 day window for performance debugging and error investigation. Cold start analysis and function error root causes are typically diagnosed within days of occurrence. 14 days balances utility against cost for high-volume function logs.",
+        },
+      ],
+      feedback: {
+        perfect: "Well configured. Tiered retention by log category matches business need against cost — debug logs expire quickly, audit logs meet compliance, operational logs cover the investigation window.",
+        partial: "Some retention periods are correct but review the debug and audit logs. Debug logs should be very short (7 days), audit logs must meet compliance minimums (1 year).",
+        wrong: "Infinite retention on all log groups is expensive and unnecessary. Apply retention based on the purpose of each log group: compliance requirements drive audit log retention, operational utility drives application log retention.",
+      },
+    },
+    {
+      type: "toggle-config",
+      id: "log-s2",
+      title: "Structured Logging Configuration",
+      description:
+        "An engineering team is migrating from unstructured text logs to structured JSON logging for their Node.js microservices. Configure the logging setup to maximize CloudWatch Insights query efficiency and enable effective alerting on error conditions.",
+      targetSystem: "Application Logging Configuration — Node.js Microservice",
+      items: [
+        {
+          id: "log-format",
+          label: "Log Format",
+          detail: "The serialization format for log messages emitted by the application.",
+          currentState: "Unstructured text (e.g., 'ERROR 2026-03-28 user 42 not found')",
+          correctState: "Structured JSON with consistent field schema",
+          states: [
+            "Unstructured text (e.g., 'ERROR 2026-03-28 user 42 not found')",
+            "Structured JSON with consistent field schema",
+            "CSV format for easy parsing",
+            "Key=value pairs (logfmt)",
+          ],
+          rationaleId: "r-log-format",
+        },
+        {
+          id: "required-fields",
+          label: "Required Log Fields",
+          detail: "The minimum fields every log line must include for effective querying.",
+          currentState: "message, timestamp",
+          correctState: "level, timestamp, requestId, service, message, durationMs (for requests)",
+          states: [
+            "message, timestamp",
+            "level, message, timestamp",
+            "level, timestamp, requestId, service, message, durationMs (for requests)",
+            "level, timestamp, message, userId, sessionId, stackTrace",
+          ],
+          rationaleId: "r-log-fields",
+        },
+        {
+          id: "log-level-production",
+          label: "Default Log Level in Production",
+          detail: "The minimum severity level to write to CloudWatch Logs in production.",
+          currentState: "DEBUG",
+          correctState: "INFO",
+          states: ["TRACE", "DEBUG", "INFO", "WARN", "ERROR"],
+          rationaleId: "r-log-level",
+        },
+        {
+          id: "sampling-errors",
+          label: "Error Log Sampling",
+          detail: "Whether to apply sampling to ERROR-level log events.",
+          currentState: "Sample at 10% (log 1 in 10 errors)",
+          correctState: "Log 100% of ERROR events (no sampling)",
+          states: [
+            "Sample at 1% (log 1 in 100 errors)",
+            "Sample at 10% (log 1 in 10 errors)",
+            "Sample at 50% (log 1 in 2 errors)",
+            "Log 100% of ERROR events (no sampling)",
+          ],
+          rationaleId: "r-error-sampling",
+        },
+      ],
+      rationales: [
+        {
+          id: "r-log-format",
+          text: "Structured JSON enables CloudWatch Logs Insights to parse and query specific fields without regex. `filter level = 'ERROR' | stats count(*) by service` is only possible with structured logs. Unstructured text requires regex parsing which is slow, error-prone, and can't be used for metric filters or alarms.",
+        },
+        {
+          id: "r-log-fields",
+          text: "requestId enables correlation of all log events for a single request across multiple services. service identifies which microservice produced the log. durationMs enables latency analysis with Insights aggregations. Without these fields, tracing a customer-reported issue across services requires guessing at time windows.",
+        },
+        {
+          id: "r-log-level",
+          text: "DEBUG in production generates enormous log volume (often 100x more events than INFO), significantly increasing CloudWatch Logs ingestion costs. Production should default to INFO. DEBUG level should only be enabled temporarily for specific investigations, and only for targeted services.",
+        },
+        {
+          id: "r-error-sampling",
+          text: "Errors should never be sampled. Sampling at 10% means 90% of error events are silently dropped — a systematic error affecting every request would appear as only 10% of its true volume, making alert thresholds unreliable. Sample high-volume INFO/DEBUG logs; always capture 100% of errors.",
+        },
+      ],
+      feedback: {
+        perfect: "Correct logging configuration. JSON structure + required correlation fields + INFO production level + 100% error capture is the professional production logging setup.",
+        partial: "Most settings are right but check your error sampling. Sampling errors in production is one of the most dangerous logging anti-patterns — errors must always be captured at 100%.",
+        wrong: "Logging configuration directly impacts incident investigation capability. DEBUG in production and sampled errors means you'll be flying blind during incidents — exactly when you need logs most.",
+      },
+    },
+    {
+      type: "toggle-config",
+      id: "log-s3",
+      title: "Multi-Account Log Centralization",
+      description:
+        "A company runs workloads across 5 AWS accounts (dev, staging, prod, security, shared-services). The security team needs centralized access to all logs from all accounts for compliance monitoring. Currently each account's logs are isolated in its own CloudWatch Log Groups with no cross-account access.",
+      targetSystem: "Cross-Account Log Aggregation Architecture",
+      items: [
+        {
+          id: "destination-type",
+          label: "Central Log Destination",
+          detail: "Where logs from all 5 accounts should be centralized for querying and long-term storage.",
+          currentState: "Each account queries its own CloudWatch Logs independently",
+          correctState: "Central S3 bucket in security account with CloudWatch Logs subscription filters streaming to it",
+          states: [
+            "Each account queries its own CloudWatch Logs independently",
+            "Central CloudWatch Log Group in shared-services account with cross-account replication",
+            "Central S3 bucket in security account with CloudWatch Logs subscription filters streaming to it",
+            "Third-party SIEM with direct CloudWatch API polling from each account",
+          ],
+          rationaleId: "r-log-destination",
+        },
+        {
+          id: "delivery-mechanism",
+          label: "Log Delivery Mechanism",
+          detail: "How logs flow from source accounts to the central destination.",
+          currentState: "Manual export via scheduled Lambda",
+          correctState: "CloudWatch Logs subscription filters streaming in real-time via Kinesis Data Firehose",
+          states: [
+            "Manual export via scheduled Lambda",
+            "Daily S3 export job triggered by EventBridge",
+            "CloudWatch Logs subscription filters streaming in real-time via Kinesis Data Firehose",
+            "EC2-based Fluentd agents reading CloudWatch API",
+          ],
+          rationaleId: "r-log-delivery",
+        },
+        {
+          id: "access-control",
+          label: "Security Team Access to Central Logs",
+          detail: "How the security team accesses the centralized logs for queries and compliance review.",
+          currentState: "IAM user with AdministratorAccess in each account",
+          correctState: "IAM role in security account with cross-account assume-role access to read S3 centralized logs",
+          states: [
+            "IAM user with AdministratorAccess in each account",
+            "Shared root account credentials for emergency access",
+            "IAM role in security account with cross-account assume-role access to read S3 centralized logs",
+            "VPN tunnel to each account with direct CloudWatch console access",
+          ],
+          rationaleId: "r-log-access",
+        },
+        {
+          id: "compression",
+          label: "Log Compression in Central S3",
+          detail: "Whether logs are compressed before storage in the central S3 bucket.",
+          currentState: "Uncompressed JSON",
+          correctState: "GZIP compressed JSON",
+          states: ["Uncompressed JSON", "GZIP compressed JSON", "Parquet format", "Encrypted ZIP archives"],
+          rationaleId: "r-log-compression",
+        },
+      ],
+      rationales: [
+        {
+          id: "r-log-destination",
+          text: "A central S3 bucket in a dedicated security account is the AWS Well-Architected best practice for log centralization. S3 in the security account is isolated from production workloads, supports S3 Object Lock for tamper-proof audit logs, integrates with Athena for SQL querying, and costs significantly less than CloudWatch Logs for long-term storage.",
+        },
+        {
+          id: "r-log-delivery",
+          text: "CloudWatch Logs subscription filters with Kinesis Data Firehose provide near-real-time log delivery (seconds of latency) without polling. Daily batch exports mean the security team is always looking at yesterday's data during active incidents — unacceptable for compliance monitoring and incident response.",
+        },
+        {
+          id: "r-log-access",
+          text: "Cross-account IAM roles using assume-role are the AWS-recommended access pattern for multi-account architectures. IAM users with AdministratorAccess in each account are a security anti-pattern — compromising one set of credentials gives full account access. Cross-account roles are scoped, auditable, and revocable centrally.",
+        },
+        {
+          id: "r-log-compression",
+          text: "GZIP compression typically reduces JSON log size by 70–80%. For a compliance archive storing years of security logs, this directly translates to 70–80% S3 cost reduction. Parquet is better for analytics workloads but adds complexity for raw log storage.",
+        },
+      ],
+      feedback: {
+        perfect: "Correct architecture. S3 destination + Firehose streaming + cross-account IAM roles + GZIP compression is the AWS Well-Architected pattern for multi-account log centralization.",
+        partial: "Most choices are right but check your delivery mechanism. Batch exports create gaps in coverage during incidents. Real-time streaming with Firehose is required for compliance monitoring.",
+        wrong: "Multi-account log centralization requires streaming delivery (not batch), a dedicated security-account destination, and scoped IAM role access — not IAM users with broad permissions.",
+      },
+    },
+  ],
+  hints: [
+    "Set log retention periods by category: debug logs need only days, application logs need 30 days, compliance audit logs need 1 year.",
+    "Never sample error-level logs. Sample INFO and DEBUG if needed to control cost, but always capture 100% of errors.",
+    "For multi-account log centralization, stream logs to S3 in a dedicated security account via Kinesis Firehose — not cross-account CloudWatch replication.",
+  ],
+  scoring: {
+    maxScore: 100,
+    hintPenalty: 5,
+    penalties: { perfect: 0, partial: 10, wrong: 20 },
+    passingThresholds: { pass: 80, partial: 50 },
+  },
+  careerInsight:
+    "Logging architecture is a surprisingly deep skill that separates reactive engineers from proactive ones. Engineers who design logging systems with structured output, appropriate retention, and real-time centralization give their teams the tools to investigate incidents in minutes rather than hours.",
+  toolRelevance: ["AWS CloudWatch Logs", "AWS Kinesis Firehose", "AWS S3", "AWS Athena", "Datadog", "Splunk"],
+  createdAt: "2026-03-28",
+  updatedAt: "2026-03-28",
+};
