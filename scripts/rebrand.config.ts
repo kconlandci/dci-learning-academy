@@ -27,12 +27,22 @@ export interface Replacement {
 }
 
 export interface PostRebrandAssertion {
-  /** File path relative to the dest root. */
+  /**
+   * File path or fast-glob pattern, relative to the dest root. Literal paths
+   * (no glob chars) match a single file; globs are expanded and every match
+   * is checked.
+   */
   file: string;
-  /** Substring that must appear in the file after all transforms. */
+  /** Substring to search for. */
   marker: string;
-  /** Human-readable description for the error message if missing. */
+  /** Human-readable description for the error message. */
   description: string;
+  /**
+   * When true, the assertion FAILS if `marker` is found in any matched file.
+   * When false / undefined (default), the assertion fails if `marker` is
+   * missing from any matched file (or if no files match).
+   */
+  absent?: boolean;
 }
 
 export interface ModuleRebrand {
@@ -93,6 +103,14 @@ export const MODULES: Record<string, ModuleRebrand> = {
         pattern: /^\.env\.\*\r?\n(?!!\.env\.example)/m,
         replacement: ".env.*\n!.env.example\n",
       },
+      // Strip premium access gating — DCI Learning Academy unlocks all
+      // content for classroom use, so lab metadata should read "free", and
+      // the paywall section comments in paths.ts should disappear. Kept as
+      // text replacements (rather than a sed in the source repo) so future
+      // DataForge / CloudForge / TechForge rebrands inherit the fix for free.
+      { pattern: /accessLevel: "premium"/g, replacement: 'accessLevel: "free"' },
+      { pattern: /accessLevel: 'premium'/g, replacement: "accessLevel: 'free'" },
+      { pattern: /^[ \t]*\/\/ --- PREMIUM.*\r?\n/gm, replacement: "" },
       // Phase B: inject @dci/shared import into useProgress.ts for the
       // Firestore progress mirror. Anchors on the localDate import (unique
       // to useProgress.ts). If upstream ever removes that import, the
@@ -787,6 +805,16 @@ export default defineConfig(({ command }) => ({
           "check the import and mirrorToPreferences text replacements " +
           "in rebrand.config.ts.",
       },
+      {
+        file: "src/data/**/*.ts",
+        marker: 'accessLevel: "premium"',
+        absent: true,
+        description:
+          "Premium access gating must not survive rebrand. DCI unlocks " +
+          "all labs — if this fires, the premium-stripping text " +
+          "replacement missed a new quote style or the source added a " +
+          "new gating mechanism.",
+      },
     ],
   },
 
@@ -818,6 +846,10 @@ export default defineConfig(({ command }) => ({
         pattern: /^\.env\.\*\r?\n(?!!\.env\.example)/m,
         replacement: ".env.*\n!.env.example\n",
       },
+      // Strip premium access gating — see cybersecurity module for rationale.
+      { pattern: /accessLevel: "premium"/g, replacement: 'accessLevel: "free"' },
+      { pattern: /accessLevel: 'premium'/g, replacement: "accessLevel: 'free'" },
+      { pattern: /^[ \t]*\/\/ --- PREMIUM.*\r?\n/gm, replacement: "" },
       // Phase B: inject @dci/shared import into useProgress.ts
       {
         pattern: /import \{ getLocalDateString \} from "\.\.\/utils\/localDate";/,
@@ -1437,6 +1469,16 @@ export default defineConfig(({ command }) => ({
           "check the import and mirrorToPreferences text replacements " +
           "in rebrand.config.ts.",
       },
+      {
+        file: "src/data/**/*.ts",
+        marker: 'accessLevel: "premium"',
+        absent: true,
+        description:
+          "Premium access gating must not survive rebrand. DCI unlocks " +
+          "all labs — if this fires, the premium-stripping text " +
+          "replacement missed a new quote style or the source added a " +
+          "new gating mechanism.",
+      },
     ],
   },
 
@@ -1468,6 +1510,10 @@ export default defineConfig(({ command }) => ({
         pattern: /^\.env\.\*\r?\n(?!!\.env\.example)/m,
         replacement: ".env.*\n!.env.example\n",
       },
+      // Strip premium access gating — see cybersecurity module for rationale.
+      { pattern: /accessLevel: "premium"/g, replacement: 'accessLevel: "free"' },
+      { pattern: /accessLevel: 'premium'/g, replacement: "accessLevel: 'free'" },
+      { pattern: /^[ \t]*\/\/ --- PREMIUM.*\r?\n/gm, replacement: "" },
       // Phase B: inject @dci/shared import into useProgress.ts
       {
         pattern: /import \{ getLocalDateString \} from "\.\.\/utils\/localDate";/,
@@ -2084,6 +2130,16 @@ export default defineConfig(({ command }) => ({
           "If this assertion fires, the upstream anchor changed — " +
           "check the import and mirrorToPreferences text replacements " +
           "in rebrand.config.ts.",
+      },
+      {
+        file: "src/data/**/*.ts",
+        marker: 'accessLevel: "premium"',
+        absent: true,
+        description:
+          "Premium access gating must not survive rebrand. DCI unlocks " +
+          "all labs — if this fires, the premium-stripping text " +
+          "replacement missed a new quote style or the source added a " +
+          "new gating mechanism.",
       },
     ],
   },

@@ -382,23 +382,51 @@ async function main(): Promise<void> {
     console.log("[rebrand] checking post-rebrand assertions…");
     let passed = 0;
     for (const assertion of module.assertions) {
-      const absFile = path.resolve(destPath, assertion.file);
-      let content: string;
-      try {
-        content = await readFile(absFile, "utf8");
-      } catch {
+      // Expand file as a fast-glob pattern. Literal paths with no glob chars
+      // resolve to [that path] if it exists, [] otherwise — which the code
+      // below treats as "file not found" for presence checks.
+      const matches = await fg([assertion.file], {
+        cwd: destPath,
+        dot: true,
+        onlyFiles: true,
+        absolute: true,
+      });
+
+      if (!assertion.absent && matches.length === 0) {
         console.error(
-          `[rebrand] ASSERTION FAILED: file not found: ${assertion.file}`,
+          `[rebrand] ASSERTION FAILED: no files matched: ${assertion.file}`,
         );
         console.error(`  ${assertion.description}`);
         process.exit(1);
       }
-      if (!content.includes(assertion.marker)) {
-        console.error(
-          `[rebrand] ASSERTION FAILED: marker "${assertion.marker}" not found in ${assertion.file}`,
-        );
-        console.error(`  ${assertion.description}`);
-        process.exit(1);
+
+      for (const absFile of matches) {
+        const rel = path.relative(destPath, absFile);
+        let content: string;
+        try {
+          content = await readFile(absFile, "utf8");
+        } catch {
+          console.error(
+            `[rebrand] ASSERTION FAILED: could not read ${rel}`,
+          );
+          console.error(`  ${assertion.description}`);
+          process.exit(1);
+        }
+        const found = content.includes(assertion.marker);
+        if (assertion.absent && found) {
+          console.error(
+            `[rebrand] ASSERTION FAILED: forbidden marker "${assertion.marker}" still present in ${rel}`,
+          );
+          console.error(`  ${assertion.description}`);
+          process.exit(1);
+        }
+        if (!assertion.absent && !found) {
+          console.error(
+            `[rebrand] ASSERTION FAILED: marker "${assertion.marker}" not found in ${rel}`,
+          );
+          console.error(`  ${assertion.description}`);
+          process.exit(1);
+        }
       }
       passed++;
     }
