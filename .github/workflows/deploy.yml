@@ -68,16 +68,15 @@ jobs:
             [ -d "$app_dir/dist" ] || continue
             mkdir -p "_site/$app_name"
             cp -r "$app_dir/dist/"* "_site/$app_name/"
-
-            # Per-module SPA fallback: deep links like /cybersecurity/labs/foo
-            # need to resolve to that module's index.html, not the portal's.
-            cp "$app_dir/dist/index.html" "_site/$app_name/404.html"
           done
 
-          # Root SPA deep-link support: GitHub Pages serves 404.html when a
-          # path has no matching file. For portal routes (e.g. /instructor)
-          # the portal's index.html boots and React Router resolves the route.
-          cp apps/portal/dist/index.html _site/404.html
+          # Root SPA deep-link support: GitHub Pages project sites only honor
+          # the REPO-ROOT 404.html — per-subdirectory 404.html is ignored. So
+          # every unknown path (including /<module>/deep/path) hits this file.
+          # scripts/pages/404.html inspects the first path segment, redirects
+          # to the correct SPA shell, and encodes the deep path as ?/... so
+          # the shell's companion decoder can restore it via replaceState.
+          cp scripts/pages/404.html _site/404.html
 
       - name: Configure Pages
         uses: actions/configure-pages@v5

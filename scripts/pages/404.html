@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>DCI Learning Academy</title>
+    <meta name="robots" content="noindex" />
+    <script>
+      // SPA deep-link redirect for GitHub Pages.
+      //
+      // GitHub Pages project sites only honor the REPO-ROOT 404.html for
+      // unknown paths — per-subdirectory 404.html files are ignored. So
+      // /dci-learning-academy/networking/lab/anything-fake hits THIS file.
+      //
+      // We inspect the first path segment:
+      //   - If it's a known module slug, redirect to that module's index.html
+      //     (e.g. /dci-learning-academy/networking/) and encode the deep path
+      //     as `?/lab/anything-fake` so the module shell can restore it.
+      //   - Otherwise, redirect to the portal root with the deep path encoded
+      //     the same way, so React Router in the portal sees the original URL.
+      //
+      // A companion decoder runs on every SPA's index.html — see
+      // scripts/pages/spa-decode.html — which calls history.replaceState
+      // to restore the original path before React Router boots.
+      //
+      // Based on https://github.com/rafgraph/spa-github-pages (MIT).
+      (function () {
+        var PAGES_BASE = "/dci-learning-academy";
+        var KNOWN_MODULES = [
+          "cybersecurity",
+          "programming",
+          "networking",
+          "data-analytics",
+          "cloud-computing",
+          "it-support",
+        ];
+
+        var l = window.location;
+        var pathname = l.pathname;
+
+        // Strip the GitHub Pages base prefix.
+        if (pathname.indexOf(PAGES_BASE + "/") === 0) {
+          pathname = pathname.slice(PAGES_BASE.length + 1);
+        } else if (pathname === PAGES_BASE) {
+          pathname = "";
+        }
+
+        var segments = pathname.split("/");
+        var first = segments[0] || "";
+        var isModule = KNOWN_MODULES.indexOf(first) >= 0;
+
+        var shellPath = isModule ? first + "/" : "";
+        var deepPath = isModule ? segments.slice(1).join("/") : pathname;
+
+        var encoded =
+          "?/" +
+          deepPath.replace(/&/g, "~and~") +
+          (l.search ? "&" + l.search.slice(1).replace(/&/g, "~and~") : "");
+
+        l.replace(
+          l.protocol +
+            "//" +
+            l.host +
+            PAGES_BASE +
+            "/" +
+            shellPath +
+            encoded +
+            l.hash,
+        );
+      })();
+    </script>
+  </head>
+  <body></body>
+</html>

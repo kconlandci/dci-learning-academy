@@ -38,6 +38,7 @@ import { spawn } from "node:child_process";
 import { createServer } from "node:net";
 import {
   cp,
+  copyFile,
   mkdir,
   readdir,
   rm,
@@ -114,6 +115,22 @@ async function buildDeployTree() {
     await cp(moduleDist, target, { recursive: true });
     console.log(`[smoke]   ${name.padEnd(17)} → /dci-learning-academy/${name}/`);
   }
+
+  // Root SPA 404.html — mirrors the deploy step in .github/workflows/deploy.yml.
+  // `serve` looks for 404.html at the root of its public dir (DEPLOY_DIR here)
+  // for missing paths; on GitHub Pages the analogous location is the pages-
+  // root 404.html. The script's logic is URL-path-absolute and works for both.
+  // We also drop a copy inside SITE_DIR so direct hits on
+  // /dci-learning-academy/404.html match the deployed layout.
+  await copyFile(
+    join(__dirname, "pages", "404.html"),
+    join(DEPLOY_DIR, "404.html"),
+  );
+  await copyFile(
+    join(__dirname, "pages", "404.html"),
+    join(SITE_DIR, "404.html"),
+  );
+  console.log(`[smoke]   404 redirect       → /404.html + /dci-learning-academy/404.html`);
 }
 
 async function serveDeployTree() {
