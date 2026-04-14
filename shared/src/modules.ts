@@ -11,6 +11,8 @@ export interface DciModule {
   slug: string;
   /** Full in-module name (used inside HomeScreen/SettingsScreen headers) */
   name: string;
+  /** Short subject name — used on portal tiles and any compact UI surface */
+  shortName: string;
   /** One-line tagline for module tiles */
   tagline: string;
   /** Forge Labs source repo name (used by the rebrand script) */
@@ -26,6 +28,7 @@ export const MODULES: readonly DciModule[] = [
   {
     slug: "cybersecurity",
     name: "DCI Cybersecurity Labs",
+    shortName: "Cybersecurity",
     tagline: "Hands-on cybersecurity fundamentals and threat analysis",
     sourceRepo: "ThreatForge",
     labCount: 100,
@@ -34,6 +37,7 @@ export const MODULES: readonly DciModule[] = [
   {
     slug: "cloud-computing",
     name: "DCI Cloud Computing Labs",
+    shortName: "Cloud Computing",
     tagline: "Cloud platform fundamentals and infrastructure basics",
     sourceRepo: "CloudForge",
     labCount: 100,
@@ -42,6 +46,7 @@ export const MODULES: readonly DciModule[] = [
   {
     slug: "data-analytics",
     name: "DCI Data Analytics Labs",
+    shortName: "Data Analytics",
     tagline: "Data exploration, analysis, and visualization practice",
     sourceRepo: "DataForge",
     labCount: 100,
@@ -50,6 +55,7 @@ export const MODULES: readonly DciModule[] = [
   {
     slug: "programming",
     name: "DCI Programming Labs",
+    shortName: "Programming",
     tagline: "Software development foundations with real coding exercises",
     sourceRepo: "CodeForge",
     labCount: 100,
@@ -58,6 +64,7 @@ export const MODULES: readonly DciModule[] = [
   {
     slug: "networking",
     name: "DCI Networking Labs",
+    shortName: "Networking",
     tagline: "Network concepts, protocols, and troubleshooting skills",
     sourceRepo: "NetForge",
     labCount: 100,
@@ -66,6 +73,7 @@ export const MODULES: readonly DciModule[] = [
   {
     slug: "it-support",
     name: "DCI IT Support Labs",
+    shortName: "IT Support",
     tagline: "Help desk skills and IT support fundamentals",
     sourceRepo: "TechForge",
     labCount: 100,

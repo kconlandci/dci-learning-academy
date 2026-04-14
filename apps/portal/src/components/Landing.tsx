@@ -50,7 +50,7 @@ function ModuleCard({ module: mod }: { module: DciModule }) {
         className="group block p-6 rounded-lg bg-[#F5F5F5] border border-gray-200 hover:border-[#2A7F6F] hover:shadow-md transition-all"
       >
         <h3 className="text-lg font-semibold text-gray-900 group-hover:text-[#2A7F6F] transition-colors">
-          {mod.name}
+          {mod.shortName}
         </h3>
         <p className="mt-2 text-sm text-gray-500">{mod.tagline}</p>
         <p className="mt-4 text-xs font-medium text-[#2A7F6F]">
@@ -68,7 +68,7 @@ function ModuleCard({ module: mod }: { module: DciModule }) {
       <span className="absolute top-3 right-3 text-[10px] font-semibold uppercase tracking-wide text-gray-500 bg-gray-200 rounded-full px-2 py-0.5">
         Coming soon
       </span>
-      <h3 className="text-lg font-semibold text-gray-600">{mod.name}</h3>
+      <h3 className="text-lg font-semibold text-gray-600">{mod.shortName}</h3>
       <p className="mt-2 text-sm text-gray-400">{mod.tagline}</p>
     </div>
   );

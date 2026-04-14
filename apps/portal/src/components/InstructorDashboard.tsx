@@ -148,7 +148,7 @@ export function InstructorDashboard({ onSignOut }: InstructorDashboardProps) {
                       className="px-4 py-3 font-semibold whitespace-nowrap"
                       title={mod.name}
                     >
-                      {mod.name.replace(/^DCI\s+/, "").replace(/\s+Labs$/, "")}
+                      {mod.shortName}
                     </th>
                   ))}
                 </tr>
