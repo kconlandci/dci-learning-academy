@@ -60,15 +60,11 @@ export default function HomeScreen() {
         <div className="max-w-lg mx-auto pt-6">
           {/* Header */}
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-xl bg-[#2A7F6F]/20 flex items-center justify-center">
-              <Router className="text-[#2A7F6F]" size={22} />
-            </div>
-            <div>
-              <h1 className="text-xl font-bold text-[#1A1A1A]">DCI Networking Labs</h1>
-              <p className="text-xs text-gray-500">
-                Network Decision Simulator
-              </p>
-            </div>
+            <img
+              src={`${import.meta.env.BASE_URL}logo-wide.png`}
+              alt="DCI Networking Labs"
+              className="h-8"
+            />
           </div>
 
           {/* Stats bar */}

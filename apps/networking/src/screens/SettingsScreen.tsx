@@ -1,6 +1,5 @@
 import { useNavigate, Link } from "react-router-dom";
 import {
-  Router,
   ChevronRight,
   Crown,
   FileText,
@@ -55,9 +54,11 @@ export default function SettingsScreen() {
     <div className="min-h-screen bg-white p-4 pb-24">
       <div className="max-w-lg mx-auto pt-6">
         <div className="text-center mb-8">
-          <div className="w-14 h-14 rounded-2xl bg-[#2A7F6F]/20 flex items-center justify-center mx-auto mb-3">
-            <Router className="text-[#2A7F6F]" size={28} />
-          </div>
+          <img
+            src={`${import.meta.env.BASE_URL}logo-mark.png`}
+            alt="DCI Networking Labs"
+            className="w-14 h-14 rounded-2xl mx-auto mb-3"
+          />
           <h1 className="text-xl font-bold text-[#1A1A1A]">DCI Networking Labs</h1>
           <p className="text-xs text-gray-500 mt-1">
             Network Judgment Training
