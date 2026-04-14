@@ -1,6 +1,5 @@
 import { useNavigate, Link } from "react-router-dom";
 import {
-  Cloud,
   ChevronRight,
   Crown,
   FileText,
@@ -55,9 +54,11 @@ export default function SettingsScreen() {
       <div className="max-w-lg mx-auto pt-6">
         {/* App Info */}
         <div className="text-center mb-8">
-          <div className="w-14 h-14 rounded-2xl bg-[#2A7F6F]/10 flex items-center justify-center mx-auto mb-3">
-            <Cloud className="text-[#2A7F6F]" size={28} />
-          </div>
+          <img
+            src={`${import.meta.env.BASE_URL}logo-mark.png`}
+            alt="DCI Cloud Computing Labs"
+            className="w-14 h-14 rounded-2xl mx-auto mb-3"
+          />
           <h1 className="text-xl font-bold text-[#1A1A1A]">DCI Cloud Computing Labs</h1>
           <p className="text-xs text-gray-500 mt-1">
             Cloud Judgment Training
