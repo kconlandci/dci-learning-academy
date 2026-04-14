@@ -52,7 +52,7 @@ interface LabEngineProps {
 
 function getPerformanceTier(score: number, thresholds: ScoringConfig["passingThresholds"]) {
   if (score >= thresholds.pass) return { label: "PASS", color: "text-green-400", bg: "bg-green-500/10" };
-  if (score >= thresholds.partial) return { label: "PARTIAL", color: "text-yellow-400", bg: "bg-yellow-500/10" };
+  if (score >= thresholds.partial) return { label: "PARTIAL", color: "text-yellow-600", bg: "bg-yellow-500/10" };
   return { label: "NEEDS IMPROVEMENT", color: "text-red-400", bg: "bg-red-500/10" };
 }
 
@@ -221,7 +221,7 @@ export default function LabEngine({ manifest, renderer: Renderer, onExit, onLabC
               <div className="flex justify-between text-green-400">
                 <span>Perfect answers</span><span>{perfectCount}</span>
               </div>
-              <div className="flex justify-between text-yellow-400">
+              <div className="flex justify-between text-yellow-600">
                 <span>Partial answers</span><span>{partialCount}</span>
               </div>
               <div className="flex justify-between text-red-400">

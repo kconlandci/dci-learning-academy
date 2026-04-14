@@ -85,7 +85,7 @@ export default function DevScreen() {
                   key={r}
                   className={`px-2 py-1 rounded text-xs font-mono ${
                     (rendererCounts[r] || 0) < 2
-                      ? "bg-yellow-900/30 text-yellow-400 border border-yellow-500/30"
+                      ? "bg-yellow-900/30 text-yellow-600 border border-yellow-500/30"
                       : "bg-gray-700 text-gray-300"
                   }`}
                 >
@@ -173,7 +173,7 @@ export default function DevScreen() {
                       className={`px-1.5 py-0.5 rounded ${
                         lab.status === "published"
                           ? "bg-green-900/30 text-green-400"
-                          : "bg-yellow-900/30 text-yellow-400"
+                          : "bg-yellow-900/30 text-yellow-600"
                       }`}
                     >
                       {lab.status}
