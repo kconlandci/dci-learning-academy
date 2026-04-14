@@ -9,7 +9,7 @@
 export interface DciModule {
   /** URL slug and Firestore `module` field value */
   slug: string;
-  /** Human-readable name shown in UI */
+  /** Full in-module name (used inside HomeScreen/SettingsScreen headers) */
   name: string;
   /** One-line tagline for module tiles */
   tagline: string;
@@ -21,6 +21,7 @@ export interface DciModule {
   available: boolean;
 }
 
+// Market-demand-first ordering.
 export const MODULES: readonly DciModule[] = [
   {
     slug: "cybersecurity",
@@ -31,10 +32,10 @@ export const MODULES: readonly DciModule[] = [
     available: true,
   },
   {
-    slug: "programming",
-    name: "DCI Programming Labs",
-    tagline: "Software development foundations with real coding exercises",
-    sourceRepo: "CodeForge",
+    slug: "cloud-computing",
+    name: "DCI Cloud Computing Labs",
+    tagline: "Cloud platform fundamentals and infrastructure basics",
+    sourceRepo: "CloudForge",
     labCount: 100,
     available: true,
   },
@@ -47,10 +48,10 @@ export const MODULES: readonly DciModule[] = [
     available: true,
   },
   {
-    slug: "cloud-computing",
-    name: "DCI Cloud Computing Labs",
-    tagline: "Cloud platform fundamentals and infrastructure basics",
-    sourceRepo: "CloudForge",
+    slug: "programming",
+    name: "DCI Programming Labs",
+    tagline: "Software development foundations with real coding exercises",
+    sourceRepo: "CodeForge",
     labCount: 100,
     available: true,
   },
