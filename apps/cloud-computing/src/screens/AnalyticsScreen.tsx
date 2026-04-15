@@ -111,7 +111,7 @@ export default function AnalyticsScreen() {
               <div className="text-2xl font-bold text-[#1A1A1A]">{summary.labsStarted}</div>
               <div className="text-xs text-gray-400">Started</div>
             </div>
-            <div className="text-slate-600 text-lg">&rarr;</div>
+            <div className="text-gray-500 text-lg">&rarr;</div>
             <div className="flex-1">
               <div className="text-2xl font-bold text-green-400">{summary.labsCompleted}</div>
               <div className="text-xs text-gray-400">Completed</div>
@@ -145,10 +145,10 @@ export default function AnalyticsScreen() {
             })}
           </div>
           <div className="flex justify-between mt-1">
-            <span className="text-[9px] text-slate-600">
+            <span className="text-[9px] text-gray-500">
               {summary.labsPerDay[0]?.date.slice(5)}
             </span>
-            <span className="text-[9px] text-slate-600">
+            <span className="text-[9px] text-gray-500">
               {summary.labsPerDay[summary.labsPerDay.length - 1]?.date.slice(5)}
             </span>
           </div>

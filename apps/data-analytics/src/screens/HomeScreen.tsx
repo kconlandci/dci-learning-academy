@@ -311,7 +311,7 @@ function PathCard({
                 {isLocked ? (
                   <Lock size={12} className="text-gray-400 shrink-0" />
                 ) : (
-                  <ChevronRight size={14} className="text-slate-600 shrink-0" />
+                  <ChevronRight size={14} className="text-gray-500 shrink-0" />
                 )}
               </Link>
             );
@@ -375,7 +375,7 @@ function LabCard({
         {locked ? (
           <Lock size={14} className="text-gray-400 shrink-0" />
         ) : (
-          <ChevronRight size={16} className="text-slate-600 shrink-0" />
+          <ChevronRight size={16} className="text-gray-500 shrink-0" />
         )}
       </div>
     </Link>

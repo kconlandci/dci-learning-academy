@@ -12,7 +12,7 @@ import type { ActionRationaleScenario } from "../../types/manifest";
 const COLOR_MAP: Record<string, { selected: string; base: string }> = {
   blue:   { selected: "bg-blue-500/15 border-blue-500 text-blue-700", base: "bg-[#F5F5F5] border-gray-200 text-gray-700 hover:border-gray-400" },
   green:  { selected: "bg-green-500/15 border-green-500 text-green-700", base: "bg-[#F5F5F5] border-gray-200 text-gray-700 hover:border-gray-400" },
-  yellow: { selected: "bg-yellow-500/15 border-yellow-500 text-yellow-700", base: "bg-[#F5F5F5] border-gray-200 text-gray-700 hover:border-gray-400" },
+  yellow: { selected: "bg-yellow-500/15 border-yellow-500 text-amber-700", base: "bg-[#F5F5F5] border-gray-200 text-gray-700 hover:border-gray-400" },
   orange: { selected: "bg-orange-500/15 border-orange-500 text-orange-700", base: "bg-[#F5F5F5] border-gray-200 text-gray-700 hover:border-gray-400" },
   red:    { selected: "bg-red-500/15 border-red-500 text-red-700", base: "bg-[#F5F5F5] border-gray-200 text-gray-700 hover:border-gray-400" },
 };

@@ -63,7 +63,7 @@ export default function DevScreen() {
   const allRenderers: RendererType[] = ["action-rationale", "toggle-config", "investigate-decide", "triage-remediate"];
 
   return (
-    <div className="min-h-screen bg-slate-950 text-[#1A1A1A] p-4 pb-24">
+    <div className="min-h-screen bg-white text-[#1A1A1A] p-4 pb-24">
       <div className="max-w-3xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <div>
@@ -147,7 +147,7 @@ export default function DevScreen() {
             <span>Streak: {progress.streakDays}d</span>
             <span>Completed: {getTotalCompleted()}</span>
           </div>
-          <pre className="text-[10px] text-gray-500 bg-slate-950 rounded p-3 overflow-auto max-h-48 font-mono">
+          <pre className="text-[10px] text-gray-500 bg-white rounded p-3 overflow-auto max-h-48 font-mono">
             {JSON.stringify(progress, null, 2)}
           </pre>
         </div>

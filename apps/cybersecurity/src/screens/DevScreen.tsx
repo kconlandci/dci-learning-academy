@@ -87,7 +87,7 @@ export default function DevScreen() {
                   key={r}
                   className={`px-2 py-1 rounded text-xs font-mono ${
                     (rendererCounts[r] || 0) < 2
-                      ? "bg-yellow-100 text-yellow-700 border border-yellow-300"
+                      ? "bg-amber-100 text-amber-700 border border-amber-300"
                       : "bg-white text-gray-600"
                   }`}
                 >
