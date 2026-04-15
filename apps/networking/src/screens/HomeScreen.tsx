@@ -58,6 +58,12 @@ export default function HomeScreen() {
               alt="DCI Networking Labs"
               className="h-8"
             />
+            <div>
+              <h1 className="text-xl font-bold text-[#1A1A1A]">
+                DCI Networking Labs
+              </h1>
+              <p className="text-xs text-gray-500">Network Judgment Training</p>
+            </div>
           </div>
 
           {/* Stats bar */}

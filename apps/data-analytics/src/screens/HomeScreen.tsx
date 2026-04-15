@@ -69,6 +69,12 @@ export default function HomeScreen() {
               alt="DCI Data Analytics Labs"
               className="h-8"
             />
+            <div>
+              <h1 className="text-xl font-bold text-[#1A1A1A]">
+                DCI Data Analytics Labs
+              </h1>
+              <p className="text-xs text-gray-500">Data Training</p>
+            </div>
           </div>
 
           <div className="flex items-center gap-4 mb-6 px-1">
