@@ -77,6 +77,60 @@ function formatDateTime(ms: number | null): string {
  * For "phishing-email-triage" that yields "Phishing Email Triage" — good
  * enough for a pilot readout.
  */
+function csvEscape(value: string): string {
+  // Quote when the value contains a comma, quote, or newline; double any
+  // embedded quotes per RFC 4180.
+  if (/[",\r\n]/.test(value)) {
+    return `"${value.replace(/"/g, '""')}"`;
+  }
+  return value;
+}
+
+function buildRosterCsv(rows: StudentRow[]): string {
+  const header = [
+    "Display Name",
+    "Student ID",
+    "Joined",
+    "Last Activity",
+    ...MODULES.map((m) => m.shortName),
+  ];
+  const lines = [header.map(csvEscape).join(",")];
+  for (const row of rows) {
+    const cells = [
+      row.displayName,
+      row.studentId,
+      formatDate(row.createdAtMs),
+      formatDate(row.lastActivityMs),
+      ...MODULES.map(
+        (m) => `${row.perModule[m.slug] ?? 0}/${m.labCount}`,
+      ),
+    ];
+    lines.push(cells.map(csvEscape).join(","));
+  }
+  return lines.join("\r\n");
+}
+
+function downloadCsv(filename: string, csv: string): void {
+  // Prepend BOM so Excel picks up UTF-8 encoding for non-ASCII display names.
+  const blob = new Blob(["\ufeff", csv], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function todayStamp(): string {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
 function slugToTitle(labId: string): string {
   return labId
     .split(/[-_]/g)
@@ -208,7 +262,7 @@ export function InstructorDashboard({ onSignOut }: InstructorDashboardProps) {
   return (
     <div className="min-h-screen bg-white text-gray-900 flex flex-col">
       <header className="bg-[#2A7F6F] text-white">
-        <div className="mx-auto max-w-6xl px-6 py-5 flex items-center justify-between">
+        <div className="mx-auto max-w-6xl px-6 py-5 flex items-center justify-between gap-4">
           <div>
             <p className="text-[10px] uppercase tracking-widest text-teal-100">
               Instructor
@@ -217,9 +271,27 @@ export function InstructorDashboard({ onSignOut }: InstructorDashboardProps) {
               Class Dashboard
             </h1>
           </div>
-          <p className="text-sm text-teal-100">
-            {sorted ? `${sorted.length} student${sorted.length === 1 ? "" : "s"}` : ""}
-          </p>
+          <div className="flex items-center gap-4">
+            <p className="text-sm text-teal-100">
+              {sorted
+                ? `${sorted.length} student${sorted.length === 1 ? "" : "s"}`
+                : ""}
+            </p>
+            {sorted && sorted.length > 0 && (
+              <button
+                type="button"
+                onClick={() =>
+                  downloadCsv(
+                    `dci-roster-${todayStamp()}.csv`,
+                    buildRosterCsv(sorted),
+                  )
+                }
+                className="text-xs font-medium bg-white/10 hover:bg-white/20 text-white rounded-md px-3 py-1.5 transition-colors"
+              >
+                Export CSV
+              </button>
+            )}
+          </div>
         </div>
       </header>
 
