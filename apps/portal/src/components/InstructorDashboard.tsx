@@ -58,6 +58,17 @@ function formatDate(ms: number | null): string {
   });
 }
 
+function formatDateTime(ms: number | null): string {
+  if (ms === null) return "\u2014";
+  return new Date(ms).toLocaleString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
+
 /**
  * Best-effort lab title from a slug-style labId.
  *
@@ -147,6 +158,7 @@ export function InstructorDashboard({ onSignOut }: InstructorDashboardProps) {
   const [rows, setRows] = useState<StudentRow[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [overviewOpen, setOverviewOpen] = useState(true);
+  const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -183,6 +195,14 @@ export function InstructorDashboard({ onSignOut }: InstructorDashboardProps) {
   const moduleStats = useMemo(
     () => (rows ? computeModuleStats(rows) : null),
     [rows],
+  );
+
+  const selectedStudent = useMemo(
+    () =>
+      selectedStudentId && rows
+        ? rows.find((r) => r.studentId === selectedStudentId) ?? null
+        : null,
+    [selectedStudentId, rows],
   );
 
   return (
@@ -276,11 +296,12 @@ export function InstructorDashboard({ onSignOut }: InstructorDashboardProps) {
                 {sorted.map((row, i) => (
                   <tr
                     key={row.studentId}
-                    className={`border-t border-gray-200 hover:bg-gray-50 ${
+                    onClick={() => setSelectedStudentId(row.studentId)}
+                    className={`border-t border-gray-200 cursor-pointer hover:bg-gray-50 ${
                       i % 2 === 1 ? "bg-[#FAFAFA]" : ""
                     }`}
                   >
-                    <td className="px-4 py-3 font-medium text-gray-900">
+                    <td className="px-4 py-3 font-medium text-gray-900 underline decoration-dotted decoration-gray-400 underline-offset-2">
                       {row.displayName}
                     </td>
                     <td className="px-4 py-3 text-gray-500">
@@ -310,6 +331,13 @@ export function InstructorDashboard({ onSignOut }: InstructorDashboardProps) {
           </div>
         )}
       </main>
+
+      {selectedStudent && (
+        <StudentDetailModal
+          student={selectedStudent}
+          onClose={() => setSelectedStudentId(null)}
+        />
+      )}
 
       <Footer onSignOut={onSignOut} label="Sign out (instructor)" />
     </div>
@@ -374,6 +402,146 @@ function LabList({
           ))}
         </ul>
       )}
+    </div>
+  );
+}
+
+interface TimelineEntry {
+  moduleSlug: string;
+  moduleShortName: string;
+  labId: string;
+  labTitle: string;
+  completedAtMs: number | null;
+}
+
+function buildTimeline(student: StudentRow): TimelineEntry[] {
+  const moduleShortNames = new Map(MODULES.map((m) => [m.slug, m.shortName]));
+  return student.completions
+    .map((c) => ({
+      moduleSlug: c.module,
+      moduleShortName: moduleShortNames.get(c.module) ?? c.module,
+      labId: c.labId,
+      labTitle: slugToTitle(c.labId),
+      completedAtMs: timestampToMs(c.completedAt),
+    }))
+    .sort((a, b) => (b.completedAtMs ?? 0) - (a.completedAtMs ?? 0));
+}
+
+function StudentDetailModal({
+  student,
+  onClose,
+}: {
+  student: StudentRow;
+  onClose: () => void;
+}) {
+  const timeline = useMemo(() => buildTimeline(student), [student]);
+  const totalCompleted = student.completions.length;
+  const shortId = `${student.studentId.slice(0, 8)}\u2026`;
+
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") onClose();
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label={`Progress detail for ${student.displayName}`}
+      className="fixed inset-0 z-50 flex items-start justify-center bg-black/40 p-4 overflow-y-auto"
+      onClick={onClose}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="w-full max-w-3xl bg-white rounded-lg shadow-xl my-10"
+      >
+        <header className="flex items-start justify-between border-b border-gray-200 px-6 py-4">
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900">
+              {student.displayName}
+            </h2>
+            <p
+              className="mt-1 text-[11px] font-mono text-gray-400"
+              title={student.studentId}
+            >
+              {shortId}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close student detail"
+            className="text-gray-400 hover:text-gray-600 text-2xl leading-none px-2"
+          >
+            &times;
+          </button>
+        </header>
+
+        <section className="px-6 py-4 border-b border-gray-200">
+          <dl className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
+            <div>
+              <dt className="text-gray-500">Joined</dt>
+              <dd className="text-gray-900 font-medium">
+                {formatDate(student.createdAtMs)}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-gray-500">Last activity</dt>
+              <dd className="text-gray-900 font-medium">
+                {formatDate(student.lastActivityMs)}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-gray-500">Labs completed</dt>
+              <dd className="text-gray-900 font-medium">{totalCompleted}</dd>
+            </div>
+          </dl>
+        </section>
+
+        <section className="px-6 py-4">
+          <h3 className="text-[10px] uppercase tracking-wide text-gray-500 mb-3">
+            Completed labs ({timeline.length})
+          </h3>
+          {timeline.length === 0 ? (
+            <p className="text-sm text-gray-400">
+              No completions recorded yet.
+            </p>
+          ) : (
+            <div className="overflow-x-auto rounded-md border border-gray-200">
+              <table className="w-full text-xs">
+                <thead className="bg-[#F5F5F5] text-left uppercase tracking-wide text-gray-500">
+                  <tr>
+                    <th className="px-3 py-2 font-semibold">When</th>
+                    <th className="px-3 py-2 font-semibold">Module</th>
+                    <th className="px-3 py-2 font-semibold">Lab</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {timeline.map((entry, i) => (
+                    <tr
+                      key={`${entry.moduleSlug}:${entry.labId}:${i}`}
+                      className="border-t border-gray-200"
+                    >
+                      <td className="px-3 py-2 text-gray-500 whitespace-nowrap">
+                        {formatDateTime(entry.completedAtMs)}
+                      </td>
+                      <td className="px-3 py-2 text-gray-700 whitespace-nowrap">
+                        {entry.moduleShortName}
+                      </td>
+                      <td className="px-3 py-2 text-gray-900">
+                        {entry.labTitle}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </section>
+      </div>
     </div>
   );
 }
