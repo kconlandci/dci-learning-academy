@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   getAllStudentsProgress,
+  LAB_CATALOG,
   MODULES,
   type LabCompletion,
   type StudentProgress,
@@ -131,12 +132,31 @@ function todayStamp(): string {
   return `${y}-${m}-${day}`;
 }
 
-function slugToTitle(labId: string): string {
-  return labId
-    .split(/[-_]/g)
-    .filter(Boolean)
-    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-    .join(" ");
+/**
+ * Title lookup keyed by `${moduleSlug}:${labId}` for O(1) render-path access.
+ * Falls back to the raw labId if a completion references a lab that's no
+ * longer in the catalog (rename / removal between deploys).
+ */
+const TITLE_BY_KEY: ReadonlyMap<string, string> = new Map(
+  LAB_CATALOG.map((e) => [`${e.moduleSlug}:${e.labId}`, e.title]),
+);
+
+/** Catalog entries grouped by module slug, order preserved from generation. */
+const CATALOG_BY_MODULE: ReadonlyMap<
+  string,
+  ReadonlyArray<(typeof LAB_CATALOG)[number]>
+> = (() => {
+  const map = new Map<string, (typeof LAB_CATALOG)[number][]>();
+  for (const entry of LAB_CATALOG) {
+    const list = map.get(entry.moduleSlug) ?? [];
+    list.push(entry);
+    map.set(entry.moduleSlug, list);
+  }
+  return map;
+})();
+
+function titleFor(moduleSlug: string, labId: string): string {
+  return TITLE_BY_KEY.get(`${moduleSlug}:${labId}`) ?? labId;
 }
 
 function toRow(student: StudentProgress): StudentRow {
@@ -182,11 +202,26 @@ function computeModuleStats(rows: StudentRow[]): ModuleStats[] {
         labCounts.set(c.labId, (labCounts.get(c.labId) ?? 0) + 1);
       }
     }
-    const labs: LabStat[] = [...labCounts.entries()].map(([labId, count]) => ({
-      labId,
-      title: slugToTitle(labId),
-      count,
-    }));
+
+    // Start from the full catalog so zero-completion labs surface in the
+    // bottom-5 "not resonating" signal. Any completion whose labId isn't in
+    // the catalog (renamed / removed lab) still gets included as a fallback.
+    const catalogEntries = CATALOG_BY_MODULE.get(mod.slug) ?? [];
+    const seen = new Set<string>();
+    const labs: LabStat[] = [];
+    for (const entry of catalogEntries) {
+      seen.add(entry.labId);
+      labs.push({
+        labId: entry.labId,
+        title: entry.title,
+        count: labCounts.get(entry.labId) ?? 0,
+      });
+    }
+    for (const [labId, count] of labCounts) {
+      if (seen.has(labId)) continue;
+      labs.push({ labId, title: titleFor(mod.slug, labId), count });
+    }
+
     // Stable title tiebreaker keeps the list deterministic turn-to-turn.
     const sortedDesc = [...labs].sort(
       (a, b) => b.count - a.count || a.title.localeCompare(b.title),
@@ -463,15 +498,32 @@ function LabList({
         <p className="text-xs text-gray-400">{emptyHint ?? "\u2014"}</p>
       ) : (
         <ul className="space-y-0.5">
-          {labs.map((lab) => (
-            <li
-              key={lab.labId}
-              className="flex items-center justify-between text-xs"
-            >
-              <span className="text-gray-700 truncate pr-2">{lab.title}</span>
-              <span className="text-gray-500 tabular-nums">{lab.count}</span>
-            </li>
-          ))}
+          {labs.map((lab) => {
+            const zero = lab.count === 0;
+            return (
+              <li
+                key={lab.labId}
+                className="flex items-center justify-between gap-2 text-xs"
+              >
+                <span
+                  className={`truncate pr-2 ${
+                    zero ? "text-gray-400" : "text-gray-700"
+                  }`}
+                >
+                  {lab.title}
+                </span>
+                {zero ? (
+                  <span className="shrink-0 rounded-full bg-amber-100 text-amber-800 px-1.5 py-0.5 text-[10px] font-medium tabular-nums">
+                    0
+                  </span>
+                ) : (
+                  <span className="shrink-0 text-gray-500 tabular-nums">
+                    {lab.count}
+                  </span>
+                )}
+              </li>
+            );
+          })}
         </ul>
       )}
     </div>
@@ -493,7 +545,7 @@ function buildTimeline(student: StudentRow): TimelineEntry[] {
       moduleSlug: c.module,
       moduleShortName: moduleShortNames.get(c.module) ?? c.module,
       labId: c.labId,
-      labTitle: slugToTitle(c.labId),
+      labTitle: titleFor(c.module, c.labId),
       completedAtMs: timestampToMs(c.completedAt),
     }))
     .sort((a, b) => (b.completedAtMs ?? 0) - (a.completedAtMs ?? 0));

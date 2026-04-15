@@ -15,6 +15,7 @@
     "lint": "pnpm -r lint",
     "typecheck": "pnpm -r typecheck",
     "rebrand": "tsx scripts/rebrand.ts",
+    "generate:catalog": "node scripts/generate-lab-catalog.mjs",
     "deploy:rules": "npx -y firebase-tools@latest deploy --only firestore:rules"
   },
   "devDependencies": {

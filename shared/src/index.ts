@@ -31,3 +31,6 @@ export {
 
 // Module registry
 export { MODULES, getModule, type DciModule } from "./modules";
+
+// Lab catalog (generated from each app's lab manifests at build time).
+export { LAB_CATALOG, type LabCatalogEntry } from "./generated/labCatalog";
