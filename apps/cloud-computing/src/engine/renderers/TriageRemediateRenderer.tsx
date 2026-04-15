@@ -106,7 +106,7 @@ export default function TriageRemediateRenderer({ scenario, onSubmit, phase, fee
                 disabled={isLocked}
                 className={`min-h-[44px] p-3 rounded-xl border-2 text-left transition-all ${
                   isSelected
-                    ? "bg-[#2A7F6F]/10 border-[#2A7F6F] text-violet-200"
+                    ? "bg-[#2A7F6F]/10 border-[#2A7F6F] text-gray-500"
                     : "bg-[#F5F5F5] border-gray-200 text-gray-500 hover:border-gray-400"
                 } ${isLocked ? "opacity-70 cursor-default" : "cursor-pointer"}`}
               >
@@ -133,7 +133,7 @@ export default function TriageRemediateRenderer({ scenario, onSubmit, phase, fee
                 disabled={isLocked}
                 className={`min-h-[44px] p-3 rounded-xl border-2 text-left text-sm transition-all ${
                   isSelected
-                    ? "bg-[#2A7F6F]/10 border-[#2A7F6F] text-violet-200"
+                    ? "bg-[#2A7F6F]/10 border-[#2A7F6F] text-gray-500"
                     : "bg-[#F5F5F5] border-gray-200 text-gray-500 hover:border-gray-400"
                 } ${isLocked ? "opacity-70 cursor-default" : "cursor-pointer"}`}
               >

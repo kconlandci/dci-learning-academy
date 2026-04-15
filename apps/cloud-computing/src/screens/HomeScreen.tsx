@@ -141,7 +141,7 @@ export default function HomeScreen() {
               to="/upgrade"
               className="block bg-[#2A7F6F]/10 border border-[#2A7F6F]/30 rounded-xl p-4 mb-6 active:bg-[#2A7F6F]/10 transition-colors"
             >
-              <p className="text-sm text-violet-200 text-center">
+              <p className="text-sm text-gray-500 text-center">
                 Ready for more? Unlock advanced labs with DCI Cloud Computing Labs
                 Premium.
               </p>
@@ -302,7 +302,7 @@ function PathCard({
                 {isLocked ? (
                   <Lock size={12} className="text-gray-400 shrink-0" />
                 ) : (
-                  <ChevronRight size={14} className="text-slate-600 shrink-0" />
+                  <ChevronRight size={14} className="text-gray-500 shrink-0" />
                 )}
               </Link>
             );
@@ -368,7 +368,7 @@ function LabCard({ lab, locked, labProgress }: LabCardProps) {
         {locked ? (
           <Lock size={14} className="text-gray-400 shrink-0" />
         ) : (
-          <ChevronRight size={16} className="text-slate-600 shrink-0" />
+          <ChevronRight size={16} className="text-gray-500 shrink-0" />
         )}
       </div>
     </Link>

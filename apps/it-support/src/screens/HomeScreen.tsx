@@ -174,7 +174,7 @@ function PathCard({ path, isLabCompleted, getLabProgress, isPremium }: {
                 </span>
                 <span className="text-xs text-[#1A1A1A] flex-1 truncate">{lab.title}</span>
                 {lp?.completed && <span className="text-[10px] text-green-400">{lp.bestScore}</span>}
-                {isLocked ? <Lock size={12} className="text-gray-400 shrink-0" /> : <ChevronRight size={14} className="text-slate-600 shrink-0" />}
+                {isLocked ? <Lock size={12} className="text-gray-400 shrink-0" /> : <ChevronRight size={14} className="text-gray-500 shrink-0" />}
               </Link>
             );
           })}
@@ -207,7 +207,7 @@ function LabCard({ lab, locked, labProgress }: LabCardProps) {
             )}
           </div>
         </div>
-        {locked ? <Lock size={14} className="text-gray-400 shrink-0" /> : <ChevronRight size={16} className="text-slate-600 shrink-0" />}
+        {locked ? <Lock size={14} className="text-gray-400 shrink-0" /> : <ChevronRight size={16} className="text-gray-500 shrink-0" />}
       </div>
     </Link>
   );

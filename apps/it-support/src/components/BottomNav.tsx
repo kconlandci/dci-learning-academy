@@ -15,7 +15,7 @@ const tabs = IS_DEV
 export default function BottomNav() {
   const location = useLocation();
   return (
-    <nav aria-label="Main navigation" className="fixed bottom-0 left-0 right-0 z-40 bg-slate-950 border-t border-gray-200" style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}>
+    <nav aria-label="Main navigation" className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200" style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}>
       <div className="max-w-lg mx-auto flex">
         {tabs.map((tab) => {
           const isActive = tab.path === "/" ? location.pathname === "/" : location.pathname.startsWith(tab.path);
