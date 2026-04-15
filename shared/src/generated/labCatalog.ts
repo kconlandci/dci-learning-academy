@@ -397,7 +397,6 @@ export const LAB_CATALOG: readonly LabCatalogEntry[] = [
   { moduleSlug: "programming", labId: "service-to-service-auth", title: "Service-to-Service Auth" },
   { moduleSlug: "programming", labId: "session-fixation-defense", title: "Session Fixation Defense" },
   { moduleSlug: "programming", labId: "session-id-generation", title: "Session ID Generation" },
-  { moduleSlug: "programming", labId: "telemetry-rationale", title: "Choose the safer implementation path" },
   { moduleSlug: "programming", labId: "shift-left-security-tests", title: "Shift-Left Security Tests" },
   { moduleSlug: "programming", labId: "sql-parameterized-queries", title: "SQL Parameterized Queries" },
   { moduleSlug: "programming", labId: "ssrf-guardrails", title: "SSRF Guardrails" },

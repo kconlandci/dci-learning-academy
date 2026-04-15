@@ -12,7 +12,7 @@
  * CI/build wiring: hooked into `shared` via pnpm `prebuild`/`pretypecheck`.
  */
 
-import { readFileSync, readdirSync, writeFileSync, mkdirSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -45,16 +45,36 @@ function extract(file) {
   return { id: idMatch[1], title };
 }
 
+/**
+ * Derive the authoritative lab file list from the app's catalog.ts by
+ * reading its `from "./labs/<name>"` imports. This avoids mistaking helper
+ * modules (e.g. programming's labs/shared.ts factory) for lab manifests.
+ */
+function listLabFilesFromCatalog(slug) {
+  const catalogPath = join(
+    repoRoot,
+    "apps",
+    slug,
+    "src",
+    "data",
+    "catalog.ts",
+  );
+  const src = readFileSync(catalogPath, "utf8");
+  const re = /from\s+"\.\/labs\/([^"]+)"/g;
+  const names = new Set();
+  let m;
+  while ((m = re.exec(src)) !== null) names.add(m[1]);
+  return [...names]
+    .sort()
+    .map((name) => join(repoRoot, "apps", slug, "src", "data", "labs", `${name}.ts`));
+}
+
 function collect() {
   /** @type {{ moduleSlug: string; labId: string; title: string }[]} */
   const entries = [];
   for (const slug of MODULE_SLUGS) {
-    const labsDir = join(repoRoot, "apps", slug, "src", "data", "labs");
-    const files = readdirSync(labsDir)
-      .filter((f) => f.endsWith(".ts"))
-      .sort();
-    for (const f of files) {
-      const { id, title } = extract(join(labsDir, f));
+    for (const file of listLabFilesFromCatalog(slug)) {
+      const { id, title } = extract(file);
       entries.push({ moduleSlug: slug, labId: id, title });
     }
   }
