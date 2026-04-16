@@ -63,12 +63,12 @@ export default function SettingsScreen() {
           <div className="mx-auto mb-3 flex justify-center">
             <img
               src={`${import.meta.env.BASE_URL}logo-wide.png`}
-              alt="DCI Programming Labs"
+              alt="DCI Secure Development Labs"
               className="h-16"
             />
           </div>
-          <h1 className="text-xl font-bold text-[#1A1A1A]">DCI Programming Labs</h1>
-          <p className="text-xs text-gray-500 mt-1">DCI Programming Labs: Dev Training</p>
+          <h1 className="text-xl font-bold text-[#1A1A1A]">DCI Secure Development Labs</h1>
+          <p className="text-xs text-gray-500 mt-1">DCI Secure Development Labs: AppSec Training</p>
           <p className="text-[10px] text-gray-400 mt-1">v1.0.3</p>
           <p className="text-xs text-gray-500 mt-3 max-w-xs mx-auto leading-relaxed">
             Build secure coding instincts through short labs on web, backend,
@@ -87,7 +87,7 @@ export default function SettingsScreen() {
             <div className="flex items-center gap-3">
               <Crown size={18} className="text-[#2A7F6F]" />
               <span className="text-sm font-medium text-[#1A1A1A]">
-                DCI Programming Labs Premium
+                DCI Secure Development Labs Premium
               </span>
             </div>
             <ChevronRight size={18} className="text-gray-400" />
@@ -147,7 +147,7 @@ export default function SettingsScreen() {
             <button
               onClick={() =>
                 openExternal(
-                  "mailto:dci-programming.app@gmail.com?subject=DCI Programming Labs%20Feedback"
+                  "mailto:dci-programming.app@gmail.com?subject=DCI Secure Development Labs%20Feedback"
                 )
               }
               className="flex items-center gap-3 w-full bg-[#F5F5F5] rounded-xl p-4 min-h-[48px] active:bg-gray-100 transition-colors text-left"

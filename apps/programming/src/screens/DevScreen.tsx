@@ -83,7 +83,7 @@ export default function DevScreen() {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-lg font-bold text-white">
-              DCI Programming Labs Dev Preview
+              DCI Secure Development Labs Dev Preview
             </h1>
             <p className="text-xs text-gray-400">
               {labCatalog.length} manifests loaded

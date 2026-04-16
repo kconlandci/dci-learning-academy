@@ -71,9 +71,9 @@ export const MODULES: readonly DciModule[] = [
   },
   {
     slug: "programming",
-    name: "DCI Programming Labs",
-    shortName: "Programming",
-    tagline: "Software development foundations with real coding exercises",
+    name: "DCI Secure Development Labs",
+    shortName: "Secure Dev",
+    tagline: "AppSec Training",
     sourceRepo: "CodeForge",
     labCount: getLabCount("programming"),
     available: true,

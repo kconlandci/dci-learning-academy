@@ -84,7 +84,7 @@ export default function LabScreen() {
           <Lock size={32} className="text-gray-400 mx-auto mb-3" />
           <p className="text-sm font-medium text-[#1A1A1A] mb-1">Premium Lab</p>
           <p className="text-xs text-gray-500 mb-4">
-            This lab requires DCI Programming Labs Premium.
+            This lab requires DCI Secure Development Labs Premium.
           </p>
           <div className="flex gap-3 justify-center">
             <button

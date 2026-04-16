@@ -81,7 +81,7 @@ function validateProgressShape(data: unknown): DciProgrammingProgress | null {
     return result.data;
   }
 
-  console.warn("[DCI Programming Labs] Progress validation failed:", result.error.message);
+  console.warn("[DCI Secure Development Labs] Progress validation failed:", result.error.message);
   return null;
 }
 
@@ -111,7 +111,7 @@ function saveProgress(progress: DciProgrammingProgress) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
   } catch (error) {
-    console.error("[DCI Programming Labs] Failed to save progress:", error);
+    console.error("[DCI Secure Development Labs] Failed to save progress:", error);
 
     try {
       const minimal = {
@@ -120,7 +120,7 @@ function saveProgress(progress: DciProgrammingProgress) {
       };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(minimal));
     } catch {
-      console.error("[DCI Programming Labs] Even minimal progress save failed.");
+      console.error("[DCI Secure Development Labs] Even minimal progress save failed.");
     }
   }
 }
@@ -135,7 +135,7 @@ function loadProgress(): DciProgrammingProgress {
     const parsed = JSON.parse(raw);
     const validated = validateProgressShape(parsed);
     if (!validated) {
-      console.warn("[DCI Programming Labs] Progress data failed validation. Resetting.");
+      console.warn("[DCI Secure Development Labs] Progress data failed validation. Resetting.");
       return createDefaultProgress();
     }
 
@@ -156,7 +156,7 @@ function mirrorToPreferences(progress: DciProgrammingProgress) {
     value: JSON.stringify(progress),
   }).catch((error) => {
     console.warn(
-      "[DCI Programming Labs] Failed to mirror progress to Preferences:",
+      "[DCI Secure Development Labs] Failed to mirror progress to Preferences:",
       error
     );
   });
@@ -180,13 +180,13 @@ async function recoverFromPreferences(
     // Reject recovered progress if it belongs to a different user
     if (currentUserId && validated.userId && validated.userId !== currentUserId) {
       console.warn(
-        "[DCI Programming Labs] UID mismatch during recovery — rejecting stale progress."
+        "[DCI Secure Development Labs] UID mismatch during recovery — rejecting stale progress."
       );
       return null;
     }
 
     const migrated = migrateProgress(validated);
-    console.info("[DCI Programming Labs] Recovered progress from Preferences backup.");
+    console.info("[DCI Secure Development Labs] Recovered progress from Preferences backup.");
     return migrated;
   } catch {
     return null;

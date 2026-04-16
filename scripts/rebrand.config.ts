@@ -851,7 +851,7 @@ export default defineConfig(({ command }) => ({
       // Identifier form FIRST — CodeForgeProgress etc.
       { pattern: /CodeForge(?=[A-Za-z0-9_])/g, replacement: "DciProgramming" },
       // Brand name — display form.
-      { pattern: /CodeForge/g, replacement: "DCI Programming Labs" },
+      { pattern: /CodeForge/g, replacement: "DCI Secure Development Labs" },
       { pattern: /codeforge/g, replacement: "dci-programming" },
       { pattern: /CODEFORGE/g, replacement: "DCI_PROGRAMMING" },
       // "Forge Labs" → "DCI Learning Academy"
@@ -1011,7 +1011,7 @@ export default class ErrorBoundary extends Component<Props, State> {
   }
 
   override componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error("[DCI Programming Labs] Lab error:", error, errorInfo);
+    console.error("[DCI Secure Development Labs] Lab error:", error, errorInfo);
     this.props.onError?.(error, errorInfo);
   }
 
@@ -1481,7 +1481,7 @@ export default defineConfig(({ command }) => ({
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/logo-mark.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>DCI Programming Labs</title>
+    <title>DCI Secure Development Labs</title>
     <script>
       // SPA deep-link decoder — companion to the repo-root 404.html redirect.
       // See scripts/pages/spa-decode.html for the canonical source and rationale.

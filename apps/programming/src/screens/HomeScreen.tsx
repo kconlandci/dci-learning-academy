@@ -70,14 +70,14 @@ export default function HomeScreen() {
             <a href={import.meta.env.BASE_URL.replace(/\/programming\/?$/, "/") || "/"} className="flex items-center gap-3 no-underline text-inherit">
               <img
                 src={`${import.meta.env.BASE_URL}logo-wide.png`}
-                alt="DCI Programming Labs"
+                alt="DCI Secure Development Labs"
                 className="h-8"
               />
               <div>
                 <h1 className="text-xl font-bold text-[#1A1A1A]">
-                  DCI Programming Labs
+                  DCI Secure Development Labs
                 </h1>
-                <p className="text-xs text-gray-500">Dev Training</p>
+                <p className="text-xs text-gray-500">AppSec Training</p>
               </div>
             </a>
           </div>
@@ -163,7 +163,7 @@ export default function HomeScreen() {
             >
               <p className="text-sm text-[#2A7F6F] text-center">
                 Ready for more? Unlock the remaining {premiumLabs.length} labs
-                with DCI Programming Labs Premium.
+                with DCI Secure Development Labs Premium.
               </p>
             </Link>
           )}

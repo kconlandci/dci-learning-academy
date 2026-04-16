@@ -22,7 +22,7 @@ export default class ErrorBoundary extends Component<Props, State> {
   }
 
   override componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error("[DCI Programming Labs] Lab error:", error, errorInfo);
+    console.error("[DCI Secure Development Labs] Lab error:", error, errorInfo);
     this.props.onError?.(error, errorInfo);
   }
 

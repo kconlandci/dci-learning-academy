@@ -1,5 +1,5 @@
 // ============================================================
-// DCI Programming Labs — Lab Manifest Schema v1.1
+// DCI Secure Development Labs — Lab Manifest Schema v1.1
 // TypeScript types + Zod runtime validation
 // ============================================================
 

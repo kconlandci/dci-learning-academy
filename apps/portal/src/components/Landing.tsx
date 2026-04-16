@@ -1,6 +1,12 @@
 import { MODULES, type DciModule, type Session } from "@dci/shared";
 import { Footer } from "./Footer";
 
+// Portal tile descriptions — longer form than in-module taglines.
+// Keyed by module slug; falls back to mod.tagline if not overridden.
+const TILE_DESCRIPTIONS: Record<string, string> = {
+  programming: "Secure coding practices and application security fundamentals",
+};
+
 interface LandingProps {
   session: Session;
   onSignOut: () => void;
@@ -43,6 +49,8 @@ export function Landing({ session, onSignOut }: LandingProps) {
 }
 
 function ModuleCard({ module: mod }: { module: DciModule }) {
+  const description = TILE_DESCRIPTIONS[mod.slug] ?? mod.tagline;
+
   if (mod.available) {
     return (
       <a
@@ -52,7 +60,7 @@ function ModuleCard({ module: mod }: { module: DciModule }) {
         <h3 className="text-lg font-semibold text-gray-900 group-hover:text-[#2A7F6F] transition-colors">
           {mod.shortName}
         </h3>
-        <p className="mt-2 text-sm text-gray-500">{mod.tagline}</p>
+        <p className="mt-2 text-sm text-gray-500">{description}</p>
         <p className="mt-4 text-xs font-medium text-[#2A7F6F]">
           {mod.labCount} labs &rarr;
         </p>
@@ -69,7 +77,7 @@ function ModuleCard({ module: mod }: { module: DciModule }) {
         Coming soon
       </span>
       <h3 className="text-lg font-semibold text-gray-600">{mod.shortName}</h3>
-      <p className="mt-2 text-sm text-gray-400">{mod.tagline}</p>
+      <p className="mt-2 text-sm text-gray-400">{description}</p>
     </div>
   );
 }
