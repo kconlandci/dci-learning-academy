@@ -138,7 +138,7 @@ export default function LabEngine({ manifest, renderer: Renderer, onExit, onLabC
             <div>
               <h1 className="text-xl font-bold text-[#1A1A1A]">{manifest.title}</h1>
               <div className="flex gap-2 mt-1">
-                <span className="px-2 py-0.5 rounded text-xs font-medium bg-blue-500/15 text-blue-600">
+                <span className="px-2 py-0.5 rounded text-xs font-medium bg-sky-500/20 text-sky-600">
                   {manifest.tier}
                 </span>
                 <span className="px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-600">
@@ -320,9 +320,9 @@ export default function LabEngine({ manifest, renderer: Renderer, onExit, onLabC
       {/* Hint display */}
       {hintVisible && phase === "active" && (
         <div className="max-w-lg mx-auto px-4 pt-3">
-          <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 flex items-start gap-2">
-            <AlertTriangle size={16} className="text-amber-500 mt-0.5 shrink-0" />
-            <p className="text-sm text-amber-700">{manifest.hints[hintsUsed - 1]}</p>
+          <div className="bg-[#2A7F6F]/10 border border-[#2A7F6F]/30 rounded-lg p-3 flex items-start gap-2">
+            <AlertTriangle size={16} className="text-[#2A7F6F] mt-0.5 shrink-0" />
+            <p className="text-sm text-[#2A7F6F]">{manifest.hints[hintsUsed - 1]}</p>
           </div>
         </div>
       )}

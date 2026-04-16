@@ -114,13 +114,13 @@ export default function LabEngine({ manifest, renderer: Renderer, onExit, onLabC
       <div className="min-h-screen bg-white p-4">
         <div className="max-w-lg mx-auto pt-8">
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-12 h-12 rounded-xl bg-sky-500/20 flex items-center justify-center">
-              <Cpu className="text-sky-400" size={24} />
+            <div className="w-12 h-12 rounded-xl bg-[#2A7F6F]/20 flex items-center justify-center">
+              <Cpu className="text-[#2A7F6F]" size={24} />
             </div>
             <div>
               <h1 className="text-xl font-bold text-[#1A1A1A]">{manifest.title}</h1>
               <div className="flex gap-2 mt-1">
-                <span className="px-2 py-0.5 rounded text-xs font-medium bg-blue-500/20 text-blue-300">
+                <span className="px-2 py-0.5 rounded text-xs font-medium bg-sky-500/20 text-sky-600">
                   {manifest.tier}
                 </span>
                 <span className="px-2 py-0.5 rounded text-xs font-medium bg-gray-200 text-gray-500">
@@ -137,7 +137,7 @@ export default function LabEngine({ manifest, renderer: Renderer, onExit, onLabC
             <ul className="space-y-2">
               {manifest.learningObjectives.map((obj, i) => (
                 <li key={i} className="flex items-start gap-2 text-sm text-gray-500">
-                  <Target size={14} className="text-sky-400 mt-0.5 shrink-0" />
+                  <Target size={14} className="text-[#2A7F6F] mt-0.5 shrink-0" />
                   {obj}
                 </li>
               ))}
@@ -196,8 +196,8 @@ export default function LabEngine({ manifest, renderer: Renderer, onExit, onLabC
           </div>
           <div className="bg-[#F5F5F5] rounded-xl p-4 mb-6">
             <div className="flex items-center gap-2 mb-2">
-              <Lightbulb size={16} className="text-sky-400" />
-              <h2 className="text-sm font-semibold text-sky-400">Career Insight</h2>
+              <Lightbulb size={16} className="text-[#2A7F6F]" />
+              <h2 className="text-sm font-semibold text-[#2A7F6F]">Career Insight</h2>
             </div>
             <p className="text-sm text-gray-500">{manifest.careerInsight}</p>
           </div>
@@ -235,12 +235,12 @@ export default function LabEngine({ manifest, renderer: Renderer, onExit, onLabC
       <div className="sticky top-0 z-10 bg-white/95 backdrop-blur border-b border-gray-200 px-4 py-3">
         <div className="max-w-lg mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Cpu size={18} className="text-sky-400" />
+            <Cpu size={18} className="text-[#2A7F6F]" />
             <span className="text-sm font-medium text-[#1A1A1A] truncate max-w-[180px]">{manifest.title}</span>
           </div>
           <div className="flex items-center gap-3">
             <span className="text-xs text-gray-500">{scenarioIndex + 1}/{manifest.scenarios.length}</span>
-            <span className="text-sm font-bold text-sky-400">{score}</span>
+            <span className="text-sm font-bold text-[#2A7F6F]">{score}</span>
             {phase === "active" && hintsUsed < 3 && (
               <button
                 onClick={useHint}
@@ -256,9 +256,9 @@ export default function LabEngine({ manifest, renderer: Renderer, onExit, onLabC
       </div>
       {hintVisible && phase === "active" && (
         <div className="max-w-lg mx-auto px-4 pt-3">
-          <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-3 flex items-start gap-2">
-            <AlertTriangle size={16} className="text-amber-600 mt-0.5 shrink-0" />
-            <p className="text-sm text-amber-200">{manifest.hints[hintsUsed - 1]}</p>
+          <div className="bg-[#2A7F6F]/10 border border-[#2A7F6F]/30 rounded-lg p-3 flex items-start gap-2">
+            <AlertTriangle size={16} className="text-[#2A7F6F] mt-0.5 shrink-0" />
+            <p className="text-sm text-[#2A7F6F]">{manifest.hints[hintsUsed - 1]}</p>
           </div>
         </div>
       )}
