@@ -177,7 +177,7 @@ export default function LabEngine({ manifest, renderer: Renderer, onExit, onLabC
           <button
             onClick={() => setPhase("active")}
             aria-label="Start lab"
-            className="w-full py-3.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-semibold text-lg transition-colors flex items-center justify-center gap-2"
+            className="w-full py-3.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-semibold text-lg transition-colors flex items-center justify-center gap-2"
           >
             Start Lab <ArrowRight size={20} />
           </button>
@@ -274,7 +274,7 @@ export default function LabEngine({ manifest, renderer: Renderer, onExit, onLabC
           <button
             onClick={onExit}
             aria-label="Back to catalog"
-            className="w-full py-3 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-semibold transition-colors"
+            className="w-full py-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-semibold transition-colors"
           >
             Back to Catalog
           </button>
@@ -345,7 +345,7 @@ export default function LabEngine({ manifest, renderer: Renderer, onExit, onLabC
             <button
               onClick={advance}
               aria-label={isLastScenario ? "View results" : "Next scenario"}
-              className="w-full py-3 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-semibold transition-colors flex items-center justify-center gap-2"
+              className="w-full py-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-semibold transition-colors flex items-center justify-center gap-2"
             >
               {isLastScenario ? "View Results" : "Next Scenario"}
               <ChevronRight size={18} />
