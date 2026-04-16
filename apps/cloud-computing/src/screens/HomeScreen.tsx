@@ -50,17 +50,19 @@ export default function HomeScreen() {
         <div className="max-w-lg mx-auto pt-6">
           {/* Header */}
           <div className="flex items-center gap-3 mb-4">
-            <img
-              src={`${import.meta.env.BASE_URL}logo-wide.png`}
-              alt="DCI Cloud Computing Labs"
-              className="h-8"
-            />
-            <div>
-              <h1 className="text-xl font-bold text-[#1A1A1A]">
-                DCI Cloud Computing Labs
-              </h1>
-              <p className="text-xs text-gray-500">Cloud Judgment Training</p>
-            </div>
+            <a href={import.meta.env.BASE_URL.replace(/\/cloud-computing\/?$/, "/") || "/"} className="flex items-center gap-3 no-underline text-inherit">
+              <img
+                src={`${import.meta.env.BASE_URL}logo-wide.png`}
+                alt="DCI Cloud Computing Labs"
+                className="h-8"
+              />
+              <div>
+                <h1 className="text-xl font-bold text-[#1A1A1A]">
+                  DCI Cloud Computing Labs
+                </h1>
+                <p className="text-xs text-gray-500">Cloud Judgment Training</p>
+              </div>
+            </a>
           </div>
 
           {/* Stats bar */}
@@ -114,7 +116,7 @@ export default function HomeScreen() {
                   <button
                     onClick={() => navigate(`/lab/${activePath.nextLabId}`)}
                     aria-label="Continue learning path"
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#2A7F6F] text-white text-xs font-medium min-h-[36px] active:bg-[#2A7F6F] transition-colors"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500 text-white text-xs font-medium min-h-[36px] active:bg-amber-600 transition-colors"
                   >
                     <Play size={12} /> Continue
                   </button>

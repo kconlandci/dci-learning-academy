@@ -47,13 +47,15 @@ export default function HomeScreen() {
         <div className="max-w-lg mx-auto pt-6">
           {/* Header */}
           <div className="flex items-center gap-3 mb-4">
-            <img src={`${import.meta.env.BASE_URL}logo-wide.png`} alt="DCI Cybersecurity Labs" className="h-8" />
-            <div>
-              <h1 className="text-xl font-bold text-[#1A1A1A]">DCI Cybersecurity Labs</h1>
-              <p className="text-xs text-gray-500">
-                Cybersecurity Decision Simulator
-              </p>
-            </div>
+            <a href={import.meta.env.BASE_URL.replace(/\/cybersecurity\/?$/, "/") || "/"} className="flex items-center gap-3 no-underline text-inherit">
+              <img src={`${import.meta.env.BASE_URL}logo-wide.png`} alt="DCI Cybersecurity Labs" className="h-8" />
+              <div>
+                <h1 className="text-xl font-bold text-[#1A1A1A]">DCI Cybersecurity Labs</h1>
+                <p className="text-xs text-gray-500">
+                  Cybersecurity Decision Simulator
+                </p>
+              </div>
+            </a>
           </div>
 
           {/* Stats bar */}
@@ -107,7 +109,7 @@ export default function HomeScreen() {
                   <button
                     onClick={() => navigate(`/lab/${activePath.nextLabId}`)}
                     aria-label="Continue learning path"
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-orange-500 text-white text-xs font-medium min-h-[36px] active:bg-orange-600 transition-colors"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500 text-white text-xs font-medium min-h-[36px] active:bg-amber-600 transition-colors"
                   >
                     <Play size={12} /> Continue
                   </button>
