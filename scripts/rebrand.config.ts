@@ -144,6 +144,11 @@ export const MODULES: Record<string, ModuleRebrand> = {
           "$1      );\n" +
           "$1    },\n" +
           "$1  );\n" +
+          "$1} else {\n" +
+          "$1  console.warn(\n" +
+          "$1    \"[DCI] Skipped Firestore write — dci:student-id not found in localStorage. \" +\n" +
+          "$1    \"Student may not have signed in through the portal Gate.\",\n" +
+          "$1  );\n" +
           "$1}\n" +
           "$1// ━━━ END DCI PHASE B ━━━\n\n" +
           "$1return next;",
@@ -818,6 +823,15 @@ export default defineConfig(({ command }) => ({
           "in rebrand.config.ts.",
       },
       {
+        file: "src/hooks/useProgress.ts",
+        marker: "recordToFirestore(dciStudentId,",
+        description:
+          "Phase B must contain the actual Firestore write call, not " +
+          "just the marker comment. If this fires, the Phase B anchor " +
+          "landed but the call-body replacement was malformed — " +
+          "instructor dashboard will silently show 0/N for this module.",
+      },
+      {
         file: "src/data/**/*.ts",
         marker: 'accessLevel: "premium"',
         absent: true,
@@ -889,6 +903,11 @@ export default defineConfig(({ command }) => ({
           "$1        err,\n" +
           "$1      );\n" +
           "$1    },\n" +
+          "$1  );\n" +
+          "$1} else {\n" +
+          "$1  console.warn(\n" +
+          "$1    \"[DCI] Skipped Firestore write — dci:student-id not found in localStorage. \" +\n" +
+          "$1    \"Student may not have signed in through the portal Gate.\",\n" +
           "$1  );\n" +
           "$1}\n" +
           "$1// ━━━ END DCI PHASE B ━━━\n\n" +
@@ -1494,6 +1513,15 @@ export default defineConfig(({ command }) => ({
           "in rebrand.config.ts.",
       },
       {
+        file: "src/hooks/useProgress.ts",
+        marker: "recordToFirestore(dciStudentId,",
+        description:
+          "Phase B must contain the actual Firestore write call, not " +
+          "just the marker comment. If this fires, the Phase B anchor " +
+          "landed but the call-body replacement was malformed — " +
+          "instructor dashboard will silently show 0/N for this module.",
+      },
+      {
         file: "src/data/**/*.ts",
         marker: 'accessLevel: "premium"',
         absent: true,
@@ -1565,6 +1593,11 @@ export default defineConfig(({ command }) => ({
           "$1        err,\n" +
           "$1      );\n" +
           "$1    },\n" +
+          "$1  );\n" +
+          "$1} else {\n" +
+          "$1  console.warn(\n" +
+          "$1    \"[DCI] Skipped Firestore write — dci:student-id not found in localStorage. \" +\n" +
+          "$1    \"Student may not have signed in through the portal Gate.\",\n" +
           "$1  );\n" +
           "$1}\n" +
           "$1// ━━━ END DCI PHASE B ━━━\n\n" +
@@ -2172,6 +2205,15 @@ export default defineConfig(({ command }) => ({
           "in rebrand.config.ts.",
       },
       {
+        file: "src/hooks/useProgress.ts",
+        marker: "recordToFirestore(dciStudentId,",
+        description:
+          "Phase B must contain the actual Firestore write call, not " +
+          "just the marker comment. If this fires, the Phase B anchor " +
+          "landed but the call-body replacement was malformed — " +
+          "instructor dashboard will silently show 0/N for this module.",
+      },
+      {
         file: "src/data/**/*.ts",
         marker: 'accessLevel: "premium"',
         absent: true,
@@ -2242,6 +2284,11 @@ export default defineConfig(({ command }) => ({
           "$1        err,\n" +
           "$1      );\n" +
           "$1    },\n" +
+          "$1  );\n" +
+          "$1} else {\n" +
+          "$1  console.warn(\n" +
+          "$1    \"[DCI] Skipped Firestore write — dci:student-id not found in localStorage. \" +\n" +
+          "$1    \"Student may not have signed in through the portal Gate.\",\n" +
           "$1  );\n" +
           "$1}\n" +
           "$1// ━━━ END DCI PHASE B ━━━\n\n" +
@@ -2849,6 +2896,15 @@ export default defineConfig(({ command }) => ({
           "in rebrand.config.ts.",
       },
       {
+        file: "src/hooks/useProgress.ts",
+        marker: "recordToFirestore(dciStudentId,",
+        description:
+          "Phase B must contain the actual Firestore write call, not " +
+          "just the marker comment. If this fires, the Phase B anchor " +
+          "landed but the call-body replacement was malformed — " +
+          "instructor dashboard will silently show 0/N for this module.",
+      },
+      {
         file: "src/data/**/*.ts",
         marker: 'accessLevel: "premium"',
         absent: true,
@@ -2919,6 +2975,11 @@ export default defineConfig(({ command }) => ({
           "$1        err,\n" +
           "$1      );\n" +
           "$1    },\n" +
+          "$1  );\n" +
+          "$1} else {\n" +
+          "$1  console.warn(\n" +
+          "$1    \"[DCI] Skipped Firestore write — dci:student-id not found in localStorage. \" +\n" +
+          "$1    \"Student may not have signed in through the portal Gate.\",\n" +
           "$1  );\n" +
           "$1}\n" +
           "$1// ━━━ END DCI PHASE B ━━━\n\n" +
@@ -3526,6 +3587,15 @@ export default defineConfig(({ command }) => ({
           "in rebrand.config.ts.",
       },
       {
+        file: "src/hooks/useProgress.ts",
+        marker: "recordToFirestore(dciStudentId,",
+        description:
+          "Phase B must contain the actual Firestore write call, not " +
+          "just the marker comment. If this fires, the Phase B anchor " +
+          "landed but the call-body replacement was malformed — " +
+          "instructor dashboard will silently show 0/N for this module.",
+      },
+      {
         file: "src/data/**/*.ts",
         marker: 'accessLevel: "premium"',
         absent: true,
@@ -3600,6 +3670,11 @@ export default defineConfig(({ command }) => ({
           "$1        err,\n" +
           "$1      );\n" +
           "$1    },\n" +
+          "$1  );\n" +
+          "$1} else {\n" +
+          "$1  console.warn(\n" +
+          "$1    \"[DCI] Skipped Firestore write — dci:student-id not found in localStorage. \" +\n" +
+          "$1    \"Student may not have signed in through the portal Gate.\",\n" +
           "$1  );\n" +
           "$1}\n" +
           "$1// ━━━ END DCI PHASE B ━━━\n\n" +
@@ -4205,6 +4280,15 @@ export default defineConfig(({ command }) => ({
           "If this assertion fires, the upstream anchor changed — " +
           "check the import and mirrorToPreferences text replacements " +
           "in rebrand.config.ts.",
+      },
+      {
+        file: "src/hooks/useProgress.ts",
+        marker: "recordToFirestore(dciStudentId,",
+        description:
+          "Phase B must contain the actual Firestore write call, not " +
+          "just the marker comment. If this fires, the Phase B anchor " +
+          "landed but the call-body replacement was malformed — " +
+          "instructor dashboard will silently show 0/N for this module.",
       },
       {
         file: "src/data/**/*.ts",

@@ -291,6 +291,11 @@ export function useProgress(userId?: string | null) {
               );
             },
           );
+        } else {
+          console.warn(
+            "[DCI] Skipped Firestore write — dci:student-id not found in localStorage. " +
+            "Student may not have signed in through the portal Gate.",
+          );
         }
         // ━━━ END DCI PHASE B ━━━
 
