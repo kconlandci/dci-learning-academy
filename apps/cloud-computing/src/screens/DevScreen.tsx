@@ -192,7 +192,7 @@ export default function DevScreen() {
                 </div>
                 <Link
                   to={`/lab/${lab.id}`}
-                  className="shrink-0 px-3 py-1.5 rounded bg-[#2A7F6F] text-white text-xs font-semibold hover:bg-[#2A7F6F] transition-colors"
+                  className="shrink-0 px-3 py-1.5 rounded bg-amber-500 text-white text-xs font-semibold hover:bg-amber-600 transition-colors"
                 >
                   Play
                 </Link>

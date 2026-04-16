@@ -60,7 +60,7 @@ export default function LabScreen() {
           <p className="text-gray-500 mb-4">Lab not found.</p>
           <button
             onClick={() => navigate("/")}
-            className="px-4 py-2 rounded-xl bg-orange-500 text-white font-medium"
+            className="px-4 py-2 rounded-xl bg-amber-500 text-white font-medium"
           >
             Back to Home
           </button>
@@ -89,7 +89,7 @@ export default function LabScreen() {
           <div className="flex gap-3 justify-center">
             <button
               onClick={() => navigate("/upgrade")}
-              className="px-4 py-2 rounded-xl bg-orange-500 text-white font-medium text-sm min-h-[44px]"
+              className="px-4 py-2 rounded-xl bg-amber-500 text-white font-medium text-sm min-h-[44px]"
             >
               View Premium
             </button>
@@ -153,7 +153,7 @@ export default function LabScreen() {
           </p>
           <button
             onClick={() => navigate("/")}
-            className="px-4 py-2 rounded-lg bg-orange-500 text-white text-sm font-medium min-h-[44px]"
+            className="px-4 py-2 rounded-lg bg-amber-500 text-white text-sm font-medium min-h-[44px]"
           >
             Browse All Labs
           </button>
@@ -183,7 +183,7 @@ export default function LabScreen() {
         ) : (
           <button
             onClick={() => navigate(`/lab/${recommendation.lab.id}`)}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-orange-500 text-white text-sm font-medium min-h-[44px]"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-500 text-white text-sm font-medium min-h-[44px]"
           >
             Start Lab <ArrowRight size={14} />
           </button>

@@ -44,7 +44,7 @@ export default function DevScreen() {
       <div className="max-w-3xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <div><h1 className="text-lg font-bold text-[#1A1A1A]">DCI IT Support Labs Dev Preview</h1><p className="text-xs text-gray-500">{labCatalog.length} manifests loaded</p></div>
-          <Link to="/" className="text-xs text-sky-400 hover:underline">Home</Link>
+          <Link to="/" className="text-xs text-[#2A7F6F] hover:underline">Home</Link>
         </div>
         <div className="bg-white border border-gray-200 rounded-lg p-4 mb-6 space-y-4">
           <h2 className="text-sm font-semibold text-[#1A1A1A]">Content Coverage</h2>
@@ -89,13 +89,13 @@ export default function DevScreen() {
                   <div className="flex flex-wrap gap-2 mt-1 text-[10px] font-mono">
                     <span className="px-1.5 py-0.5 rounded bg-[#F5F5F5] text-gray-500">{lab.tier}</span>
                     <span className="px-1.5 py-0.5 rounded bg-[#F5F5F5] text-gray-500">{lab.track}</span>
-                    <span className="px-1.5 py-0.5 rounded bg-[#F5F5F5] text-sky-300">{lab.rendererType}</span>
+                    <span className="px-1.5 py-0.5 rounded bg-[#F5F5F5] text-[#2A7F6F]">{lab.rendererType}</span>
                     <span className={`px-1.5 py-0.5 rounded ${lab.status === "published" ? "bg-green-900/30 text-green-400" : "bg-yellow-900/30 text-yellow-600"}`}>{lab.status}</span>
                     <span className="px-1.5 py-0.5 rounded bg-[#F5F5F5] text-gray-500">{lab.scenarios.length} scenarios</span>
                     <span className="px-1.5 py-0.5 rounded bg-[#F5F5F5] text-gray-500">{lab.accessLevel}</span>
                   </div>
                 </div>
-                <Link to={`/lab/${lab.id}`} className="shrink-0 px-3 py-1.5 rounded bg-sky-500 text-[#1A1A1A] text-xs font-semibold hover:bg-sky-600 transition-colors">Play</Link>
+                <Link to={`/lab/${lab.id}`} className="shrink-0 px-3 py-1.5 rounded bg-amber-500 text-white text-xs font-semibold hover:bg-amber-600 transition-colors">Play</Link>
               </div>
               <ValidateButton manifest={lab} />
             </div>

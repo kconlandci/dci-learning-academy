@@ -85,7 +85,6 @@ export const learningPaths: LearningPath[] = [
       "network-segmentation-plan",
       "certificate-management-audit",
       "endpoint-hardening-audit",
-      "cloud-iam-misconfiguration",
       "security-architecture-review",
     ],
   },

@@ -22,7 +22,7 @@ export default function BottomNav() {
           const Icon = tab.icon;
           return (
             <Link key={tab.path} to={tab.path} aria-label={tab.label} aria-current={isActive ? "page" : undefined}
-              className={`flex-1 flex flex-col items-center justify-center min-h-[48px] py-2 transition-colors ${isActive ? "text-sky-400" : "text-gray-400"}`}
+              className={`flex-1 flex flex-col items-center justify-center min-h-[48px] py-2 transition-colors ${isActive ? "text-[#2A7F6F]" : "text-gray-400"}`}
             >
               <Icon size={20} />
               <span className="text-[10px] font-medium mt-0.5">{tab.label}</span>

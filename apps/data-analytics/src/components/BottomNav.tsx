@@ -30,7 +30,7 @@ export default function BottomNav() {
               to={tab.path}
               aria-label={tab.label}
               className={`flex-1 flex flex-col items-center justify-center min-h-[48px] py-2 transition-colors ${
-                isActive ? "text-amber-600" : "text-gray-400"
+                isActive ? "text-[#2A7F6F]" : "text-gray-400"
               }`}
             >
               <Icon size={20} />
