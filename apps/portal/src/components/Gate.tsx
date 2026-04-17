@@ -27,7 +27,7 @@ function errorMessage(err: GateError): string {
     case "empty-code":
       return "Please enter your access code.";
     case "empty-name":
-      return "Please enter your first name and last initial.";
+      return "Please enter your first and last name.";
     case "bad-code":
       return "That access code doesn't match. Check with your instructor.";
     case "network":
@@ -126,7 +126,6 @@ export function Gate({ onAuthed }: GateProps) {
               onChange={(e) => setAccessCode(e.target.value)}
               disabled={busy}
               className="w-full rounded-md bg-white border border-gray-300 focus:border-[#2A7F6F] focus:outline-none focus:ring-2 focus:ring-[#2A7F6F]/30 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 disabled:opacity-60"
-              placeholder="DCI-LABS"
             />
           </div>
 
@@ -135,7 +134,7 @@ export function Gate({ onAuthed }: GateProps) {
               htmlFor="display-name"
               className="block text-xs font-semibold uppercase tracking-wide text-gray-600"
             >
-              First name, last initial
+              First name, last name
             </label>
             <input
               id="display-name"
@@ -145,11 +144,9 @@ export function Gate({ onAuthed }: GateProps) {
               onChange={(e) => setDisplayName(e.target.value)}
               disabled={busy}
               className="w-full rounded-md bg-white border border-gray-300 focus:border-[#2A7F6F] focus:outline-none focus:ring-2 focus:ring-[#2A7F6F]/30 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 disabled:opacity-60"
-              placeholder="Kevin C."
             />
             <p className="text-[11px] text-gray-500">
-              e.g. Kevin C. If another student in your class has the same
-              initial, use two letters (Kevin Co.).
+              Enter your full name as it appears on your class roster.
             </p>
           </div>
 
