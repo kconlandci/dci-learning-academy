@@ -97,7 +97,7 @@ export default function AnalyticsScreen() {
         {/* Started vs Completed */}
         <div className="bg-[#F5F5F5] rounded-xl p-4 mb-6">
           <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">
-            Lab Funnel
+            Scenario Funnel
           </h2>
           <div className="flex items-end gap-4">
             <div className="flex-1">
@@ -115,7 +115,7 @@ export default function AnalyticsScreen() {
         {/* Labs Per Day Chart */}
         <div className="bg-[#F5F5F5] rounded-xl p-4 mb-6">
           <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">
-            Labs Completed (Last 14 Days)
+            Scenarios Completed (Last 14 Days)
           </h2>
           <div className="flex items-end gap-1" style={{ height: 100 }}>
             {summary.labsPerDay.map((day) => {
@@ -131,7 +131,7 @@ export default function AnalyticsScreen() {
                       day.count > 0 ? "bg-amber-500" : "bg-gray-200"
                     }`}
                     style={{ height: `${height}%`, minWidth: 4 }}
-                    title={`${day.date}: ${day.count} labs`}
+                    title={`${day.date}: ${day.count} scenarios`}
                   />
                 </div>
               );
@@ -151,7 +151,7 @@ export default function AnalyticsScreen() {
         {summary.topLabs.length > 0 && (
           <div className="bg-[#F5F5F5] rounded-xl p-4 mb-6">
             <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">
-              Most Played Labs
+              Most Played Scenarios
             </h2>
             <div className="space-y-2">
               {summary.topLabs.map((lab, i) => (

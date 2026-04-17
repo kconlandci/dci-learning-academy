@@ -91,7 +91,7 @@ export default function ProgressScreen() {
         {completedLabs.length > 0 && (
           <div>
             <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-3">
-              Completed Labs
+              Completed Scenarios
             </h2>
             <div className="space-y-2">
               {completedLabs.map((lp) => {
@@ -119,7 +119,7 @@ export default function ProgressScreen() {
 
         {completedLabs.length === 0 && (
           <p className="text-sm text-gray-400 text-center py-8">
-            Complete a lab to see your progress here.
+            Complete a scenario to see your progress here.
           </p>
         )}
       </div>

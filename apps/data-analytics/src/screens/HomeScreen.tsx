@@ -67,12 +67,12 @@ export default function HomeScreen() {
             <a href={import.meta.env.BASE_URL.replace(/\/data-analytics\/?$/, "/") || "/"} className="flex items-center gap-3 no-underline text-inherit">
               <img
                 src={`${import.meta.env.BASE_URL}logo-wide.png`}
-                alt="DCI Data Analytics Labs"
+                alt="DCI Data Analytics Scenarios"
                 className="h-8"
               />
               <div>
                 <h1 className="text-xl font-bold text-[#1A1A1A]">
-                  DCI Data Analytics Labs
+                  DCI Data Analytics Scenarios
                 </h1>
                 <p className="text-xs text-gray-500">Data Training</p>
               </div>
@@ -123,7 +123,7 @@ export default function HomeScreen() {
                 <div className="flex items-center justify-between gap-3">
                   <span className="text-xs text-gray-500">
                     {labCatalog.find((lab) => lab.id === activePath.nextLabId)
-                      ?.title ?? "Next lab"}
+                      ?.title ?? "Next scenario"}
                   </span>
                   <button
                     onClick={() => navigate(`/lab/${activePath.nextLabId}`)}
@@ -161,7 +161,7 @@ export default function HomeScreen() {
             >
               <p className="text-sm text-[#2A7F6F] text-center">
                 Ready for deeper drills? Unlock the remaining {premiumLabs.length}{" "}
-                premium labs with DCI Data Analytics Labs Premium.
+                premium scenarios with DCI Data Analytics Scenarios Premium.
               </p>
             </Link>
           )}
@@ -172,7 +172,7 @@ export default function HomeScreen() {
               className="flex items-center gap-2 w-full mb-3 min-h-[44px]"
             >
               <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
-                All Labs
+                All Scenarios
               </h2>
               <ChevronDown
                 size={14}
@@ -181,7 +181,7 @@ export default function HomeScreen() {
                 }`}
               />
               <span className="text-[10px] text-gray-400 ml-auto">
-                {publishedLabs.length} labs
+                {publishedLabs.length} scenarios
               </span>
             </button>
             {showAllLabs && (

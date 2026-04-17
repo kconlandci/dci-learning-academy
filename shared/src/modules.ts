@@ -44,7 +44,7 @@ function getLabCount(slug: string): number {
 export const MODULES: readonly DciModule[] = [
   {
     slug: "cybersecurity",
-    name: "DCI Cybersecurity Labs",
+    name: "DCI Cybersecurity Scenarios",
     shortName: "Cybersecurity",
     tagline: "Hands-on cybersecurity fundamentals and threat analysis",
     sourceRepo: "ThreatForge",
@@ -53,7 +53,7 @@ export const MODULES: readonly DciModule[] = [
   },
   {
     slug: "cloud-computing",
-    name: "DCI Cloud Computing Labs",
+    name: "DCI Cloud Computing Scenarios",
     shortName: "Cloud Computing",
     tagline: "Cloud platform fundamentals and infrastructure basics",
     sourceRepo: "CloudForge",
@@ -62,7 +62,7 @@ export const MODULES: readonly DciModule[] = [
   },
   {
     slug: "data-analytics",
-    name: "DCI Data Analytics Labs",
+    name: "DCI Data Analytics Scenarios",
     shortName: "Data Analytics",
     tagline: "Data exploration, analysis, and visualization practice",
     sourceRepo: "DataForge",
@@ -71,7 +71,7 @@ export const MODULES: readonly DciModule[] = [
   },
   {
     slug: "programming",
-    name: "DCI Secure Development Labs",
+    name: "DCI Secure Development Scenarios",
     shortName: "Secure Dev",
     tagline: "AppSec Training",
     sourceRepo: "CodeForge",
@@ -80,7 +80,7 @@ export const MODULES: readonly DciModule[] = [
   },
   {
     slug: "networking",
-    name: "DCI Networking Labs",
+    name: "DCI Networking Scenarios",
     shortName: "Networking",
     tagline: "Network concepts, protocols, and troubleshooting skills",
     sourceRepo: "NetForge",
@@ -89,7 +89,7 @@ export const MODULES: readonly DciModule[] = [
   },
   {
     slug: "it-support",
-    name: "DCI IT Support Labs",
+    name: "DCI IT Support Scenarios",
     shortName: "IT Support",
     tagline: "Help desk skills and IT support fundamentals",
     sourceRepo: "TechForge",

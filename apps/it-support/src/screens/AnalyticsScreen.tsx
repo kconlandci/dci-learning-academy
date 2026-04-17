@@ -59,7 +59,7 @@ export default function AnalyticsScreen() {
           <StatCard icon={<Target size={16} className="text-green-400" />} label="Completion Rate" value={summary.labsStarted > 0 ? `${summary.completionRate}%` : "—"} />
         </div>
         <div className="bg-[#F5F5F5] rounded-xl p-4 mb-6">
-          <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Lab Funnel</h2>
+          <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Scenario Funnel</h2>
           <div className="flex items-end gap-4">
             <div className="flex-1"><div className="text-2xl font-bold text-[#1A1A1A]">{summary.labsStarted}</div><div className="text-xs text-gray-400">Started</div></div>
             <div className="text-gray-500 text-lg">&rarr;</div>
@@ -67,13 +67,13 @@ export default function AnalyticsScreen() {
           </div>
         </div>
         <div className="bg-[#F5F5F5] rounded-xl p-4 mb-6">
-          <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Labs Completed (Last 14 Days)</h2>
+          <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Scenarios Completed (Last 14 Days)</h2>
           <div className="flex items-end gap-1" style={{ height: 100 }}>
             {summary.labsPerDay.map((day) => {
               const height = day.count > 0 ? Math.max((day.count / maxPerDay) * 100, 4) : 2;
               return (
                 <div key={day.date} className="flex-1 flex flex-col items-center justify-end" style={{ height: "100%" }}>
-                  <div className={`w-full rounded-t ${day.count > 0 ? "bg-sky-500" : "bg-gray-200"}`} style={{ height: `${height}%`, minWidth: 4 }} title={`${day.date}: ${day.count} labs`} />
+                  <div className={`w-full rounded-t ${day.count > 0 ? "bg-sky-500" : "bg-gray-200"}`} style={{ height: `${height}%`, minWidth: 4 }} title={`${day.date}: ${day.count} scenarios`} />
                 </div>
               );
             })}
@@ -85,7 +85,7 @@ export default function AnalyticsScreen() {
         </div>
         {summary.topLabs.length > 0 && (
           <div className="bg-[#F5F5F5] rounded-xl p-4 mb-6">
-            <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Most Played Labs</h2>
+            <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Most Played Scenarios</h2>
             <div className="space-y-2">
               {summary.topLabs.map((lab, i) => (
                 <div key={lab.labId} className="flex items-center gap-3">

@@ -67,7 +67,7 @@ export default function DevScreen() {
       <div className="max-w-3xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-lg font-bold text-[#1A1A1A]">DCI Cybersecurity Labs Dev Preview</h1>
+            <h1 className="text-lg font-bold text-[#1A1A1A]">DCI Cybersecurity Scenarios Dev Preview</h1>
             <p className="text-xs text-gray-500">{labCatalog.length} manifests loaded</p>
           </div>
           <Link to="/" className="text-xs text-[#2A7F6F] hover:underline">
@@ -153,7 +153,7 @@ export default function DevScreen() {
         </div>
 
         {/* Lab Manifests */}
-        <h2 className="text-sm font-semibold text-[#1A1A1A] mb-3">Lab Manifests</h2>
+        <h2 className="text-sm font-semibold text-[#1A1A1A] mb-3">Scenario Manifests</h2>
         <div className="space-y-3">
           {labCatalog.map((lab) => (
             <div

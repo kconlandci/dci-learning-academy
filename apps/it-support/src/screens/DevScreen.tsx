@@ -43,7 +43,7 @@ export default function DevScreen() {
     <div className="min-h-screen bg-white text-[#1A1A1A] p-4 pb-24">
       <div className="max-w-3xl mx-auto">
         <div className="flex items-center justify-between mb-6">
-          <div><h1 className="text-lg font-bold text-[#1A1A1A]">DCI IT Support Labs Dev Preview</h1><p className="text-xs text-gray-500">{labCatalog.length} manifests loaded</p></div>
+          <div><h1 className="text-lg font-bold text-[#1A1A1A]">DCI IT Support Scenarios Dev Preview</h1><p className="text-xs text-gray-500">{labCatalog.length} manifests loaded</p></div>
           <Link to="/" className="text-xs text-[#2A7F6F] hover:underline">Home</Link>
         </div>
         <div className="bg-white border border-gray-200 rounded-lg p-4 mb-6 space-y-4">
@@ -79,7 +79,7 @@ export default function DevScreen() {
           <div className="flex gap-4 text-xs text-gray-500"><span>XP: {progress.xp}</span><span>Streak: {progress.streakDays}d</span><span>Completed: {getTotalCompleted()}</span></div>
           <pre className="text-[10px] text-gray-500 bg-white rounded p-3 overflow-auto max-h-48 font-mono">{JSON.stringify(progress, null, 2)}</pre>
         </div>
-        <h2 className="text-sm font-semibold text-[#1A1A1A] mb-3">Lab Manifests</h2>
+        <h2 className="text-sm font-semibold text-[#1A1A1A] mb-3">Scenario Manifests</h2>
         <div className="space-y-3">
           {labCatalog.map((lab) => (
             <div key={lab.id} className="bg-white border border-gray-200 rounded-lg p-4 space-y-2">

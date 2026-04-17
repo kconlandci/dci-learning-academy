@@ -47,7 +47,7 @@ export default function LabScreen() {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center p-4">
         <div className="text-center">
-          <p className="text-gray-500 mb-4">Lab not found.</p>
+          <p className="text-gray-500 mb-4">Scenario not found.</p>
           <button
             onClick={() => navigate("/")}
             className="px-4 py-2 rounded-xl bg-amber-500 text-white font-medium"
@@ -74,9 +74,9 @@ export default function LabScreen() {
       <div className="min-h-screen bg-white flex items-center justify-center p-4">
         <div className="text-center">
           <Lock size={32} className="text-gray-400 mx-auto mb-3" />
-          <p className="text-sm font-medium text-[#1A1A1A] mb-1">Premium Lab</p>
+          <p className="text-sm font-medium text-[#1A1A1A] mb-1">Premium Scenario</p>
           <p className="text-xs text-gray-500 mb-4">
-            This simulation requires DCI Cybersecurity Labs Pro.
+            This simulation requires DCI Cybersecurity Scenarios Pro.
           </p>
           <div className="flex gap-3 justify-center">
             <button
@@ -128,16 +128,16 @@ export default function LabScreen() {
         <div className="bg-[#F5F5F5] rounded-xl p-4 text-center">
           <PartyPopper size={24} className="text-[#2A7F6F] mx-auto mb-2" />
           <p className="text-sm font-semibold text-[#1A1A1A] mb-1">
-            You've completed all available labs!
+            You've completed all available scenarios!
           </p>
           <p className="text-xs text-gray-500 mb-3">
-            More labs coming soon. Keep your streak alive by replaying favorites.
+            More scenarios coming soon. Keep your streak alive by replaying favorites.
           </p>
           <button
             onClick={() => navigate("/")}
             className="px-4 py-2 rounded-lg bg-amber-500 text-white text-sm font-medium min-h-[44px]"
           >
-            Browse All Labs
+            Browse All Scenarios
           </button>
         </div>
       );
@@ -166,7 +166,7 @@ export default function LabScreen() {
             onClick={() => navigate(`/lab/${recommendation.lab.id}`)}
             className="flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-500 text-white text-sm font-medium min-h-[44px]"
           >
-            Start Lab <ArrowRight size={14} />
+            Start Scenario <ArrowRight size={14} />
           </button>
         )}
       </div>

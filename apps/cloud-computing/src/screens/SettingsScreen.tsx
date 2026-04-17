@@ -24,7 +24,7 @@ export default function SettingsScreen() {
       const { value } = await Dialog.confirm({
         title: "Reset All Progress?",
         message:
-          "This will clear all completed labs, scores, streaks, and XP. This cannot be undone.",
+          "This will clear all completed scenarios, scores, streaks, and XP. This cannot be undone.",
         okButtonTitle: "Reset Everything",
         cancelButtonTitle: "Cancel",
       });
@@ -44,7 +44,7 @@ export default function SettingsScreen() {
 
   const handleSendFeedback = () => {
     window.open(
-      "mailto:dci-cloud-computing.app@gmail.com?subject=DCI Cloud Computing Labs%20Feedback",
+      "mailto:dci-cloud-computing.app@gmail.com?subject=DCI Cloud Computing Scenarios%20Feedback",
       "_self"
     );
   };
@@ -56,10 +56,10 @@ export default function SettingsScreen() {
         <div className="text-center mb-8">
           <img
             src={`${import.meta.env.BASE_URL}logo-mark.png`}
-            alt="DCI Cloud Computing Labs"
+            alt="DCI Cloud Computing Scenarios"
             className="w-14 h-14 rounded-2xl mx-auto mb-3"
           />
-          <h1 className="text-xl font-bold text-[#1A1A1A]">DCI Cloud Computing Labs</h1>
+          <h1 className="text-xl font-bold text-[#1A1A1A]">DCI Cloud Computing Scenarios</h1>
           <p className="text-xs text-gray-500 mt-1">
             Cloud Judgment Training
           </p>
@@ -82,7 +82,7 @@ export default function SettingsScreen() {
             <div className="flex items-center gap-3">
               <Crown size={18} className="text-[#2A7F6F]" />
               <span className="text-sm font-medium text-[#1A1A1A]">
-                DCI Cloud Computing Labs Premium
+                DCI Cloud Computing Scenarios Premium
               </span>
             </div>
             <ChevronRight size={18} className="text-gray-400" />

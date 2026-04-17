@@ -14,19 +14,19 @@ export default function SettingsScreen() {
     try {
       const { value } = await Dialog.confirm({
         title: "Reset All Progress?",
-        message: "This will clear all completed labs, scores, streaks, and XP. This cannot be undone.",
+        message: "This will clear all completed scenarios, scores, streaks, and XP. This cannot be undone.",
         okButtonTitle: "Reset Everything",
         cancelButtonTitle: "Cancel",
       });
       confirmed = value;
     } catch {
-      confirmed = window.confirm("Reset All Progress?\n\nThis will clear all completed labs, scores, streaks, and XP. This cannot be undone.");
+      confirmed = window.confirm("Reset All Progress?\n\nThis will clear all completed scenarios, scores, streaks, and XP. This cannot be undone.");
     }
     if (confirmed) { resetProgress(); navigate("/"); }
   };
 
   const handleSendFeedback = () => {
-    window.open("mailto:dci-it-support.app@gmail.com?subject=DCI IT Support Labs%20Feedback", "_self");
+    window.open("mailto:dci-it-support.app@gmail.com?subject=DCI IT Support Scenarios%20Feedback", "_self");
   };
 
   return (
@@ -35,10 +35,10 @@ export default function SettingsScreen() {
         <div className="text-center mb-8">
           <img
             src={`${import.meta.env.BASE_URL}logo-mark.png`}
-            alt="DCI IT Support Labs"
+            alt="DCI IT Support Scenarios"
             className="w-14 h-14 rounded-2xl mx-auto mb-3"
           />
-          <h1 className="text-xl font-bold text-[#1A1A1A]">DCI IT Support Labs</h1>
+          <h1 className="text-xl font-bold text-[#1A1A1A]">DCI IT Support Scenarios</h1>
           <p className="text-xs text-gray-500 mt-1">IT Decision Training</p>
           <p className="text-[10px] text-gray-400 mt-1">v0.1.0</p>
           <p className="text-xs text-gray-500 mt-3 max-w-xs mx-auto leading-relaxed">Practice real-world IT troubleshooting judgment through interactive workplace simulations.</p>
@@ -46,7 +46,7 @@ export default function SettingsScreen() {
         <section className="mb-6">
           <h2 className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-2 px-1">Premium</h2>
           <Link to="/upgrade" className="flex items-center justify-between bg-[#F5F5F5] rounded-xl p-4 min-h-[48px] active:bg-gray-200 transition-colors">
-            <div className="flex items-center gap-3"><Crown size={18} className="text-sky-400" /><span className="text-sm font-medium text-[#1A1A1A]">DCI IT Support Labs Premium</span></div>
+            <div className="flex items-center gap-3"><Crown size={18} className="text-sky-400" /><span className="text-sm font-medium text-[#1A1A1A]">DCI IT Support Scenarios Premium</span></div>
             <ChevronRight size={18} className="text-gray-400" />
           </Link>
         </section>

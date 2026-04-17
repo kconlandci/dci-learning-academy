@@ -49,12 +49,12 @@ export default function HomeScreen() {
             <a href={import.meta.env.BASE_URL.replace(/\/it-support\/?$/, "/") || "/"} className="flex items-center gap-3 no-underline text-inherit">
               <img
                 src={`${import.meta.env.BASE_URL}logo-wide.png`}
-                alt="DCI IT Support Labs"
+                alt="DCI IT Support Scenarios"
                 className="h-8"
               />
               <div>
                 <h1 className="text-xl font-bold text-[#1A1A1A]">
-                  DCI IT Support Labs
+                  DCI IT Support Scenarios
                 </h1>
                 <p className="text-xs text-gray-500">IT Decision Training</p>
               </div>
@@ -84,7 +84,7 @@ export default function HomeScreen() {
                   <div className="h-full bg-[#2A7F6F] rounded-full transition-all" style={{ width: `${(activePath.completedCount / activePath.path.labIds.length) * 100}%` }} />
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-gray-500">{labCatalog.find((l) => l.id === activePath.nextLabId)?.title ?? "Next lab"}</span>
+                  <span className="text-xs text-gray-500">{labCatalog.find((l) => l.id === activePath.nextLabId)?.title ?? "Next scenario"}</span>
                   <button onClick={() => navigate(`/lab/${activePath.nextLabId}`)}
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500 text-white text-xs font-medium min-h-[36px] active:bg-amber-600 transition-colors"
                   ><Play size={12} /> Continue</button>
@@ -102,14 +102,14 @@ export default function HomeScreen() {
           </section>
           {allFreeComplete && !isPremium && (
             <Link to="/upgrade" className="block bg-[#2A7F6F]/10 border border-[#2A7F6F]/30 rounded-xl p-4 mb-6 active:bg-[#2A7F6F]/20 transition-colors">
-              <p className="text-sm text-[#2A7F6F] text-center">Ready for more? Unlock advanced labs with DCI IT Support Labs Premium.</p>
+              <p className="text-sm text-[#2A7F6F] text-center">Ready for more? Unlock advanced scenarios with DCI IT Support Scenarios Premium.</p>
             </Link>
           )}
           <section className="mb-8">
             <button onClick={() => setShowAllLabs(!showAllLabs)} className="flex items-center gap-2 w-full mb-3 min-h-[44px]">
-              <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">All Labs</h2>
+              <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">All Scenarios</h2>
               <ChevronDown size={14} className={`text-gray-400 transition-transform ${showAllLabs ? "rotate-180" : ""}`} />
-              <span className="text-[10px] text-gray-400 ml-auto">{publishedLabs.length} labs</span>
+              <span className="text-[10px] text-gray-400 ml-auto">{publishedLabs.length} scenarios</span>
             </button>
             {showAllLabs && (
               <>

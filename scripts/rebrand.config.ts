@@ -69,12 +69,12 @@ export const MODULES: Record<string, ModuleRebrand> = {
     textReplacements: [
       // Identifier form FIRST — must run before the display-form replacement
       // below, because "ThreatForgeProgress" would otherwise become
-      // "DCI Cybersecurity LabsProgress" (space inside identifier = syntax error).
+      // "DCI Cybersecurity ScenariosProgress" (space inside identifier = syntax error).
       // The lookahead matches only when followed by a word character, so
       // standalone `ThreatForge` still hits the next rule.
       { pattern: /ThreatForge(?=[A-Za-z0-9_])/g, replacement: "DciCybersecurity" },
       // Brand name — display form.
-      { pattern: /ThreatForge/g, replacement: "DCI Cybersecurity Labs" },
+      { pattern: /ThreatForge/g, replacement: "DCI Cybersecurity Scenarios" },
       { pattern: /threatforge/g, replacement: "dci-cybersecurity" },
       { pattern: /THREATFORGE/g, replacement: "DCI_CYBERSECURITY" },
       // "Forge Labs" → "DCI Learning Academy" (catches store copy, headings)
@@ -271,7 +271,7 @@ export default class ErrorBoundary extends Component<Props, State> {
   }
 
   override componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error("[DCI Cybersecurity Labs] Lab error:", error, errorInfo);
+    console.error("[DCI Cybersecurity Scenarios] Lab error:", error, errorInfo);
     this.props.onError?.(error, errorInfo);
   }
 
@@ -286,10 +286,10 @@ export default class ErrorBoundary extends Component<Props, State> {
               <span className="text-3xl">\u26A0\uFE0F</span>
             </div>
             <h2 className="text-lg font-bold text-white mb-2">
-              This lab encountered an issue
+              This scenario encountered an issue
             </h2>
             <p className="text-sm text-slate-400 mb-6">
-              Something went wrong loading this lab. This has been logged and
+              Something went wrong loading this scenario. This has been logged and
               we'll look into it.
             </p>
             <a
@@ -791,7 +791,7 @@ export default defineConfig(({ command }) => ({
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/logo-mark.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>DCI Cybersecurity Labs</title>
+    <title>DCI Cybersecurity Scenarios</title>
     <script>
       // SPA deep-link decoder — companion to the repo-root 404.html redirect.
       // See scripts/pages/spa-decode.html for the canonical source and rationale.
@@ -851,7 +851,7 @@ export default defineConfig(({ command }) => ({
       // Identifier form FIRST — CodeForgeProgress etc.
       { pattern: /CodeForge(?=[A-Za-z0-9_])/g, replacement: "DciProgramming" },
       // Brand name — display form.
-      { pattern: /CodeForge/g, replacement: "DCI Secure Development Labs" },
+      { pattern: /CodeForge/g, replacement: "DCI Secure Development Scenarios" },
       { pattern: /codeforge/g, replacement: "dci-programming" },
       { pattern: /CODEFORGE/g, replacement: "DCI_PROGRAMMING" },
       // "Forge Labs" → "DCI Learning Academy"
@@ -1011,7 +1011,7 @@ export default class ErrorBoundary extends Component<Props, State> {
   }
 
   override componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error("[DCI Secure Development Labs] Lab error:", error, errorInfo);
+    console.error("[DCI Secure Development Scenarios] Lab error:", error, errorInfo);
     this.props.onError?.(error, errorInfo);
   }
 
@@ -1026,10 +1026,10 @@ export default class ErrorBoundary extends Component<Props, State> {
               <span className="text-3xl">\u26A0\uFE0F</span>
             </div>
             <h2 className="text-lg font-bold text-white mb-2">
-              This lab encountered an issue
+              This scenario encountered an issue
             </h2>
             <p className="text-sm text-slate-400 mb-6">
-              Something went wrong loading this lab. This has been logged and
+              Something went wrong loading this scenario. This has been logged and
               we'll look into it.
             </p>
             <a
@@ -1481,7 +1481,7 @@ export default defineConfig(({ command }) => ({
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/logo-mark.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>DCI Secure Development Labs</title>
+    <title>DCI Secure Development Scenarios</title>
     <script>
       // SPA deep-link decoder — companion to the repo-root 404.html redirect.
       // See scripts/pages/spa-decode.html for the canonical source and rationale.
@@ -1541,7 +1541,7 @@ export default defineConfig(({ command }) => ({
       // Identifier form FIRST — NetForgeProgress etc.
       { pattern: /NetForge(?=[A-Za-z0-9_])/g, replacement: "DciNetworking" },
       // Brand name — display form.
-      { pattern: /NetForge/g, replacement: "DCI Networking Labs" },
+      { pattern: /NetForge/g, replacement: "DCI Networking Scenarios" },
       { pattern: /netforge/g, replacement: "dci-networking" },
       { pattern: /NETFORGE/g, replacement: "DCI_NETWORKING" },
       // "Forge Labs" → "DCI Learning Academy"
@@ -1703,7 +1703,7 @@ export default class ErrorBoundary extends Component<Props, State> {
   }
 
   override componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error("[DCI Networking Labs] Lab error:", error, errorInfo);
+    console.error("[DCI Networking Scenarios] Lab error:", error, errorInfo);
     this.props.onError?.(error, errorInfo);
   }
 
@@ -1718,10 +1718,10 @@ export default class ErrorBoundary extends Component<Props, State> {
               <span className="text-3xl">\u26A0\uFE0F</span>
             </div>
             <h2 className="text-lg font-bold text-white mb-2">
-              This lab encountered an issue
+              This scenario encountered an issue
             </h2>
             <p className="text-sm text-slate-400 mb-6">
-              Something went wrong loading this lab. This has been logged and
+              Something went wrong loading this scenario. This has been logged and
               we'll look into it.
             </p>
             <a
@@ -2173,7 +2173,7 @@ export default defineConfig(({ command }) => ({
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/logo-mark.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>DCI Networking Labs</title>
+    <title>DCI Networking Scenarios</title>
     <script>
       // SPA deep-link decoder — companion to the repo-root 404.html redirect.
       // See scripts/pages/spa-decode.html for the canonical source and rationale.
@@ -2232,7 +2232,7 @@ export default defineConfig(({ command }) => ({
       // Identifier form FIRST — CloudForgeProgress etc.
       { pattern: /CloudForge(?=[A-Za-z0-9_])/g, replacement: "DciCloudComputing" },
       // Brand name — display form.
-      { pattern: /CloudForge/g, replacement: "DCI Cloud Computing Labs" },
+      { pattern: /CloudForge/g, replacement: "DCI Cloud Computing Scenarios" },
       { pattern: /cloudforge/g, replacement: "dci-cloud-computing" },
       { pattern: /CLOUDFORGE/g, replacement: "DCI_CLOUD_COMPUTING" },
       // "Forge Labs" → "DCI Learning Academy"
@@ -2394,7 +2394,7 @@ export default class ErrorBoundary extends Component<Props, State> {
   }
 
   override componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error("[DCI Cloud Computing Labs] Lab error:", error, errorInfo);
+    console.error("[DCI Cloud Computing Scenarios] Lab error:", error, errorInfo);
     this.props.onError?.(error, errorInfo);
   }
 
@@ -2409,10 +2409,10 @@ export default class ErrorBoundary extends Component<Props, State> {
               <span className="text-3xl">\u26A0\uFE0F</span>
             </div>
             <h2 className="text-lg font-bold text-white mb-2">
-              This lab encountered an issue
+              This scenario encountered an issue
             </h2>
             <p className="text-sm text-slate-400 mb-6">
-              Something went wrong loading this lab. This has been logged and
+              Something went wrong loading this scenario. This has been logged and
               we'll look into it.
             </p>
             <a
@@ -2864,7 +2864,7 @@ export default defineConfig(({ command }) => ({
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/logo-mark.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>DCI Cloud Computing Labs</title>
+    <title>DCI Cloud Computing Scenarios</title>
     <script>
       // SPA deep-link decoder — companion to the repo-root 404.html redirect.
       // See scripts/pages/spa-decode.html for the canonical source and rationale.
@@ -2923,7 +2923,7 @@ export default defineConfig(({ command }) => ({
       // Identifier form FIRST — DataForgeProgress etc.
       { pattern: /DataForge(?=[A-Za-z0-9_])/g, replacement: "DciDataAnalytics" },
       // Brand name — display form.
-      { pattern: /DataForge/g, replacement: "DCI Data Analytics Labs" },
+      { pattern: /DataForge/g, replacement: "DCI Data Analytics Scenarios" },
       { pattern: /dataforge/g, replacement: "dci-data-analytics" },
       { pattern: /DATAFORGE/g, replacement: "DCI_DATA_ANALYTICS" },
       // "Forge Labs" → "DCI Learning Academy"
@@ -3085,7 +3085,7 @@ export default class ErrorBoundary extends Component<Props, State> {
   }
 
   override componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error("[DCI Data Analytics Labs] Lab error:", error, errorInfo);
+    console.error("[DCI Data Analytics Scenarios] Lab error:", error, errorInfo);
     this.props.onError?.(error, errorInfo);
   }
 
@@ -3100,10 +3100,10 @@ export default class ErrorBoundary extends Component<Props, State> {
               <span className="text-3xl">\u26A0\uFE0F</span>
             </div>
             <h2 className="text-lg font-bold text-white mb-2">
-              This lab encountered an issue
+              This scenario encountered an issue
             </h2>
             <p className="text-sm text-slate-400 mb-6">
-              Something went wrong loading this lab. This has been logged and
+              Something went wrong loading this scenario. This has been logged and
               we'll look into it.
             </p>
             <a
@@ -3555,7 +3555,7 @@ export default defineConfig(({ command }) => ({
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/logo-mark.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>DCI Data Analytics Labs</title>
+    <title>DCI Data Analytics Scenarios</title>
     <script>
       // SPA deep-link decoder — companion to the repo-root 404.html redirect.
       // See scripts/pages/spa-decode.html for the canonical source and rationale.
@@ -3614,7 +3614,7 @@ export default defineConfig(({ command }) => ({
       // Identifier form FIRST — TechForgeProgress etc.
       { pattern: /TechForge(?=[A-Za-z0-9_])/g, replacement: "DciItSupport" },
       // Brand name — display form.
-      { pattern: /TechForge/g, replacement: "DCI IT Support Labs" },
+      { pattern: /TechForge/g, replacement: "DCI IT Support Scenarios" },
       { pattern: /techforge/g, replacement: "dci-it-support" },
       { pattern: /TECHFORGE/g, replacement: "DCI_IT_SUPPORT" },
       // "Forge Labs" → "DCI Learning Academy"
@@ -3780,7 +3780,7 @@ export default class ErrorBoundary extends Component<Props, State> {
   }
 
   override componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error("[DCI IT Support Labs] Lab error:", error, errorInfo);
+    console.error("[DCI IT Support Scenarios] Lab error:", error, errorInfo);
     this.props.onError?.(error, errorInfo);
   }
 
@@ -3795,10 +3795,10 @@ export default class ErrorBoundary extends Component<Props, State> {
               <span className="text-3xl">\u26A0\uFE0F</span>
             </div>
             <h2 className="text-lg font-bold text-white mb-2">
-              This lab encountered an issue
+              This scenario encountered an issue
             </h2>
             <p className="text-sm text-slate-400 mb-6">
-              Something went wrong loading this lab. This has been logged and
+              Something went wrong loading this scenario. This has been logged and
               we'll look into it.
             </p>
             <a
@@ -4250,7 +4250,7 @@ export default defineConfig(({ command }) => ({
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/logo-mark.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>DCI IT Support Labs</title>
+    <title>DCI IT Support Scenarios</title>
     <script>
       // SPA deep-link decoder — companion to the repo-root 404.html redirect.
       // See scripts/pages/spa-decode.html for the canonical source and rationale.

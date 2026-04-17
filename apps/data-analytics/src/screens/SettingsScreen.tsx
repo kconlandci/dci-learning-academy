@@ -25,7 +25,7 @@ export default function SettingsScreen() {
       const { value } = await Dialog.confirm({
         title: "Reset All Progress?",
         message:
-          "This will clear all completed labs, scores, streaks, and XP. This cannot be undone.",
+          "This will clear all completed scenarios, scores, streaks, and XP. This cannot be undone.",
         okButtonTitle: "Reset Everything",
         cancelButtonTitle: "Cancel",
       });
@@ -56,15 +56,15 @@ export default function SettingsScreen() {
         <div className="text-center mb-8">
           <img
             src={`${import.meta.env.BASE_URL}logo-mark.png`}
-            alt="DCI Data Analytics Labs"
+            alt="DCI Data Analytics Scenarios"
             className="w-14 h-14 rounded-2xl mx-auto mb-3"
           />
-          <h1 className="text-xl font-bold text-[#1A1A1A]">DCI Data Analytics Labs</h1>
-          <p className="text-xs text-gray-500 mt-1">DCI Data Analytics Labs: Data Training</p>
+          <h1 className="text-xl font-bold text-[#1A1A1A]">DCI Data Analytics Scenarios</h1>
+          <p className="text-xs text-gray-500 mt-1">DCI Data Analytics Scenarios: Data Training</p>
           <p className="text-[10px] text-gray-400 mt-1">v1.0.0</p>
           <p className="text-xs text-gray-500 mt-3 max-w-xs mx-auto leading-relaxed">
             Build SQL, analytics, BI, and data pipeline instincts through
-            scenario-driven labs.
+            scenario-driven simulations.
           </p>
         </div>
 
@@ -79,7 +79,7 @@ export default function SettingsScreen() {
             <div className="flex items-center gap-3">
               <Crown size={18} className="text-amber-600" />
               <span className="text-sm font-medium text-[#1A1A1A]">
-                DCI Data Analytics Labs Premium
+                DCI Data Analytics Scenarios Premium
               </span>
             </div>
             <ChevronRight size={18} className="text-gray-400" />
@@ -139,7 +139,7 @@ export default function SettingsScreen() {
             <button
               onClick={() =>
                 openExternal(
-                  "mailto:dci-data-analytics.app@gmail.com?subject=DCI Data Analytics Labs%20Feedback"
+                  "mailto:dci-data-analytics.app@gmail.com?subject=DCI Data Analytics Scenarios%20Feedback"
                 )
               }
               className="flex items-center gap-3 w-full bg-[#F5F5F5] rounded-xl p-4 min-h-[48px] active:bg-gray-200 transition-colors text-left"

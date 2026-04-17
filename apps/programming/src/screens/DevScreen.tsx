@@ -83,7 +83,7 @@ export default function DevScreen() {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-lg font-bold text-white">
-              DCI Secure Development Labs Dev Preview
+              DCI Secure Development Scenarios Dev Preview
             </h1>
             <p className="text-xs text-gray-400">
               {labCatalog.length} manifests loaded
@@ -188,7 +188,7 @@ export default function DevScreen() {
           </pre>
         </div>
 
-        <h2 className="text-sm font-semibold text-white mb-3">Lab Manifests</h2>
+        <h2 className="text-sm font-semibold text-white mb-3">Scenario Manifests</h2>
         <div className="space-y-3">
           {labCatalog.map((lab) => (
             <div

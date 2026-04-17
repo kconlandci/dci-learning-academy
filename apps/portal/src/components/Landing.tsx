@@ -62,7 +62,7 @@ function ModuleCard({ module: mod }: { module: DciModule }) {
         </h3>
         <p className="mt-2 text-sm text-gray-500">{description}</p>
         <p className="mt-4 text-xs font-medium text-[#2A7F6F]">
-          {mod.labCount} labs &rarr;
+          {mod.labCount} scenarios &rarr;
         </p>
       </a>
     );

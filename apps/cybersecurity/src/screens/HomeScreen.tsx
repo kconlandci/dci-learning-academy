@@ -48,9 +48,9 @@ export default function HomeScreen() {
           {/* Header */}
           <div className="flex items-center gap-3 mb-4">
             <a href={import.meta.env.BASE_URL.replace(/\/cybersecurity\/?$/, "/") || "/"} className="flex items-center gap-3 no-underline text-inherit">
-              <img src={`${import.meta.env.BASE_URL}logo-wide.png`} alt="DCI Cybersecurity Labs" className="h-8" />
+              <img src={`${import.meta.env.BASE_URL}logo-wide.png`} alt="DCI Cybersecurity Scenarios" className="h-8" />
               <div>
-                <h1 className="text-xl font-bold text-[#1A1A1A]">DCI Cybersecurity Labs</h1>
+                <h1 className="text-xl font-bold text-[#1A1A1A]">DCI Cybersecurity Scenarios</h1>
                 <p className="text-xs text-gray-500">
                   Cybersecurity Decision Simulator
                 </p>
@@ -104,7 +104,7 @@ export default function HomeScreen() {
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-gray-500">
                     {labCatalog.find((l) => l.id === activePath.nextLabId)
-                      ?.title ?? "Next lab"}
+                      ?.title ?? "Next scenario"}
                   </span>
                   <button
                     onClick={() => navigate(`/lab/${activePath.nextLabId}`)}
@@ -143,7 +143,7 @@ export default function HomeScreen() {
               className="block bg-[#2A7F6F]/10 border border-[#2A7F6F]/30 rounded-xl p-4 mb-6 active:bg-[#2A7F6F]/20 transition-colors"
             >
               <p className="text-sm text-[#2A7F6F] text-center">
-                Ready for more? Unlock intermediate labs with DCI Cybersecurity Labs
+                Ready for more? Unlock intermediate scenarios with DCI Cybersecurity Scenarios
                 Premium.
               </p>
             </Link>
@@ -156,7 +156,7 @@ export default function HomeScreen() {
               className="flex items-center gap-2 w-full mb-3 min-h-[44px]"
             >
               <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wide">
-                All Labs
+                All Scenarios
               </h2>
               <ChevronDown
                 size={14}
@@ -165,7 +165,7 @@ export default function HomeScreen() {
                 }`}
               />
               <span className="text-[10px] text-gray-400 ml-auto">
-                {publishedLabs.length} labs
+                {publishedLabs.length} scenarios
               </span>
             </button>
             {showAllLabs && (

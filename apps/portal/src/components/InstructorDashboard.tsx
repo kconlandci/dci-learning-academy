@@ -457,7 +457,7 @@ function ModuleCard({ stat }: { stat: ModuleStats }) {
     <div className="rounded-lg border border-gray-200 bg-[#FAFAFA] p-4">
       <div className="flex items-baseline justify-between mb-2">
         <h3 className="text-sm font-semibold text-gray-900">{stat.shortName}</h3>
-        <span className="text-[10px] text-gray-400">{stat.labCount} labs</span>
+        <span className="text-[10px] text-gray-400">{stat.labCount} scenarios</span>
       </div>
 
       <dl className="grid grid-cols-2 gap-2 text-xs mb-3">
@@ -625,7 +625,7 @@ function StudentDetailModal({
               </dd>
             </div>
             <div>
-              <dt className="text-gray-500">Labs completed</dt>
+              <dt className="text-gray-500">Scenarios completed</dt>
               <dd className="text-gray-900 font-medium">{totalCompleted}</dd>
             </div>
           </dl>
@@ -633,7 +633,7 @@ function StudentDetailModal({
 
         <section className="px-6 py-4">
           <h3 className="text-[10px] uppercase tracking-wide text-gray-500 mb-3">
-            Completed labs ({timeline.length})
+            Completed scenarios ({timeline.length})
           </h3>
           {timeline.length === 0 ? (
             <p className="text-sm text-gray-400">
@@ -646,7 +646,7 @@ function StudentDetailModal({
                   <tr>
                     <th className="px-3 py-2 font-semibold">When</th>
                     <th className="px-3 py-2 font-semibold">Module</th>
-                    <th className="px-3 py-2 font-semibold">Lab</th>
+                    <th className="px-3 py-2 font-semibold">Scenario</th>
                   </tr>
                 </thead>
                 <tbody>

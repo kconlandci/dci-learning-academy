@@ -200,10 +200,10 @@ export default function LabEngine({
 
           <button
             onClick={() => setPhase("active")}
-            aria-label="Start lab"
+            aria-label="Start scenario"
             className="w-full py-3.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-semibold text-lg transition-colors flex items-center justify-center gap-2"
           >
-            Start Lab <ArrowRight size={20} />
+            Start Scenario <ArrowRight size={20} />
           </button>
 
           <button
@@ -299,10 +299,10 @@ export default function LabEngine({
 
           <button
             onClick={restart}
-            aria-label="Retry lab"
+            aria-label="Retry scenario"
             className="w-full py-3 rounded-xl bg-[#F5F5F5] hover:bg-gray-100 text-[#1A1A1A] font-medium transition-colors flex items-center justify-center gap-2 mb-3"
           >
-            <RotateCcw size={18} /> Retry Lab
+            <RotateCcw size={18} /> Retry Scenario
           </button>
           <button
             onClick={onExit}

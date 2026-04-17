@@ -51,7 +51,7 @@ export default function ProgressScreen() {
         </div>
         {completedLabs.length > 0 && (
           <div>
-            <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Completed Labs</h2>
+            <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Completed Scenarios</h2>
             <div className="space-y-2">
               {completedLabs.map((lp) => {
                 const manifest = labCatalog.find((l) => l.id === lp.labId);
@@ -69,7 +69,7 @@ export default function ProgressScreen() {
           </div>
         )}
         {completedLabs.length === 0 && (
-          <p className="text-sm text-gray-400 text-center py-8">Complete a lab to see your progress here.</p>
+          <p className="text-sm text-gray-400 text-center py-8">Complete a scenario to see your progress here.</p>
         )}
       </div>
     </div>
