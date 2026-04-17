@@ -253,8 +253,9 @@ export function InstructorDashboard({ onSignOut }: InstructorDashboardProps) {
     let cancelled = false;
     (async () => {
       try {
-        // NOTE: getAllStudentsProgress() is N+1 (one getDocs per student).
-        // Fine at pilot scale (~30 students); revisit when we cross ~100.
+        // getAllStudentsProgress() still does 1 + N reads, but the N runs
+        // concurrently (Promise.all). Switch to a collectionGroup query if
+        // we cross ~500 students or need date-range filtering.
         const raw = await getAllStudentsProgress();
         if (cancelled) return;
         setRows(raw.map(toRow));
@@ -461,7 +462,12 @@ function ModuleCard({ stat }: { stat: ModuleStats }) {
 
       <dl className="grid grid-cols-2 gap-2 text-xs mb-3">
         <div>
-          <dt className="text-gray-500">Students active</dt>
+          <dt
+            className="text-gray-500 underline decoration-dotted decoration-gray-300 underline-offset-2 cursor-help"
+            title="Students with at least one completion in this module (all time)"
+          >
+            Students active
+          </dt>
           <dd className="text-gray-900 font-medium">{stat.studentsTouched}</dd>
         </div>
         <div>

@@ -143,25 +143,31 @@ export async function getStudentProgress(studentId: string): Promise<LabCompleti
 /**
  * Fetch every student's progress (instructor view).
  *
- * Flat query: no cohort filtering. For ~30 students × ~600 total labs this
- * is well within Firestore free-tier read budgets; optimize later if needed.
+ * Still 1 + N reads, but the N subcollection fetches run concurrently via
+ * Promise.all so total latency is ~max(rtt) instead of ~sum(rtts). Well
+ * within Firestore free-tier budgets at pilot scale.
+ *
+ * When we cross ~500 students or need date-range filters, switch to a
+ * `collectionGroup("progress")` query — that's 2 RTT regardless of N, but
+ * requires a collection-group rule in firestore.rules and derives studentId
+ * from `doc.ref.parent.parent.id` rather than the doc body.
  */
 export async function getAllStudentsProgress(): Promise<StudentProgress[]> {
   const db = getDb();
   const studentsSnap = await getDocs(collection(db, "students"));
 
-  const results: StudentProgress[] = [];
-  for (const studentSnap of studentsSnap.docs) {
-    const student = studentSnap.data() as StudentDoc;
-    const progressSnap = await getDocs(
-      collection(db, "students", studentSnap.id, "progress"),
-    );
-    results.push({
-      studentId: studentSnap.id,
-      displayName: student.displayName,
-      createdAt: student.createdAt,
-      completions: progressSnap.docs.map((d) => d.data() as LabCompletion),
-    });
-  }
-  return results;
+  return Promise.all(
+    studentsSnap.docs.map(async (studentSnap) => {
+      const student = studentSnap.data() as StudentDoc;
+      const progressSnap = await getDocs(
+        collection(db, "students", studentSnap.id, "progress"),
+      );
+      return {
+        studentId: studentSnap.id,
+        displayName: student.displayName,
+        createdAt: student.createdAt,
+        completions: progressSnap.docs.map((d) => d.data() as LabCompletion),
+      };
+    }),
+  );
 }
